@@ -129,10 +129,13 @@
   }
 </section>
 
-<section class="tarjeta proximamente" aria-labelledby="titulo-globo">
-  <h2 id="titulo-globo">Globo terráqueo</h2>
-  <p>
-    Pronto podrás girar un globo y ver el precio que reciben los productores en otros países (Etapa
-    4).
-  </p>
+<section class="seccion-paises" aria-labelledby="titulo-globo">
+  <h2 id="titulo-globo">Precio al productor en otros países</h2>
+  <ap-paises
+    [producto]="productoPais()"
+    [anio]="anio()"
+    [vista]="vista()"
+    [pais]="pais()"
+    (cambio)="cambiar($event)"
+  />
 </section>

@@ -32,3 +32,6 @@ npm-debug.log*
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Copias generadas de dependencias (apps/web/scripts/copiar-vendor.mjs)
+apps/web/public/vendor/

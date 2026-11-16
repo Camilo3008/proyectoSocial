@@ -7,7 +7,14 @@
       "installMode": "prefetch",
       "updateMode": "prefetch",
       "resources": {
-        "files": ["/favicon.png", "/index.html", "/manifest.webmanifest", "/*.css", "/*.js"]
+        "files": [
+          "/favicon.png",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js",
+          "!/maplibre-gl-*.js"
+        ]
       }
     },
     {
@@ -16,6 +23,14 @@
       "updateMode": "prefetch",
       "resources": {
         "files": ["/icons/**", "/**/*.(svg|png|webp|avif)"]
+      }
+    },
+    {
+      "name": "globo",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "files": ["/maplibre-gl-*.js", "/vendor/**"]
       }
     },
     {

@@ -126,3 +126,10 @@ export function tendencia(absoluta: string): Tendencia {
   const n = Number(absoluta);
   return n > 0 ? 'sube' : n < 0 ? 'baja' : 'igual';
 }
+
+const hastaDosDecimales = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 });
+
+/** Número sin moneda, con hasta 2 decimales: "20428.5000" -> "20.428,5". */
+export function formatearNumero(valor: string): string {
+  return hastaDosDecimales.format(Number(valor));
+}

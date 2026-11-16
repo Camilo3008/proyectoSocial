@@ -4,6 +4,7 @@ import {
   formatearFechaDato,
   formatearFechaHora,
   formatearMes,
+  formatearNumero,
   formatearMesCorto,
   formatearPorcentaje,
   formatearPrecio,
@@ -53,5 +54,6 @@ describe('formato es-CO', () => {
     expect(tendencia('25000.0000')).toBe('sube');
     expect(tendencia('-1')).toBe('baja');
     expect(tendencia('0.0000')).toBe('igual');
+    expect(formatearNumero('20428.5000')).toBe('20.428,5');
   });
 });

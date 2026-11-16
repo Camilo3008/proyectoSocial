@@ -488,6 +488,12 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-16 | **Etapa 3 (aprobado):** el cacao aparece en "Hoy" con el precio internacional del Banco Mundial, rotulado "Precio internacional · promedio mensual", con equivalente en pesos y advertencia | No hay fuente nacional verificada del cacao (pregunta abierta 9) |
 | 2026-11-16 | El upsert de observaciones también detecta cambios en `valor_cop_kg` | Si la TRM se carga después que el precio en USD, el valor en pesos se recalcula al reingerir |
 | 2026-11-16 | Primera carga de la TRM con `?desde=1990-01-01` (desde 1991 en el dataset) y límite de 50.000 filas por consulta | Permite valores en pesos de las series internacionales desde 1991; un límite menor cortaba el histórico sin avisar |
+| 2026-11-16 | **Etapa 4:** globo con MapLibre GL 5 (proyección `globe`), sin tiles externos: fondo sólido + GeoJSON de Natural Earth (`/geo/paises.geojson`) coloreado con `feature-state` | Funciona offline y no depende de servicios de mapas de terceros ni de llaves de API |
+| 2026-11-16 | Coropleta en 5 quintiles con la escala viridis + gris "Sin datos"; leyenda en USD/kg | Apta para daltonismo; los quintiles evitan que valores extremos (p. ej. café de EE. UU./Hawái, España/Canarias) aplasten la escala |
+| 2026-11-16 | El componente del globo va en un bloque `@defer (on viewport)` y MapLibre con `import()`; su CSS se copia a `public/vendor/` (script `copiar-vendor.mjs`) y se inyecta solo al abrir el globo | Bundle inicial sin cambios (~101 kB gzip); MapLibre (~232 kB gzip) solo se descarga en "Mundo" |
+| 2026-11-16 | `namedChunks` en producción y grupo `globo` del service worker en modo `lazy` (excluido del `prefetch` del shell) | En la vereda no conviene descargar 232 kB de MapLibre en cada actualización si el usuario no abre el globo; tras la primera visita queda en caché offline |
+| 2026-11-16 | Sin WebGL (o si MapLibre falla) la vista cambia sola a la tabla; también hay botón "Ver como tabla". La rotación lenta se detiene al primer toque y no ocurre con `prefers-reduced-motion` | CLAUDE.md: vista alternativa para equipos de gama baja; accesibilidad |
+| 2026-11-16 | Parámetros de URL de la sección de países: `productoPais`, `anio`, `vista`, `pais` | No chocan con `producto` de la sección de bolsa en la misma página |
 
 ---
 

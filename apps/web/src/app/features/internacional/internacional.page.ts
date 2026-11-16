@@ -12,6 +12,7 @@ import {
 } from '../../core/formato';
 import { NOTA_INTERNACIONAL, NOTAS_COMPARACION } from '../../core/notas';
 import { GraficaLinea, type SerieGrafica } from '../../shared/grafica-linea/grafica-linea';
+import { Paises } from './globo/paises';
 
 type Moneda = 'COP' | 'USD';
 type RangoAnios = '2a' | '5a' | '10a' | 'todo';
@@ -38,12 +39,12 @@ function desdeHaceAnios(anios: number | null): string {
 
 /**
  * Pantalla "Mundo": precios internacionales mensuales (Banco Mundial) frente al
- * precio nacional (RF-04). El globo terráqueo (RF-05) llega en la Etapa 4 y se
- * cargará con import() dinámico solo en esta ruta.
+ * precio nacional (RF-04), y precio al productor por país con el globo
+ * terráqueo (RF-05), que se carga con @defer + import() solo en esta ruta.
  */
 @Component({
   selector: 'ap-internacional-page',
-  imports: [GraficaLinea],
+  imports: [GraficaLinea, Paises],
   templateUrl: './internacional.page.html',
   styleUrl: './internacional.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,6 +57,11 @@ export class InternacionalPage {
   readonly producto = input<string>();
   readonly moneda = input<Moneda>();
   readonly rango = input<RangoAnios>();
+  // Filtros de la sección de países (globo).
+  readonly productoPais = input<string>();
+  readonly anio = input<string>();
+  readonly vista = input<string>();
+  readonly pais = input<string>();
 
   protected readonly productos = PRODUCTOS;
   protected readonly rangos = RANGOS;
@@ -188,7 +194,7 @@ export class InternacionalPage {
     return { columnas, filas };
   });
 
-  protected cambiar(params: Record<string, string>): void {
+  protected cambiar(params: Record<string, string | null>): void {
     void this.router.navigate([], {
       queryParams: params,
       queryParamsHandling: 'merge',

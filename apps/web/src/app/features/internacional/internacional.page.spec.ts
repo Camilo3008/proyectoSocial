@@ -5,6 +5,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { GraficaLinea, type SerieGrafica } from '../../shared/grafica-linea/grafica-linea';
+import { Paises } from './globo/paises';
 import { InternacionalPage } from './internacional.page';
 
 /** jsdom no tiene <canvas>: la gráfica se reemplaza por un doble que expone sus series. */
@@ -19,6 +20,15 @@ class GraficaFalsa {
   readonly etiquetas = input.required<string[]>();
   readonly series = input.required<SerieGrafica[]>();
   readonly formatear = input<(v: number) => string>();
+}
+
+/** La sección de países tiene sus propias pruebas (globo/paises.spec.ts). */
+@Component({ selector: 'ap-paises', template: '', changeDetection: ChangeDetectionStrategy.OnPush })
+class PaisesFalsa {
+  readonly producto = input<string>();
+  readonly anio = input<string>();
+  readonly vista = input<string>();
+  readonly pais = input<string>();
 }
 
 const CITA_WB = 'Fuente: Banco Mundial, Commodity Price Data (The Pink Sheet), CC BY 4.0';
@@ -71,8 +81,8 @@ describe('InternacionalPage', () => {
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     })
       .overrideComponent(InternacionalPage, {
-        remove: { imports: [GraficaLinea] },
-        add: { imports: [GraficaFalsa] },
+        remove: { imports: [GraficaLinea, Paises] },
+        add: { imports: [GraficaFalsa, PaisesFalsa] },
       })
       .compileComponents();
     fixture = TestBed.createComponent(InternacionalPage);

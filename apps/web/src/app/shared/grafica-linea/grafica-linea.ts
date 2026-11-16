@@ -134,7 +134,15 @@ export class GraficaLinea {
           },
         },
         scales: {
-          x: { ticks: { color: texto, maxTicksLimit: 6, maxRotation: 0 } },
+          x: {
+            ticks: {
+              color: texto,
+              maxTicksLimit: 6,
+              maxRotation: 0,
+              autoSkip: true,
+              autoSkipPadding: 16,
+            },
+          },
           y: { ticks: { color: texto, callback: (v) => formatear(Number(v)) } },
         },
       },

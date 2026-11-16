@@ -1,0 +1,243 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.intro,
+.cargando {
+  color: var(--color-texto-suave);
+}
+
+.filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-4);
+}
+
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+  min-width: 0;
+
+  span {
+    color: var(--color-texto-suave);
+  }
+
+  select {
+    width: 100%;
+    min-height: var(--alto-tactil);
+    padding: 0 var(--esp-3);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    background: var(--color-superficie);
+    color: var(--color-texto);
+    font: inherit;
+  }
+}
+
+.grupo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.opcion {
+  min-height: var(--alto-tactil);
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-pildora);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  cursor: pointer;
+
+  &--activa {
+    border-color: var(--color-acento);
+    background: var(--color-acento);
+    color: #fff;
+    font-weight: 700;
+  }
+}
+
+.contenedor-globo {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  min-height: min(70vh, 26rem);
+}
+
+.globo-espera {
+  display: grid;
+  place-items: center;
+  height: min(70vh, 26rem);
+  border-radius: var(--radio);
+  background: #dfe9f0;
+  color: var(--color-texto-suave);
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-4);
+  margin: var(--esp-3) 0;
+  padding: 0;
+  list-style: none;
+  font-variant-numeric: tabular-nums;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+  }
+}
+
+.muestra {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 0.25rem;
+}
+
+.ficha {
+  margin: var(--esp-4) 0;
+
+  p {
+    margin: 0 0 var(--esp-2);
+  }
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3);
+
+    h3 {
+      margin: 0;
+      font-size: var(--texto-lg);
+    }
+  }
+
+  &__valor {
+    margin-top: var(--esp-3) !important;
+    font-size: var(--texto-xl);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+
+    span {
+      color: var(--color-texto-suave);
+      font-size: var(--texto-xs);
+      font-weight: 400;
+    }
+  }
+
+  &__detalle {
+    color: var(--color-texto-suave);
+  }
+
+  &__comparacion {
+    font-weight: 700;
+  }
+}
+
+.barras {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--esp-2);
+  height: 6rem;
+  margin: var(--esp-3) 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    text-align: center;
+  }
+
+  &__barra {
+    display: block;
+    border-radius: 0.25rem 0.25rem 0 0;
+    background: var(--color-acento);
+  }
+
+  &__anio {
+    color: var(--color-texto-suave);
+    font-size: var(--texto-xs);
+  }
+}
+
+.nota {
+  margin: var(--esp-2) 0 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-xs);
+
+  &--destacada {
+    padding: var(--esp-2) var(--esp-3);
+    border-left: 4px solid var(--color-aviso);
+    background: var(--color-aviso-fondo);
+    color: var(--color-aviso);
+    font-weight: 600;
+  }
+}
+
+.cita {
+  font-style: italic;
+}
+
+.tabla-desplazable {
+  max-height: 28rem;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-superficie);
+  font-variant-numeric: tabular-nums;
+
+  caption {
+    padding: var(--esp-2) 0;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  th,
+  td {
+    padding: 0 var(--esp-3);
+    border-bottom: 1px solid var(--color-borde);
+    text-align: right;
+  }
+
+  th[scope='row'],
+  thead th:first-child {
+    text-align: left;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    padding: var(--esp-2) var(--esp-3);
+    background: var(--color-superficie);
+  }
+}
+
+.fila--colombia {
+  background: var(--color-acento-suave);
+  font-weight: 700;
+}
+
+.enlace-pais {
+  min-height: var(--alto-tactil);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-acento-oscuro);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
