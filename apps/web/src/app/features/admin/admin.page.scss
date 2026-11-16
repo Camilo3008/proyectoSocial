@@ -1,0 +1,169 @@
+:host {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+.ayuda {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-xs);
+}
+
+.formulario {
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--esp-3);
+}
+
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+  min-width: 0;
+
+  span {
+    color: var(--color-texto-suave);
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-height: var(--alto-tactil);
+    padding: 0 var(--esp-3);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    background: var(--color-superficie);
+    color: var(--color-texto);
+    font: inherit;
+  }
+}
+
+.barra-sesion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  color: var(--color-texto-suave);
+}
+
+.mensaje {
+  margin: 0;
+  padding: var(--esp-2) var(--esp-3);
+  border-left: 4px solid var(--color-ok);
+  background: var(--color-ok-fondo);
+  color: var(--color-ok);
+  font-weight: 600;
+
+  &--error {
+    border-left-color: var(--color-error);
+    background: var(--color-error-fondo);
+    color: var(--color-error);
+  }
+}
+
+.estado {
+  margin: 0;
+  font-weight: 600;
+
+  &--AL_DIA {
+    color: var(--color-ok);
+  }
+
+  &--ATRASADA,
+  &--SIN_DATOS {
+    color: var(--color-aviso);
+  }
+
+  &--ERROR {
+    color: var(--color-error);
+  }
+
+  &--NO_APLICA {
+    color: var(--color-neutro);
+  }
+}
+
+.lista-fuentes,
+.lista-precios {
+  display: grid;
+  gap: var(--esp-3);
+  margin: var(--esp-3) 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding-bottom: var(--esp-3);
+    border-bottom: 1px solid var(--color-borde);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.lista-fuentes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+}
+
+.lista-fuentes__nombre {
+  font-weight: 700;
+}
+
+.lista-precios {
+  .boton {
+    margin-top: var(--esp-2);
+  }
+}
+
+.anulado {
+  opacity: 0.7;
+
+  strong:first-child {
+    text-decoration: line-through;
+  }
+}
+
+.anulacion {
+  display: grid;
+  gap: var(--esp-2);
+  margin-top: var(--esp-2);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.tabla-desplazable {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: var(--esp-2);
+    border-bottom: 1px solid var(--color-borde);
+    text-align: left;
+    white-space: nowrap;
+  }
+}

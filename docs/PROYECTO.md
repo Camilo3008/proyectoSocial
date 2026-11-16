@@ -494,6 +494,12 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-16 | `namedChunks` en producción y grupo `globo` del service worker en modo `lazy` (excluido del `prefetch` del shell) | En la vereda no conviene descargar 232 kB de MapLibre en cada actualización si el usuario no abre el globo; tras la primera visita queda en caché offline |
 | 2026-11-16 | Sin WebGL (o si MapLibre falla) la vista cambia sola a la tabla; también hay botón "Ver como tabla". La rotación lenta se detiene al primer toque y no ocurre con `prefers-reduced-motion` | CLAUDE.md: vista alternativa para equipos de gama baja; accesibilidad |
 | 2026-11-16 | Parámetros de URL de la sección de países: `productoPais`, `anio`, `vista`, `pais` | No chocan con `producto` de la sección de bolsa en la misma página |
+| 2026-11-16 | **Etapa 5:** la antigüedad de los datos se toma del encabezado `Date` de la última respuesta de lectura de la API (el service worker lo conserva al responder desde caché). Sin red: "Sin conexión · datos de hace X"; con red pero respuesta de más de 15 min: "Conexión lenta · mostrando datos de hace X" | No requiere cambiar la API ni la caché; cubre también el caso de conexión lenta (timeout de 4 s del SW) |
+| 2026-11-16 | Versión nueva de la app: aviso "Hay una nueva versión · Toca para actualizar"; no se recarga sola. Se revisa al abrir y cada 6 h | Evita perder lo que el usuario está viendo; el usuario decide |
+| 2026-11-16 | `/api/salud` incluye el estado de la ingesta de cada fuente (mismo cálculo que `/api/fuentes`); el estado global (y el 503) depende solo de la base de datos | Un monitor externo no debe marcar caída la API porque una fuente externa esté atrasada |
+| 2026-11-16 | Panel de administración web en `/admin` (fuera de la navegación pública): ingestas manuales, bitácora, carga manual y anulación. Nuevo `GET /api/admin/precios` (solo ADMIN) para listar lo cargado a mano | Antes solo se podía administrar con Swagger o curl |
+| 2026-11-16 | Token del administrador en `sessionStorage` (se borra al cerrar la pestaña); el interceptor lo envía solo a `/api/admin/**` y cierra la sesión ante un 401 | Menor exposición en equipos compartidos; ninguna petición pública lleva el token |
+| 2026-11-16 | En la carga manual, el valor admite "2.075.000" y "278,65" y se normaliza a punto decimal; con un solo punto y sin coma se toma como decimal (no se adivina) | Evita errores de digitación frecuentes sin introducir ambigüedad |
 
 ---
 

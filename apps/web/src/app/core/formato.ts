@@ -133,3 +133,15 @@ const hastaDosDecimales = new Intl.NumberFormat(LOCALE, { maximumFractionDigits:
 export function formatearNumero(valor: string): string {
   return hastaDosDecimales.format(Number(valor));
 }
+
+const relativo = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' });
+
+/** "hace 5 minutos", "hace 3 horas", "ayer", "hace 4 días". */
+export function formatearHace(fecha: Date, ahora: Date = new Date()): string {
+  const minutos = Math.round((ahora.getTime() - fecha.getTime()) / 60_000);
+  if (minutos < 1) return 'hace un momento';
+  if (minutos < 60) return relativo.format(-minutos, 'minute');
+  const horas = Math.round(minutos / 60);
+  if (horas < 24) return relativo.format(-horas, 'hour');
+  return relativo.format(-Math.round(horas / 24), 'day');
+}

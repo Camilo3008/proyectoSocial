@@ -11,14 +11,23 @@
   </a>
 </header>
 
-@if (!conexion.enLinea()) {
+@if (avisoDatos(); as aviso) {
   <div class="aviso-offline" role="status">
     <svg viewBox="0 0 24 24" aria-hidden="true" class="aviso-offline__icono">
       <path
         d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 4-2.3M19 12.9a10 10 0 0 0-2.2-1.6M1.4 9a16 16 0 0 1 4.3-2.7M22.6 9A16 16 0 0 0 11 4.6M12 20h.01"
       />
     </svg>
-    <span>Sin conexión · mostrando los últimos datos guardados</span>
+    <span>{{ aviso }}</span>
+  </div>
+}
+
+@if (actualizacion.disponible()) {
+  <div class="aviso-version" role="status">
+    <span>Hay una nueva versión de AgroPrecios.</span>
+    <button type="button" class="boton" (click)="actualizacion.actualizar()">
+      Toca para actualizar
+    </button>
   </div>
 }
 

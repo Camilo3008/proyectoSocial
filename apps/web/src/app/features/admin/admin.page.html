@@ -1,0 +1,259 @@
+<h1>Administración</h1>
+
+@if (!sesion.activa()) {
+  <form class="tarjeta formulario" (submit)="entrar($event)" aria-labelledby="titulo-acceso">
+    <h2 id="titulo-acceso">Acceso del administrador</h2>
+    <label class="campo">
+      <span>Correo</span>
+      <input name="email" type="email" autocomplete="username" required />
+    </label>
+    <label class="campo">
+      <span>Contraseña</span>
+      <input name="password" type="password" autocomplete="current-password" required />
+    </label>
+    @if (errorAcceso(); as e) {
+      <p class="mensaje mensaje--error" role="alert">{{ e }}</p>
+    }
+    <button type="submit" class="boton" [disabled]="entrando()">
+      {{ entrando() ? 'Entrando…' : 'Entrar' }}
+    </button>
+  </form>
+} @else {
+  <div class="barra-sesion">
+    <span>Sesión activa hasta {{ fechaHora(sesion.sesion()!.expiraEn) }}</span>
+    <button type="button" class="boton boton--secundario" (click)="salir()">Salir</button>
+  </div>
+
+  <!-- Ingestas -->
+  <section class="tarjeta" aria-labelledby="titulo-ingestas">
+    <h2 id="titulo-ingestas">Ingestas</h2>
+    <p class="ayuda">
+      Cada fuente se descarga sola según su horario. Aquí puedes ejecutarla ahora.
+    </p>
+    <ul class="lista-fuentes">
+      @for (f of fuentesIngesta; track f.slug) {
+        @let estado = estadoDe(f.slug);
+        <li>
+          <div>
+            <p class="lista-fuentes__nombre">{{ estado?.nombre ?? f.slug }}</p>
+            @if (estado) {
+              <p class="estado estado--{{ estado.estado }}">
+                {{ estados[estado.estado] }}
+                @if (estado.ultimaIngestaExitosa) {
+                  · última exitosa {{ fechaHora(estado.ultimaIngestaExitosa) }}
+                }
+              </p>
+            }
+            @if (f.aviso) {
+              <p class="ayuda">{{ f.aviso }}</p>
+            }
+          </div>
+          <button
+            type="button"
+            class="boton boton--secundario"
+            [disabled]="ingiriendo() !== null"
+            (click)="ingerir(f.slug)"
+          >
+            {{ ingiriendo() === f.slug ? 'Ejecutando…' : 'Ejecutar ahora' }}
+          </button>
+        </li>
+      }
+    </ul>
+    <div aria-live="polite">
+      @if (resultadoIngesta(); as r) {
+        <p class="mensaje" [class.mensaje--error]="r.estado !== 'OK'">
+          {{ r.fuente }}: {{ r.estado }} · leídos {{ r.leidos }}, nuevos {{ r.insertados }},
+          actualizados {{ r.actualizados }}
+          @if (r.mercadosNuevos > 0) {
+            , mercados nuevos {{ r.mercadosNuevos }}
+          }
+          @if (r.error) {
+            <br />{{ r.error }}
+          }
+        </p>
+      }
+      @if (errorIngesta(); as e) {
+        <p class="mensaje mensaje--error" role="alert">{{ e }}</p>
+      }
+    </div>
+  </section>
+
+  <!-- Bitácora -->
+  <section class="tarjeta" aria-labelledby="titulo-bitacora">
+    <h2 id="titulo-bitacora">Bitácora (últimas 20)</h2>
+    @if (bitacora.hasValue()) {
+      <div class="tabla-desplazable">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Inicio</th>
+              <th scope="col">Fuente</th>
+              <th scope="col">Disparo</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Leídos</th>
+              <th scope="col">Nuevos</th>
+              <th scope="col">Act.</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of bitacora.value(); track e.id) {
+              <tr [title]="e.error ?? ''">
+                <td>{{ fechaHora(e.inicio) }}</td>
+                <td>{{ e.fuente }}</td>
+                <td>{{ e.disparo === 'MANUAL' ? 'Manual' : 'Programado' }}</td>
+                <td class="estado estado--{{ e.estado === 'OK' ? 'AL_DIA' : 'ERROR' }}">
+                  {{ e.estado }}
+                </td>
+                <td>{{ e.leidos }}</td>
+                <td>{{ e.insertados }}</td>
+                <td>{{ e.actualizados }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7">Todavía no hay ejecuciones.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (bitacora.error()) {
+      <p class="mensaje mensaje--error">No se pudo cargar la bitácora.</p>
+    }
+  </section>
+
+  <!-- Carga manual -->
+  <form class="tarjeta formulario" (submit)="cargar($event)" aria-labelledby="titulo-carga">
+    <h2 id="titulo-carga">Cargar un precio a mano</h2>
+    <p class="ayuda">
+      Escribe el valor tal como lo publica la fuente (moneda, unidad y presentación originales). La
+      app calcula el precio por kilo en pesos y dólares.
+    </p>
+    <div class="rejilla">
+      <label class="campo">
+        <span>Producto</span>
+        <select name="producto" required>
+          @for (p of productos.hasValue() ? productos.value() : []; track p.slug) {
+            <option [value]="p.slug" [selected]="p.slug === 'cafe'">{{ p.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label class="campo">
+        <span>Fuente</span>
+        <select name="fuente" required>
+          @for (f of fuentes.hasValue() ? fuentes.value() : []; track f.slug) {
+            <option [value]="f.slug" [selected]="f.slug === 'fnc'">{{ f.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label class="campo">
+        <span>Mercado (opcional)</span>
+        <select name="mercadoId">
+          <option value="">Sin mercado (precio nacional)</option>
+          @for (m of mercados.hasValue() ? mercados.value() : []; track m.id) {
+            <option [value]="m.id">{{ m.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label class="campo">
+        <span>Fecha del dato</span>
+        <input name="fecha" type="date" [max]="hoy" [value]="hoy" required />
+      </label>
+      <label class="campo">
+        <span>Presentación</span>
+        <input name="presentacion" value="pergamino seco" minlength="2" maxlength="100" required />
+      </label>
+      <label class="campo">
+        <span>Valor</span>
+        <input name="valor" inputmode="decimal" placeholder="2.075.000" required />
+      </label>
+      <label class="campo">
+        <span>Moneda</span>
+        <input name="moneda" value="COP" maxlength="3" pattern="[A-Za-z]{3}" required />
+      </label>
+      <label class="campo">
+        <span>Unidad</span>
+        <select name="unidad" required>
+          @for (u of unidades; track u) {
+            <option [value]="u" [selected]="u === 'carga 125 kg'">{{ u }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <label class="campo">
+      <span>Referencia (de dónde salió el dato)</span>
+      <input name="referencia" maxlength="300" placeholder="Boletín FNC del 13/11/2026" />
+    </label>
+    <div aria-live="polite">
+      @if (resultadoCarga(); as r) {
+        <p class="mensaje">{{ r }}</p>
+      }
+      @if (errorCarga(); as e) {
+        <p class="mensaje mensaje--error" role="alert">{{ e }}</p>
+      }
+    </div>
+    <button type="submit" class="boton" [disabled]="guardando()">
+      {{ guardando() ? 'Guardando…' : 'Guardar precio' }}
+    </button>
+  </form>
+
+  <!-- Últimos cargados -->
+  <section class="tarjeta" aria-labelledby="titulo-ultimos">
+    <h2 id="titulo-ultimos">Últimos precios cargados a mano</h2>
+    @if (precios.hasValue()) {
+      <ul class="lista-precios">
+        @for (o of precios.value(); track o.id) {
+          <li [class.anulado]="o.anulado">
+            <p>
+              <strong>{{ o.producto.nombre }} {{ o.presentacion }}</strong> · {{ fecha(o.fecha) }} ·
+              {{ precio(o.valor, o.moneda, o.unidad) }} por {{ o.unidad }}
+              @if (o.mercado) {
+                · {{ o.mercado.nombre }}
+              }
+            </p>
+            <p class="ayuda">
+              {{ o.fuente.nombre }} · registrado {{ fechaHora(o.creadoEn) }}
+              @if (o.anulado) {
+                · <strong>Anulado:</strong> {{ o.motivoAnulacion }}
+              }
+            </p>
+            @if (!o.anulado) {
+              @if (anulando() === o.id) {
+                <form class="anulacion" (submit)="anular($event, o.id)">
+                  <label class="campo">
+                    <span>Motivo de la anulación</span>
+                    <input name="motivo" minlength="5" maxlength="500" required />
+                  </label>
+                  @if (errorAnulacion(); as e) {
+                    <p class="mensaje mensaje--error" role="alert">{{ e }}</p>
+                  }
+                  <div class="acciones">
+                    <button type="submit" class="boton">Anular</button>
+                    <button
+                      type="button"
+                      class="boton boton--secundario"
+                      (click)="anulando.set(null)"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              } @else {
+                <button
+                  type="button"
+                  class="boton boton--secundario"
+                  (click)="anulando.set(o.id); errorAnulacion.set(null)"
+                >
+                  Anular
+                </button>
+              }
+            }
+          </li>
+        } @empty {
+          <li>Todavía no hay precios cargados a mano.</li>
+        }
+      </ul>
+    } @else if (precios.error()) {
+      <p class="mensaje mensaje--error">No se pudieron cargar los últimos precios.</p>
+    }
+  </section>
+}
