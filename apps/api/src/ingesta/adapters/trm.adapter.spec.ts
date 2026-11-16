@@ -95,6 +95,8 @@ describe('TrmAdapter', () => {
     it('filtra desde una fecha validada', () => {
       const url = new URL(construirUrlTrm({ desde: '2026-01-01' }));
       expect(url.searchParams.get('$where')).toBe("vigenciadesde >= '2026-01-01T00:00:00'");
+      // Con un límite bajo se perdería el histórico antiguo (desde 1991 hay ~8.700 filas).
+      expect(Number(url.searchParams.get('$limit'))).toBeGreaterThanOrEqual(20000);
       expect(() => construirUrlTrm({ desde: "2026-01-01' OR 1=1" })).toThrow(/inválida/);
     });
   });

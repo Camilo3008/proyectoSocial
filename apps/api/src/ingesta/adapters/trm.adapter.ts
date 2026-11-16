@@ -40,7 +40,8 @@ export function construirUrlTrm(contexto: ContextoIngesta = {}): string {
       throw new Error(`Fecha "desde" inválida: ${contexto.desde}`);
     }
     parametros.set('$where', `vigenciadesde >= '${contexto.desde}T00:00:00'`);
-    parametros.set('$limit', '5000');
+    // Holgado: desde 1991 hay ~8.700 filas; un límite menor cortaría el histórico sin avisar.
+    parametros.set('$limit', '50000');
   } else {
     parametros.set('$limit', String(LIMITE_POR_DEFECTO));
   }

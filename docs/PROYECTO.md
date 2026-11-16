@@ -482,6 +482,12 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-16 | Cada dato viaja con la cita que exige su licencia (`fuente.cita`: DANE, TRM) y se muestra en la interfaz | Términos de uso del DANE (cita textual) y CC BY-SA de la TRM |
 | 2026-11-16 | `Cache-Control` de precios, tasas y fuentes: `max-age=300, stale-while-revalidate=60` (antes 86400) | Con una ventana larga el navegador mostraba precios de horas atrás después de una ingesta; el modo sin conexión lo da el service worker |
 | 2026-11-16 | Gráficas con Chart.js 4 (MIT), solo los módulos de línea, cargado con `import()` dentro de Histórico (~61 kB gzip, fuera del bundle inicial) | RF-02; CLAUDE.md pide imports selectivos |
+| 2026-11-16 | **Etapa 3 (aprobado por el autor):** Banco Mundial con `fflate` (MIT, sin dependencias) + `saxes` para leer el XLSX; el código externo de cada serie es el encabezado exacto de su columna y se valida que la unidad sea `($/kg)` | Liviano y solo en la API. Se descartaron `xlsx` (versión de npm desactualizada, con vulnerabilidades conocidas) y `exceljs` (pesado) |
+| 2026-11-16 | **Etapa 3 (aprobado):** `WORLDBANK_URL` configurable; si responde 404, el adapter busca el enlace vigente en la página oficial (una petición más) y lo advierte en la bitácora | La URL del archivo cambia con el tiempo |
+| 2026-11-16 | **Etapa 3 (aprobado):** las series mensuales se convierten a COP/kg con el **promedio mensual de la TRM** (las diarias siguen usando la TRM del día o la hábil anterior) | El precio del Banco Mundial es un promedio del mes |
+| 2026-11-16 | **Etapa 3 (aprobado):** el cacao aparece en "Hoy" con el precio internacional del Banco Mundial, rotulado "Precio internacional · promedio mensual", con equivalente en pesos y advertencia | No hay fuente nacional verificada del cacao (pregunta abierta 9) |
+| 2026-11-16 | El upsert de observaciones también detecta cambios en `valor_cop_kg` | Si la TRM se carga después que el precio en USD, el valor en pesos se recalcula al reingerir |
+| 2026-11-16 | Primera carga de la TRM con `?desde=1990-01-01` (desde 1991 en el dataset) y límite de 50.000 filas por consulta | Permite valores en pesos de las series internacionales desde 1991; un límite menor cortaba el histórico sin avisar |
 
 ---
 

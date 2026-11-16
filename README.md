@@ -6,7 +6,7 @@ PWA que **recopila y muestra precios de referencia** de café, plátano, banano,
 - Reglas de implementación: [`CLAUDE.md`](CLAUDE.md)
 - Fichas de fuentes de datos: [`docs/fuentes/`](docs/fuentes/)
 
-> Estado: **Etapa 2 (Nacional)** terminada: precios mayoristas de plátano y banano (DANE – SIPSA), histórico y comparativo nacional. Fase 1: solo recopilar y mostrar datos.
+> Estado: **Etapa 3 (Internacional)** terminada: precios internacionales del Banco Mundial (café, cacao y banano) comparados con el precio nacional. Fase 1: solo recopilar y mostrar datos.
 
 ## Estructura
 
@@ -107,7 +107,9 @@ Mientras se construye el panel de administración (Etapa 5), estas tareas se hac
    Para el cierre de Nueva York: `"presentacion": "verde arábica (contrato C)"`, `"moneda": "USD"`, `"unidad": "USc/lb"` y `"mercadoId"` de la Bolsa de Nueva York (ICE). Los valores llevan **punto decimal** (`278.65`), nunca puntos de miles.
 3. **Corregir un precio:** `PATCH /api/admin/precios/{id}/anular` con un `motivo` y volver a cargarlo. El valor anterior queda en el historial.
 4. **Actualizar la TRM a mano:** `POST /api/admin/ingesta/trm`. Se ejecuta sola según `TRM_CRON` (07:30 y 18:30 por defecto) si `INGESTA_PROGRAMADA=true`.
-4. **Precios mayoristas (SIPSA):** `POST /api/admin/ingesta/sipsa`. Cada consulta descarga ~316 MB del DANE y tarda ~2 minutos. Se ejecuta sola según `SIPSA_CRON` (15:30 de lunes a sábado) y guarda los últimos `SIPSA_DIAS_VENTANA` días (45). **Primera vez:** cargar el histórico con `POST /api/admin/ingesta/sipsa?desde=2020-01-01` (y la TRM con `?desde=2020-01-01` para los valores en USD).
+4. **Precios mayoristas (SIPSA):** `POST /api/admin/ingesta/sipsa`. Cada consulta descarga ~316 MB del DANE y tarda ~2 minutos. Se ejecuta sola según `SIPSA_CRON` (15:30 de lunes a sábado) y guarda los últimos `SIPSA_DIAS_VENTANA` días (45). **Primera vez:** cargar el histórico con `POST /api/admin/ingesta/sipsa?desde=2020-01-01`.
+4. **Precios internacionales (Banco Mundial):** `POST /api/admin/ingesta/worldbank` (~0,6 MB, segundos). Se ejecuta sola según `WORLDBANK_CRON` (lunes 9:00). Si la URL cambió, la bitácora lo advierte: actualizar `WORLDBANK_URL`.
+4. **Primera vez, TRM completa:** `POST /api/admin/ingesta/trm?desde=1990-01-01` (para convertir a pesos el histórico desde 1991) y luego volver a ejecutar la ingesta del Banco Mundial.
 5. **Revisar la bitácora:** `GET /api/admin/ingestas`.
 
 > El precio de la FNC solo se puede cargar a mano: sus términos de uso no permiten la extracción automática (ver [`docs/fuentes/fnc.md`](docs/fuentes/fnc.md)).
