@@ -1,0 +1,138 @@
+<h1>Histórico</h1>
+
+<div class="filtros">
+  <label class="campo">
+    <span>Producto</span>
+    <select [value]="productoActual()" (change)="cambiarProducto($any($event.target).value)">
+      @if (productos.hasValue()) {
+        @for (p of productos.value(); track p.slug) {
+          <option [value]="p.slug" [selected]="p.slug === productoActual()">{{ p.nombre }}</option>
+        }
+      }
+    </select>
+  </label>
+
+  @if (series.hasValue() && series.value().length > 0) {
+    <label class="campo">
+      <span>Mercado y presentación</span>
+      <select (change)="cambiarSerie($any($event.target).value)">
+        @for (s of series.value(); track claveSerie(s)) {
+          <option [value]="claveSerie(s)" [selected]="claveSerie(s) === claveElegida()">
+            {{ etiquetaSerie(s) }}
+          </option>
+        }
+      </select>
+    </label>
+  }
+
+  <div class="rangos" role="group" aria-label="Rango de fechas">
+    @for (r of rangos; track r.valor) {
+      <button
+        type="button"
+        class="rango"
+        [class.rango--activo]="r.valor === rangoActual()"
+        [attr.aria-pressed]="r.valor === rangoActual()"
+        (click)="cambiarRango(r.valor)"
+      >
+        {{ r.etiqueta }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (series.hasValue() && series.value().length === 0) {
+  <p class="tarjeta">Todavía no hay datos de este producto.</p>
+} @else if (serie(); as s) {
+  <section class="tarjeta" aria-labelledby="titulo-serie">
+    <h2 id="titulo-serie" class="titulo-serie">
+      {{ s.producto.nombre }} {{ s.presentacion }}
+      @if (s.mercado) {
+        <span class="mercado">· {{ s.mercado.nombre }}</span>
+      }
+    </h2>
+
+    @if (resumen(); as r) {
+      <p class="periodo">
+        Del {{ r.desde }} al {{ r.hasta }} · {{ r.cantidad }} datos · precios {{ r.unidad }}
+      </p>
+      <dl class="resumen">
+        <div>
+          <dt>Mínimo</dt>
+          <dd>{{ r.minimo }}</dd>
+        </div>
+        <div>
+          <dt>Promedio</dt>
+          <dd>{{ r.promedio }}</dd>
+        </div>
+        <div>
+          <dt>Máximo</dt>
+          <dd>{{ r.maximo }}</dd>
+        </div>
+      </dl>
+
+      <ap-grafica-linea [puntos]="puntos()" [formatear]="formatear()" />
+    } @else {
+      <p>No hay datos en este rango. Pruebe con un rango más amplio.</p>
+    }
+
+    <p class="procedencia">Fuente: {{ s.fuente.nombre }}</p>
+    @for (n of notas(); track n) {
+      <p class="nota">{{ n }}</p>
+    }
+    @if (s.fuente.cita; as cita) {
+      <p class="nota cita">{{ cita }}</p>
+    }
+    @if (s.mercado) {
+      <p>
+        <a
+          class="enlace"
+          routerLink="/nacional"
+          [queryParams]="{ producto: s.producto.slug, presentacion: s.presentacion }"
+          >Comparar con otros mercados</a
+        >
+      </p>
+    }
+  </section>
+
+  @if (filas().length > 0) {
+    <details class="tabla-datos">
+      <summary>Ver los datos en tabla</summary>
+      <table>
+        <caption class="solo-lectores">
+          Precios de
+          {{
+            s.producto.nombre
+          }}
+          {{
+            s.presentacion
+          }}, del más reciente al más antiguo
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (f of filas(); track f.fecha) {
+            <tr>
+              <td>
+                <time [attr.datetime]="f.fecha">{{ f.fechaTexto }}</time>
+              </td>
+              <td>{{ f.precio }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </details>
+  }
+} @else if (datos.error() || series.error()) {
+  <div class="tarjeta" role="alert">
+    <p>No pudimos cargar el histórico. Revisa tu conexión e inténtalo de nuevo.</p>
+    <button type="button" class="boton" (click)="series.reload(); datos.reload()">
+      Reintentar
+    </button>
+  </div>
+} @else {
+  <p role="status" class="cargando">Cargando histórico…</p>
+}

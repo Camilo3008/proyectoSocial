@@ -71,3 +71,21 @@
   color: var(--color-texto-suave);
   font-size: var(--texto-xs);
 }
+
+.cita {
+  font-style: italic;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-4);
+  margin: var(--esp-2) 0 0;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--alto-tactil);
+    font-weight: 600;
+  }
+}

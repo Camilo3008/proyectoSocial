@@ -2,6 +2,7 @@ import { type PreciosHoyDto } from '@agroprecios/shared';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { HoyPage } from './hoy.page';
 
 // DATO DE EJEMPLO: valores con la forma de los reales, solo para pruebas.
@@ -11,7 +12,7 @@ const RESPUESTA: PreciosHoyDto = {
   items: [
     {
       producto: { slug: 'cafe', nombre: 'Café' },
-      fuente: { slug: 'fnc', nombre: 'Federación Nacional de Cafeteros' },
+      fuente: { slug: 'fnc', nombre: 'Federación Nacional de Cafeteros', cita: null },
       mercado: null,
       fecha: '2026-11-13',
       presentacion: 'pergamino seco',
@@ -48,7 +49,7 @@ describe('HoyPage', () => {
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
     await TestBed.configureTestingModule({
       imports: [HoyPage],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     }).compileComponents();
     fixture = TestBed.createComponent(HoyPage);
     http = TestBed.inject(HttpTestingController);

@@ -1,5 +1,6 @@
 import { type PrecioHoyItemDto } from '@agroprecios/shared';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   etiquetaUnidad,
   formatearFecha,
@@ -7,15 +8,12 @@ import {
   formatearPrecio,
   tendencia,
 } from '../../core/formato';
-
-/** Advertencias de comparabilidad por producto (docs/PROYECTO.md §7.1). */
-const NOTAS: Record<string, string> = {
-  cafe: 'Nueva York cotiza café verde (excelso), no pergamino: los dos precios no se comparan directamente.',
-};
+import { notasDePrecio } from '../../core/notas';
 
 /** Tarjeta con el precio de referencia de un producto (RF-01). */
 @Component({
   selector: 'ap-tarjeta-precio',
+  imports: [RouterLink],
   templateUrl: './tarjeta-precio.html',
   styleUrl: './tarjeta-precio.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,18 +23,37 @@ export class TarjetaPrecio {
   /** Fecha de hoy (AAAA-MM-DD, Bogotá) para resaltar datos que no son del día. */
   readonly hoy = input.required<string>();
 
-  protected readonly titulo = computed(
-    () => `${this.item().producto.nombre} ${this.item().presentacion}`,
-  );
+  /** "Plátano hartón verde"; sin repetir si la presentación es el mismo producto ("Banano"). */
+  protected readonly titulo = computed(() => {
+    const { producto, presentacion } = this.item();
+    return presentacion.toLowerCase() === producto.nombre.toLowerCase()
+      ? producto.nombre
+      : `${producto.nombre} ${presentacion}`;
+  });
   protected readonly precio = computed(() =>
     formatearPrecio(this.item().valor, this.item().moneda, this.item().unidad),
   );
   protected readonly unidad = computed(() => etiquetaUnidad(this.item().unidad));
   protected readonly fecha = computed(() => formatearFecha(this.item().fecha));
   protected readonly esDeHoy = computed(() => this.item().fecha === this.hoy());
-  protected readonly nota = computed(() =>
-    this.item().complementos.length > 0 ? (NOTAS[this.item().producto.slug] ?? null) : null,
+  protected readonly notas = computed(() =>
+    notasDePrecio(
+      this.item().fuente.slug,
+      this.item().producto.slug,
+      this.item().complementos.length > 0,
+    ),
   );
+
+  /** Parámetros para abrir esta misma serie en Histórico. */
+  protected readonly enlaceHistorico = computed(() => {
+    const i = this.item();
+    return {
+      producto: i.producto.slug,
+      fuente: i.fuente.slug,
+      presentacion: i.presentacion,
+      ...(i.mercado ? { mercado: i.mercado.id } : {}),
+    };
+  });
 
   protected readonly variacion = computed(() => {
     const v = this.item().variacion;

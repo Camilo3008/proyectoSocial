@@ -1,0 +1,116 @@
+.intro,
+.subtitulo,
+.procedencia,
+.cargando {
+  color: var(--color-texto-suave);
+}
+
+.filtros {
+  display: grid;
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-4);
+}
+
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+
+  span {
+    color: var(--color-texto-suave);
+  }
+
+  select {
+    min-height: var(--alto-tactil);
+    padding: 0 var(--esp-3);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    background: var(--color-superficie);
+    color: var(--color-texto);
+    font: inherit;
+  }
+}
+
+.titulo {
+  margin-bottom: var(--esp-1);
+}
+
+.lista {
+  display: grid;
+  gap: var(--esp-2);
+  margin: var(--esp-3) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--esp-2);
+
+  &--referencia {
+    border: 2px solid var(--color-acento);
+  }
+
+  &__mercado,
+  &__precio {
+    display: grid;
+    gap: 2px;
+  }
+
+  &__precio {
+    text-align: right;
+  }
+
+  &__nombre {
+    font-weight: 700;
+  }
+
+  &__depto {
+    color: var(--color-texto-suave);
+    font-size: var(--texto-xs);
+  }
+
+  &__valor {
+    font-size: var(--texto-lg);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__dif {
+    font-size: var(--texto-xs);
+    font-weight: 600;
+
+    &--mas {
+      color: var(--color-ok);
+    }
+
+    &--menos {
+      color: var(--color-error);
+    }
+
+    &--igual {
+      color: var(--color-neutro);
+    }
+  }
+}
+
+.insignia {
+  justify-self: start;
+  padding: 2px var(--esp-2);
+  border-radius: var(--radio-pildora);
+  background: var(--color-acento-suave);
+  color: var(--color-acento-oscuro);
+  font-size: var(--texto-xs);
+  font-weight: 700;
+}
+
+.nota {
+  margin: var(--esp-2) 0 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-xs);
+}
+
+.cita {
+  font-style: italic;
+}

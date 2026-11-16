@@ -16,7 +16,11 @@
     @if (!esDeHoy()) {
       <span class="procedencia__aviso">Último dato disponible:</span>
     }
-    Fuente: {{ item().fuente.nombre }} · <time [attr.datetime]="item().fecha">{{ fecha() }}</time>
+    Fuente: {{ item().fuente.nombre }}
+    @if (item().mercado; as m) {
+      · {{ m.nombre }}
+    }
+    · <time [attr.datetime]="item().fecha">{{ fecha() }}</time>
   </p>
 
   @if (complementos().length > 0) {
@@ -30,7 +34,22 @@
     </ul>
   }
 
-  @if (nota(); as n) {
+  @for (n of notas(); track n) {
     <p class="nota">{{ n }}</p>
   }
+
+  @if (item().fuente.cita; as cita) {
+    <p class="nota cita">{{ cita }}</p>
+  }
+
+  <p class="acciones">
+    <a routerLink="/historico" [queryParams]="enlaceHistorico()">Ver histórico</a>
+    @if (item().mercado) {
+      <a
+        routerLink="/nacional"
+        [queryParams]="{ producto: item().producto.slug, presentacion: item().presentacion }"
+        >Comparar mercados</a
+      >
+    }
+  </p>
 </article>
