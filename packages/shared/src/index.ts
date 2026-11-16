@@ -3,5 +3,6 @@
 export type * from './auth.js';
 export type * from './catalogo.js';
 export type * from './ingesta.js';
+export type * from './precios.js';
 export type * from './salud.js';
 export type * from './tasas.js';
