@@ -61,6 +61,12 @@ export const REFERENCIAS_HOY: Record<string, ConfigReferenciaHoy> = {
       },
     ],
   },
+  // Sin fuente nacional verificada (pregunta abierta 9): se muestra el precio internacional
+  // del Banco Mundial, claramente rotulado (decisión del autor, 2026-11-16).
+  cacao: {
+    principal: { fuente: 'worldbank', presentacion: 'en grano (ICCO)', mercado: null },
+    complementos: [],
+  },
   banano: {
     principal: {
       fuente: 'sipsa',

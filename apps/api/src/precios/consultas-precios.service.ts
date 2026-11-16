@@ -89,6 +89,14 @@ export class ConsultasPreciosService {
   }
 
   /**
+   * Observación más reciente de la serie de referencia de un producto (la de
+   * "Hoy"). La usa el módulo internacional para comparar con el precio nacional.
+   */
+  referenciaPrincipal(productoId: number, slug: string, hoy = fechaBogota()) {
+    return this.ultimaObservacion(productoId, hoy, REFERENCIAS_HOY[slug]?.principal);
+  }
+
+  /**
    * Última observación activa de un producto según el criterio. Con mercados
    * preferidos usa el primero que tenga datos recientes; si ninguno los tiene,
    * el de dato más reciente.
@@ -164,6 +172,7 @@ export class ConsultasPreciosService {
       fuente: fuenteDato(obs.fuente),
       mercado: obs.mercado ? { id: obs.mercado.id, nombre: obs.mercado.nombre } : null,
       fecha: obs.fecha,
+      periodicidad: obs.periodicidad,
       presentacion: obs.presentacion,
       valor: obs.valor,
       moneda: obs.moneda,

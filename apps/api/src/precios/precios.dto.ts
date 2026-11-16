@@ -170,6 +170,7 @@ class ComplementoRespuesta implements ComplementoPrecioDto {
   @ApiProperty({ type: FuenteDatoRespuesta }) fuente: FuenteDatoRespuesta;
   @ApiProperty({ type: MercadoRef, nullable: true }) mercado: MercadoRef | null;
   @ApiProperty() fecha: string;
+  @ApiProperty({ enum: FRECUENCIAS }) periodicidad: Frecuencia;
   @ApiProperty() presentacion: string;
   @ApiProperty() valor: string;
   @ApiProperty() moneda: string;
@@ -183,6 +184,7 @@ class PrecioHoyItemRespuesta implements PrecioHoyItemDto {
   @ApiProperty({ type: FuenteDatoRespuesta }) fuente: FuenteDatoRespuesta;
   @ApiProperty({ type: MercadoRef, nullable: true }) mercado: MercadoRef | null;
   @ApiProperty() fecha: string;
+  @ApiProperty({ enum: FRECUENCIAS }) periodicidad: Frecuencia;
   @ApiProperty() presentacion: string;
   @ApiProperty() valor: string;
   @ApiProperty() moneda: string;

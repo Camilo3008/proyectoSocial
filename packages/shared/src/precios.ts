@@ -74,6 +74,8 @@ export interface PrecioReferenciaDto {
   fuente: FuenteDatoDto;
   mercado: { id: number; nombre: string } | null;
   fecha: string;
+  /** DIARIA, SEMANAL, MENSUAL o ANUAL (los internacionales son mensuales). */
+  periodicidad: Frecuencia;
   presentacion: string;
   valor: string;
   moneda: string;
