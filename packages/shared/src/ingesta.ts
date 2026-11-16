@@ -15,6 +15,8 @@ export interface IngestaEjecucionDto {
   leidos: number;
   insertados: number;
   actualizados: number;
+  /** Mercados creados automáticamente en esta ejecución. */
+  mercadosNuevos: number;
   /** Error o advertencias (estado ERROR o PARCIAL). */
   error: string | null;
   payloadHash: string | null;

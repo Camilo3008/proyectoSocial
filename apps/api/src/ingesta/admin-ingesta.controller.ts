@@ -38,6 +38,16 @@ export class ParametroFuente {
   fuente: string;
 }
 
+export class ConsultaEjecucion {
+  @ApiPropertyOptional({
+    example: '2020-01-01',
+    description: 'Fecha mínima de los datos. Por defecto, la ventana configurada de la fuente.',
+  })
+  @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'desde debe tener el formato AAAA-MM-DD' })
+  desde?: string;
+}
+
 export class ConsultaBitacora {
   @ApiPropertyOptional({ example: 'trm' })
   @IsOptional()
@@ -68,6 +78,7 @@ class IngestaEjecucionRespuesta implements IngestaEjecucionDto {
   @ApiProperty() leidos: number;
   @ApiProperty() insertados: number;
   @ApiProperty() actualizados: number;
+  @ApiProperty() mercadosNuevos: number;
   @ApiProperty({ type: String, nullable: true }) error: string | null;
   @ApiProperty({ type: String, nullable: true }) payloadHash: string | null;
 }
@@ -88,8 +99,11 @@ export class AdminIngestaController {
     description: 'Devuelve la ejecución registrada en la bitácora (también si terminó en ERROR).',
   })
   @ApiOkResponse({ type: IngestaEjecucionRespuesta })
-  ejecutar(@Param() { fuente }: ParametroFuente): Promise<IngestaEjecucionDto> {
-    return this.ingesta.ejecutar(fuente, 'MANUAL');
+  ejecutar(
+    @Param() { fuente }: ParametroFuente,
+    @Query() { desde }: ConsultaEjecucion,
+  ): Promise<IngestaEjecucionDto> {
+    return this.ingesta.ejecutar(fuente, 'MANUAL', { desde });
   }
 
   @Get('ingestas')

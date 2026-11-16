@@ -1,4 +1,6 @@
 import { plainToInstance, Transform, Type } from 'class-transformer';
+import { CronTime } from 'cron';
+import { ZONA_NEGOCIO } from '../common/fechas.js';
 import {
   IsEmail,
   IsBoolean,
@@ -102,6 +104,39 @@ export class VariablesEntorno {
   )
   @IsBoolean()
   INGESTA_PROGRAMADA = true;
+
+  /**
+   * Horario de la ingesta TRM (cron con segundos, zona America/Bogota).
+   * Por defecto 07:30 y 18:30 todos los días.
+   */
+  @IsString()
+  TRM_CRON = '0 30 7,18 * * *';
+
+  /**
+   * Horario de la ingesta SIPSA (cron con segundos, zona America/Bogota).
+   * Por defecto 15:30 de lunes a sábado (el DANE actualiza a las 2:00 p. m.).
+   */
+  @IsString()
+  SIPSA_CRON = '0 30 15 * * 1-6';
+
+  /** Días hacia atrás que conserva cada ingesta SIPSA (la respuesta trae todo desde 2020). */
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(4000)
+  SIPSA_DIAS_VENTANA = 45;
+}
+
+const VARIABLES_CRON = ['TRM_CRON', 'SIPSA_CRON'] as const;
+
+/** Devuelve un mensaje de error si la expresión cron no es válida. */
+function validarCron(expresion: string): string | null {
+  try {
+    new CronTime(expresion, ZONA_NEGOCIO);
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
 }
 
 const SEGUNDOS_POR_UNIDAD = { s: 1, m: 60, h: 3600, d: 86_400 } as const;
@@ -123,12 +158,17 @@ export function validarEntorno(config: Record<string, unknown>): VariablesEntorn
   const variables = plainToInstance(VariablesEntorno, config, {
     exposeDefaultValues: true,
   });
-  const errores = validateSync(variables, { skipMissingProperties: false });
+  const errores = validateSync(variables, { skipMissingProperties: false }).map(
+    (e) => `  - ${e.property}: ${Object.values(e.constraints ?? {}).join('; ')}`,
+  );
+  for (const nombre of VARIABLES_CRON) {
+    const problema = typeof variables[nombre] === 'string' ? validarCron(variables[nombre]) : null;
+    if (problema) {
+      errores.push(`  - ${nombre}: expresión cron inválida (${problema})`);
+    }
+  }
   if (errores.length > 0) {
-    const detalle = errores
-      .map((e) => `  - ${e.property}: ${Object.values(e.constraints ?? {}).join('; ')}`)
-      .join('\n');
-    throw new Error(`Variables de entorno inválidas:\n${detalle}`);
+    throw new Error(`Variables de entorno inválidas:\n${errores.join('\n')}`);
   }
   return variables;
 }

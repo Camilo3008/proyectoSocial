@@ -239,11 +239,15 @@ En la Fase 1 **no hay registro de usuarios finales**: la consulta es pública y 
 
 ```
 producto            (id, slug UNIQUE, nombre, descripcion, unidad_base, activo)
-fuente              (id, slug UNIQUE, nombre, tipo[OFICIAL_NACIONAL|INTERNACIONAL|MANUAL],
-                     url, licencia, frecuencia[DIARIA|SEMANAL|MENSUAL|ANUAL], activo)
+fuente              (id, slug UNIQUE, nombre, descripcion NULL, tipo[OFICIAL_NACIONAL|INTERNACIONAL|MANUAL],
+                     url, licencia, frecuencia[DIARIA|SEMANAL|MENSUAL|ANUAL|A_DEMANDA], activo)
 pais                (iso3 PK, iso2, nombre_es, region, lat, lng)
-mercado             (id, nombre, tipo[MAYORISTA|BOLSA|REFERENCIA|LOCAL], municipio,
-                     departamento, pais_iso3 FK, lat, lng)
+mercado             (id, nombre, fuente_id FK NULL, codigo_externo NULL,
+                     tipo[MAYORISTA|BOLSA|REFERENCIA|LOCAL], municipio, departamento,
+                     pais_iso3 FK, lat NULL, lng NULL)
+  UNIQUE (nombre, pais_iso3)
+  UNIQUE (fuente_id, codigo_externo) WHERE codigo_externo IS NOT NULL
+                    -- identidad del mercado en su fuente: clave del upsert al ingerir
 producto_fuente     (producto_id, fuente_id, codigo_externo, presentacion, notas)
                     -- mapea nuestros productos a los códigos de cada fuente
 
@@ -265,13 +269,14 @@ tasa_cambio         (fecha, moneda_origen, moneda_destino, valor NUMERIC(18,6), 
 
 ingesta_ejecucion   (id, fuente_id, disparo[PROGRAMADO|MANUAL], inicio, fin,
                      estado[EN_CURSO|OK|PARCIAL|ERROR], leidos, insertados, actualizados,
-                     error TEXT, payload_hash)
+                     mercados_nuevos, error TEXT, payload_hash)
 
 usuario_admin       (id, email UNIQUE, hash_password, activo, ultimo_acceso)
 ```
 
 **Reglas:**
 - `observacion_precio` nunca se borra físicamente; se anula con un motivo.
+- Los mercados que llegan en una ingesta se crean o actualizan por `(fuente_id, codigo_externo)`, nunca por el nombre. El nombre, el municipio y el departamento se guardan tal como los publica la fuente; lo que la fuente no trae (p. ej. coordenadas) queda en `NULL`.
 - Las conversiones a COP/kg o USD/kg usan la TRM de la misma fecha (o la hábil anterior) y factores de unidad declarados en código (por ejemplo, 1 lb = 0,45359237 kg). **No se hacen conversiones entre presentaciones distintas.**
 
 ---

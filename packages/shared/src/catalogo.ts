@@ -28,6 +28,18 @@ export interface ProductoDto {
   unidadBase: string;
 }
 
+/** GET /api/mercados */
+export interface MercadoDto {
+  id: number;
+  nombre: string;
+  tipo: TipoMercado;
+  municipio: string | null;
+  departamento: string | null;
+  paisIso3: string;
+  /** Slug de la fuente que identifica al mercado (null si se sembró a mano). */
+  fuente: string | null;
+}
+
 /** GET /api/fuentes */
 export interface FuenteDto {
   slug: string;

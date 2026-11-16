@@ -52,6 +52,10 @@ export class IngestaEjecucion {
   @Column({ type: 'integer', default: 0 })
   actualizados: number;
 
+  /** Mercados creados automáticamente en esta ejecución. */
+  @Column({ name: 'mercados_nuevos', type: 'integer', default: 0 })
+  mercadosNuevos: number;
+
   @Column({ type: 'text', nullable: true })
   error: string | null;
 

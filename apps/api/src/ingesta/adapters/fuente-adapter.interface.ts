@@ -1,4 +1,4 @@
-import { type Frecuencia } from '@agroprecios/shared';
+import { type Frecuencia, type TipoMercado } from '@agroprecios/shared';
 
 /**
  * Observación tal como la entrega una fuente, ANTES de normalizar.
@@ -9,9 +9,14 @@ import { type Frecuencia } from '@agroprecios/shared';
 export interface ObservacionPrecioCruda {
   /** Código del producto en la fuente; se mapea con la tabla producto_fuente. */
   codigoExterno: string;
-  /** Nombre del mercado tal como lo reporta la fuente (precios nacionales). */
+  /**
+   * Mercado tal como lo reporta la fuente (precios nacionales). Se identifica por
+   * su código en la fuente; nombre, municipio y departamento se guardan tal cual.
+   */
   mercado?: {
+    codigoExterno: string;
     nombre: string;
+    tipo: TipoMercado;
     municipio?: string;
     departamento?: string;
   };
@@ -47,6 +52,11 @@ export interface ContextoIngesta {
   /** Rango opcional (YYYY-MM-DD) para fuentes que lo soporten. */
   desde?: string;
   hasta?: string;
+  /**
+   * Códigos de producto mapeados para esta fuente (tabla producto_fuente). Los
+   * adapters con respuestas grandes los usan para descartar lo demás temprano.
+   */
+  codigos?: ReadonlySet<string>;
   /** Permite cancelar la descarga (timeouts, apagado de la app). */
   signal?: AbortSignal;
 }
@@ -74,6 +84,8 @@ export interface ResultadoAdapter {
 export interface FuenteAdapter {
   /** Debe coincidir con fuente.slug en la base de datos. */
   readonly slug: string;
+  /** Tiempo máximo de la descarga en ms (por defecto 30 s). */
+  readonly timeoutMs?: number;
   ejecutar(contexto: ContextoIngesta): Promise<ResultadoAdapter>;
 }
 

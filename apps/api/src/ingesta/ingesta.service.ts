@@ -6,13 +6,22 @@ import {
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import { Fuente } from '../catalogo/entities/fuente.entity.js';
+import { fechaBogota, sumarDias } from '../common/fechas.js';
+import { VariablesEntorno } from '../config/variables-entorno.js';
 import { TasasService } from '../tasas/tasas.service.js';
 import { FUENTE_ADAPTERS, type FuenteAdapter } from './adapters/fuente-adapter.interface.js';
 import { IngestaEjecucion } from './entities/ingesta-ejecucion.entity.js';
+import { cargarMapeo, guardarObservaciones } from './guardar-observaciones.js';
 
-/** Tiempo máximo de una descarga antes de abortarla. */
+/** Tiempo máximo de una descarga si el adapter no define otro. */
 const TIMEOUT_DESCARGA_MS = 30_000;
+
+export interface OpcionesEjecucion {
+  /** Fecha mínima de los datos (YYYY-MM-DD). Sin ella se usa la ventana configurada. */
+  desde?: string;
+}
 const MAX_LARGO_ERROR = 2000;
 
 export interface FiltroBitacora {
@@ -39,8 +48,17 @@ export class IngestaService {
     @InjectRepository(Fuente) private readonly fuentes: Repository<Fuente>,
     private readonly dataSource: DataSource,
     private readonly tasas: TasasService,
+    private readonly config: ConfigService<VariablesEntorno, true>,
   ) {
     this.adapters = new Map(adapters.map((a) => [a.slug, a]));
+  }
+
+  /** Ventana por defecto (días hacia atrás) de cada fuente; configurable por entorno. */
+  private desdePorDefecto(slug: string): string | undefined {
+    if (slug === 'sipsa') {
+      return sumarDias(fechaBogota(), -this.config.get('SIPSA_DIAS_VENTANA', { infer: true }));
+    }
+    return undefined;
   }
 
   /** Slugs de las fuentes que tienen adapter registrado. */
@@ -52,7 +70,11 @@ export class IngestaService {
    * Ejecuta la ingesta de una fuente. Nunca lanza por fallos de la fuente: el
    * resultado (incluido un ERROR) queda en la bitácora y se devuelve.
    */
-  async ejecutar(slug: string, disparo: DisparoIngesta): Promise<IngestaEjecucionDto> {
+  async ejecutar(
+    slug: string,
+    disparo: DisparoIngesta,
+    opciones: OpcionesEjecucion = {},
+  ): Promise<IngestaEjecucionDto> {
     const adapter = this.adapters.get(slug);
     if (!adapter) {
       throw new NotFoundException(`La fuente "${slug}" no tiene ingesta automática`);
@@ -72,20 +94,31 @@ export class IngestaService {
     );
 
     try {
+      const codigos = new Set((await cargarMapeo(this.dataSource.manager, fuente.id)).keys());
       const resultado = await adapter.ejecutar({
-        signal: AbortSignal.timeout(TIMEOUT_DESCARGA_MS),
+        desde: opciones.desde ?? this.desdePorDefecto(slug),
+        codigos,
+        signal: AbortSignal.timeout(adapter.timeoutMs ?? TIMEOUT_DESCARGA_MS),
       });
-      if (resultado.observaciones.length > 0) {
-        // TODO(etapa-2): normalizar observaciones (código externo -> producto, mercado, país)
-        // y hacer el upsert con la clave uq_observacion_precio_clave. Hoy solo hay TRM.
-        throw new Error('La normalización de observaciones de precio aún no está implementada');
-      }
 
       const tasas = resultado.tasas ?? [];
-      const conteo = await this.dataSource.transaction((em) =>
-        this.tasas.guardar(em, fuente.id, tasas),
-      );
-      const advertencias = resultado.advertencias ?? [];
+      // Todo o nada: tasas, mercados y observaciones en UNA transacción por ejecución.
+      const conteo = await this.dataSource.transaction(async (em) => {
+        const deTasas = await this.tasas.guardar(em, fuente.id, tasas);
+        const deObs = await guardarObservaciones(
+          em,
+          fuente.id,
+          ejecucion.id,
+          resultado.observaciones,
+        );
+        return {
+          insertados: deTasas.insertados + deObs.insertados,
+          actualizados: deTasas.actualizados + deObs.actualizados,
+          mercadosNuevos: deObs.mercadosNuevos,
+          advertencias: deObs.advertencias,
+        };
+      });
+      const advertencias = [...(resultado.advertencias ?? []), ...conteo.advertencias];
 
       Object.assign(ejecucion, {
         estado: advertencias.length > 0 ? 'PARCIAL' : 'OK',
@@ -93,12 +126,14 @@ export class IngestaService {
         leidos: tasas.length + resultado.observaciones.length,
         insertados: conteo.insertados,
         actualizados: conteo.actualizados,
+        mercadosNuevos: conteo.mercadosNuevos,
         payloadHash: resultado.payloadHash,
         error: advertencias.length > 0 ? recortar(advertencias.join('\n')) : null,
       } satisfies Partial<IngestaEjecucion>);
       this.logger.log(
         `Ingesta ${slug}: ${ejecucion.estado} (leídos ${ejecucion.leidos}, ` +
-          `insertados ${conteo.insertados}, actualizados ${conteo.actualizados})`,
+          `insertados ${conteo.insertados}, actualizados ${conteo.actualizados}, ` +
+          `mercados nuevos ${conteo.mercadosNuevos})`,
       );
     } catch (error) {
       Object.assign(ejecucion, {
@@ -145,6 +180,7 @@ function aDto(e: IngestaEjecucion, slug: string): IngestaEjecucionDto {
     leidos: e.leidos,
     insertados: e.insertados,
     actualizados: e.actualizados,
+    mercadosNuevos: e.mercadosNuevos,
     error: e.error,
     payloadHash: e.payloadHash,
   };
