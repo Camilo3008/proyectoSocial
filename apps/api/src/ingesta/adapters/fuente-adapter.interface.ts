@@ -57,6 +57,8 @@ export interface ResultadoAdapter {
   tasas?: TasaCambioCruda[];
   /** SHA-256 (hex) del payload descargado; se guarda en la bitácora. */
   payloadHash: string;
+  /** Registros descartados o anomalías; si hay alguna, la ejecución queda PARCIAL. */
+  advertencias?: string[];
 }
 
 /**
