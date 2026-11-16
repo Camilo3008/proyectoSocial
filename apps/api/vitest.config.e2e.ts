@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['test/**/*.e2e-spec.ts'],
-    setupFiles: ['reflect-metadata'],
+    setupFiles: ['reflect-metadata', './test/entorno-e2e.ts'],
     // Las pruebas e2e comparten una base de datos: se ejecutan en serie.
     fileParallelism: false,
     hookTimeout: 30_000,
