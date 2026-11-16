@@ -8,7 +8,7 @@ queda como stub con `TODO(verificar)`.
 | Slug | Ficha | Estado |
 |---|---|---|
 | `fnc` | [fnc.md](fnc.md) | Verificada 2026-11-16 · sin adapter (los términos prohíben la extracción automatizada): carga manual |
-| `sipsa` | — | Por verificar |
+| `sipsa` | [sipsa.md](sipsa.md) | Verificada 2026-11-16 · servicio SOAP oficial; plátano y banano sí, pitaya y cacao no |
 | `worldbank` | — | Por verificar |
 | `faostat` | — | Por verificar |
 | `trm` | [trm.md](trm.md) | Verificada 2026-11-16 · adapter automático |
