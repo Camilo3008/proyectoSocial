@@ -1,0 +1,34 @@
+# Dependencias
+node_modules/
+
+# Salidas de compilación
+dist/
+out-tsc/
+tmp/
+*.tsbuildinfo
+.angular/cache/
+
+# Variables de entorno (nunca se suben; usar .env.example)
+.env
+.env.*
+!.env.example
+
+# Pruebas y cobertura
+coverage/
+__screenshots__/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editores
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.history/
+*.sublime-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
