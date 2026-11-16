@@ -1,0 +1,52 @@
+{
+  "$schema": "../../node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "shell",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/favicon.png", "/index.html", "/manifest.webmanifest", "/*.css", "/*.js"]
+      }
+    },
+    {
+      "name": "iconos",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/icons/**", "/**/*.(svg|png|webp|avif)"]
+      }
+    },
+    {
+      "name": "fuentes-y-geodatos",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "files": ["/**/*.(woff|woff2|otf|ttf)", "/geo/**"]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-diaria",
+      "urls": ["/api/precios/hoy", "/api/fuentes", "/api/productos", "/api/mercados"],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 50,
+        "maxAge": "7d",
+        "timeout": "4s"
+      }
+    },
+    {
+      "name": "api-series",
+      "urls": ["/api/precios/**", "/api/internacional/**", "/api/tasas/**"],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 200,
+        "maxAge": "30d",
+        "timeout": "4s"
+      }
+    }
+  ]
+}

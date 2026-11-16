@@ -10,9 +10,9 @@ import prettier from 'eslint-config-prettier';
 export function configuracionBase(tsconfigRootDir) {
   return tseslint.config(
     { ignores: ['dist/**', 'coverage/**', '.angular/**', 'node_modules/**'] },
-    js.configs.recommended,
-    ...tseslint.configs.recommendedTypeChecked,
     {
+      files: ['**/*.ts'],
+      extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
       languageOptions: {
         parserOptions: {
           projectService: true,
@@ -34,7 +34,7 @@ export function configuracionBase(tsconfigRootDir) {
     },
     {
       files: ['**/*.mjs', '**/*.js'],
-      ...tseslint.configs.disableTypeChecked,
+      extends: [js.configs.recommended],
     },
     prettier,
   );

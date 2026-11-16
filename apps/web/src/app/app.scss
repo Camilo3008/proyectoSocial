@@ -1,0 +1,128 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.saltar {
+  position: absolute;
+  left: var(--esp-2);
+  top: -4rem;
+  z-index: 10;
+  padding: var(--esp-2) var(--esp-4);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+
+  &:focus {
+    top: var(--esp-2);
+  }
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  min-height: 3.5rem;
+  padding: 0 var(--esp-4);
+  padding-top: env(safe-area-inset-top);
+  background: var(--color-superficie);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--alto-tactil);
+  color: var(--color-texto);
+  font-size: var(--texto-lg);
+  font-weight: 700;
+  text-decoration: none;
+
+  &__icono {
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--color-acento);
+  }
+}
+
+.aviso-offline {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-4);
+  background: var(--color-aviso-fondo);
+  color: var(--color-aviso);
+  font-weight: 600;
+
+  &__icono {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+}
+
+.contenido {
+  flex: 1;
+  width: 100%;
+  max-width: var(--ancho-contenido);
+  margin: 0 auto;
+  padding: var(--esp-4);
+  padding-bottom: calc(var(--alto-barra-inferior) + var(--esp-5) + env(safe-area-inset-bottom));
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.barra-inferior {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 5;
+  background: var(--color-superficie);
+  border-top: 1px solid var(--color-borde);
+  padding-bottom: env(safe-area-inset-bottom);
+
+  ul {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    max-width: var(--ancho-contenido);
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: var(--alto-barra-inferior);
+    color: var(--color-texto-suave);
+    font-size: var(--texto-xs);
+    text-decoration: none;
+
+    &.activa {
+      color: var(--color-acento-oscuro);
+      font-weight: 700;
+
+      svg {
+        stroke-width: 2.4;
+      }
+    }
+  }
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}

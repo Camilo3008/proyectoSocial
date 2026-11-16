@@ -1,0 +1,33 @@
+{
+  "name": "AgroPrecios",
+  "short_name": "AgroPrecios",
+  "description": "Precios de referencia de café, plátano, banano, cacao y pitaya.",
+  "lang": "es-CO",
+  "dir": "ltr",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "./",
+  "start_url": "./",
+  "theme_color": "#2e6b3f",
+  "background_color": "#f7f6f2",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

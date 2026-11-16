@@ -23,9 +23,7 @@ describe('validarEntorno', () => {
   });
 
   it('rechaza un ADMIN_PASSWORD corto', () => {
-    expect(() => validarEntorno({ ...minimas, ADMIN_PASSWORD: 'corta' })).toThrow(
-      /ADMIN_PASSWORD/,
-    );
+    expect(() => validarEntorno({ ...minimas, ADMIN_PASSWORD: 'corta' })).toThrow(/ADMIN_PASSWORD/);
   });
 
   it('rechaza un puerto inválido', () => {

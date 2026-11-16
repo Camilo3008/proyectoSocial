@@ -1,4 +1,4 @@
-# Dependencias
+﻿# Dependencias
 node_modules/
 
 # Salidas de compilación
@@ -6,7 +6,7 @@ dist/
 out-tsc/
 tmp/
 *.tsbuildinfo
-.angular/cache/
+.angular/
 
 # Variables de entorno (nunca se suben; usar .env.example)
 .env

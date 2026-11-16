@@ -7,16 +7,13 @@ export default [
     languageOptions: {
       globals: { ...globals.node },
     },
-    rules: {
-      // NestJS usa clases con decoradores e inyección por constructor; los imports
-      // de tipos usados en metadatos de decoradores deben ser imports de valor.
-      '@typescript-eslint/consistent-type-imports': 'off',
-    },
   },
   {
-    files: ['src/database/migrations/**/*.ts'],
+    files: ['**/*.ts'],
     rules: {
-      '@typescript-eslint/no-unsafe-argument': 'off',
+      // NestJS usa inyección por constructor con metadatos de decoradores: los
+      // tipos usados en constructores deben importarse como valores.
+      '@typescript-eslint/consistent-type-imports': 'off',
     },
   },
 ];

@@ -1,0 +1,66 @@
+<h1>Fuentes de datos</h1>
+<p class="intro">De dónde vienen los precios y cuándo se actualizaron por última vez.</p>
+
+@if (fuentes.hasValue()) {
+  <ul class="lista" aria-label="Fuentes de datos">
+    @for (fuente of fuentes.value(); track fuente.slug) {
+      <li class="tarjeta fuente">
+        <div class="fuente__cabecera">
+          <h2 class="fuente__nombre">{{ fuente.nombre }}</h2>
+          <span class="insignia insignia--{{ estado[fuente.estado].tono }}">
+            {{ estado[fuente.estado].texto }}
+          </span>
+        </div>
+
+        <dl class="datos">
+          <div>
+            <dt>Última actualización</dt>
+            <dd>
+              @if (fuente.ultimaIngestaExitosa; as fecha) {
+                <time [attr.datetime]="fecha">{{ fecha | date: 'd MMM y, h:mm a' }}</time>
+              } @else {
+                Todavía no hay datos
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Frecuencia</dt>
+            <dd>
+              {{ fuente.tipo === 'MANUAL' ? 'Cuando se necesite' : frecuencia[fuente.frecuencia] }}
+            </dd>
+          </div>
+          <div>
+            <dt>Tipo</dt>
+            <dd>{{ tipo[fuente.tipo] }}</dd>
+          </div>
+          <div>
+            <dt>Licencia</dt>
+            <dd>{{ fuente.licencia ?? 'Por verificar' }}</dd>
+          </div>
+        </dl>
+
+        @if (fuente.url; as url) {
+          <a class="fuente__enlace" [href]="url" target="_blank" rel="noopener noreferrer">
+            Sitio oficial<span class="solo-lectores">
+              de {{ fuente.nombre }} (se abre en otra pestaña)</span
+            >
+          </a>
+        }
+      </li>
+    } @empty {
+      <li class="tarjeta">No hay fuentes registradas.</li>
+    }
+  </ul>
+} @else if (fuentes.error()) {
+  <div class="tarjeta mensaje-error" role="alert">
+    <p>No pudimos cargar las fuentes. Revisa tu conexión e inténtalo de nuevo.</p>
+    <button type="button" class="boton" (click)="fuentes.reload()">Reintentar</button>
+  </div>
+} @else {
+  <p role="status" class="cargando">Cargando fuentes…</p>
+}
+
+<p class="descargo">
+  Los precios son de referencia y provienen de fuentes públicas. No constituyen una oferta de compra
+  ni una asesoría financiera.
+</p>

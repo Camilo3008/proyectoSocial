@@ -9,7 +9,5 @@ import { TasaCambio } from './entities/tasa-cambio.entity.js';
  */
 @Injectable()
 export class TasasService {
-  constructor(
-    @InjectRepository(TasaCambio) protected readonly tasas: Repository<TasaCambio>,
-  ) {}
+  constructor(@InjectRepository(TasaCambio) protected readonly tasas: Repository<TasaCambio>) {}
 }

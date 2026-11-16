@@ -28,7 +28,10 @@ export const TIPOS_MERCADO = [
   'LOCAL',
 ] as const satisfies readonly TipoMercado[];
 
-export const DISPAROS_INGESTA = ['PROGRAMADO', 'MANUAL'] as const satisfies readonly DisparoIngesta[];
+export const DISPAROS_INGESTA = [
+  'PROGRAMADO',
+  'MANUAL',
+] as const satisfies readonly DisparoIngesta[];
 
 export const ESTADOS_INGESTA = [
   'EN_CURSO',
