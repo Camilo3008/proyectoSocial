@@ -79,6 +79,30 @@ async function trmPorFecha(em: EntityManager, fechas: string[]): Promise<Map<str
 }
 
 /**
+ * Promedio de la TRM de cada mes pedido (fechas YYYY-MM-01), con 6 decimales.
+ * Se usa para series mensuales: su precio es un promedio del mes.
+ */
+async function trmPromedioMensual(
+  em: EntityManager,
+  meses: string[],
+): Promise<Map<string, string>> {
+  const resultado = new Map<string, string>();
+  if (meses.length === 0) return resultado;
+  const ordenados = [...new Set(meses)].sort();
+  const filas = await em.query<{ mes: string; valor: string }[]>(
+    `SELECT to_char(date_trunc('month', fecha), 'YYYY-MM-DD') AS mes,
+            round(avg(valor), 6)::text AS valor
+     FROM tasa_cambio
+     WHERE moneda_origen = 'USD' AND moneda_destino = 'COP'
+       AND fecha >= $1::date AND fecha < ($2::date + interval '1 month')
+     GROUP BY 1`,
+    [ordenados[0], ordenados.at(-1)],
+  );
+  for (const f of filas) resultado.set(f.mes, f.valor);
+  return resultado;
+}
+
+/**
  * Normaliza y guarda observaciones de una ingesta con upsert idempotente sobre
  * uq_observacion_precio_clave. No toca observaciones anuladas por el
  * administrador y solo actualiza si algo cambió. Debe correr dentro de la
@@ -101,10 +125,17 @@ export async function guardarObservaciones(
   const mapeo = await cargarMapeo(em, fuenteId);
   const { ids: idMercado, nuevos } = await upsertMercados(em, fuenteId, observaciones);
   conteo.mercadosNuevos = nuevos;
-  const trm = await trmPorFecha(
+  // TRM del día (o la anterior) para datos diarios; promedio del mes para datos mensuales.
+  const trmDiaria = await trmPorFecha(
     em,
-    observaciones.map((o) => o.fecha),
+    observaciones.filter((o) => o.periodicidad !== 'MENSUAL').map((o) => o.fecha),
   );
+  const trmMensual = await trmPromedioMensual(
+    em,
+    observaciones.filter((o) => o.periodicidad === 'MENSUAL').map((o) => o.fecha),
+  );
+  const trmDe = (o: ObservacionPrecioCruda) =>
+    (o.periodicidad === 'MENSUAL' ? trmMensual.get(o.fecha) : trmDiaria.get(o.fecha)) ?? null;
 
   const sinMapeo = new Set<string>();
   const filas: unknown[][] = [];
@@ -114,7 +145,7 @@ export async function guardarObservaciones(
       sinMapeo.add(o.codigoExterno);
       continue;
     }
-    const derivados = calcularDerivados(o.valor, o.moneda, o.unidad, trm.get(o.fecha) ?? null);
+    const derivados = calcularDerivados(o.valor, o.moneda, o.unidad, trmDe(o));
     filas.push([
       destino.productoId,
       fuenteId,
@@ -163,6 +194,7 @@ export async function guardarObservaciones(
            AND (observacion_precio.valor IS DISTINCT FROM EXCLUDED.valor
              OR observacion_precio.unidad IS DISTINCT FROM EXCLUDED.unidad
              OR observacion_precio.moneda IS DISTINCT FROM EXCLUDED.moneda
+             OR observacion_precio.valor_cop_kg IS DISTINCT FROM EXCLUDED.valor_cop_kg
              OR observacion_precio.valor_usd_kg IS DISTINCT FROM EXCLUDED.valor_usd_kg
              OR observacion_precio.metadata IS DISTINCT FROM EXCLUDED.metadata)
        RETURNING (xmax = 0) AS insertado`,

@@ -125,9 +125,27 @@ export class VariablesEntorno {
   @Min(1)
   @Max(4000)
   SIPSA_DIAS_VENTANA = 45;
+
+  /**
+   * Horario de la ingesta del Banco Mundial (cron con segundos, zona America/Bogota).
+   * Por defecto los lunes a las 9:00 (el archivo se actualiza a comienzos de mes).
+   */
+  @IsString()
+  WORLDBANK_CRON = '0 0 9 * * 1';
+
+  /**
+   * XLSX mensual del Pink Sheet (docs/fuentes/worldbank.md). Si deja de existir,
+   * el adapter busca el enlace vigente en la página oficial y lo advierte.
+   */
+  @IsString()
+  @Matches(/^https:\/\/[^\s]+\.xlsx$/, {
+    message: 'WORLDBANK_URL debe ser una URL https a un .xlsx',
+  })
+  WORLDBANK_URL =
+    'https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx';
 }
 
-const VARIABLES_CRON = ['TRM_CRON', 'SIPSA_CRON'] as const;
+const VARIABLES_CRON = ['TRM_CRON', 'SIPSA_CRON', 'WORLDBANK_CRON'] as const;
 
 /** Devuelve un mensaje de error si la expresión cron no es válida. */
 function validarCron(expresion: string): string | null {

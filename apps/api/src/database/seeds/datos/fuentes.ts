@@ -9,7 +9,7 @@ type FuenteSemilla = Pick<
  * Fuentes de datos (docs/PROYECTO.md §7).
  *
  * Las fuentes verificadas (ficha en docs/fuentes/<slug>.md) llevan su URL y su
- * licencia. TODO(verificar): sipsa, worldbank y faostat todavía apuntan a la
+ * licencia. TODO(verificar): sipsa y faostat todavía apuntan a la
  * página institucional y tienen la licencia en null ("Por verificar").
  */
 export const FUENTES: FuenteSemilla[] = [
@@ -40,8 +40,8 @@ export const FUENTES: FuenteSemilla[] = [
     descripcion:
       'Precios internacionales mensuales en dólares de café arábica, café robusta, cacao y banano.',
     tipo: 'INTERNACIONAL',
-    url: 'https://www.worldbank.org/',
-    licencia: null,
+    url: 'https://www.worldbank.org/en/research/commodity-markets',
+    licencia: 'CC BY 4.0 – Banco Mundial, Commodity Price Data (The Pink Sheet)',
     frecuencia: 'MENSUAL',
   },
   {

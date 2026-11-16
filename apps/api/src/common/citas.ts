@@ -7,6 +7,8 @@ export const CITAS_FUENTE: Readonly<Record<string, string>> = {
   sipsa: 'Fuente: Departamento Administrativo Nacional de Estadística: www.dane.gov.co',
   // CC BY-SA 4.0: atribución.
   trm: 'Fuente: Superintendencia Financiera de Colombia (datos.gov.co), CC BY-SA 4.0',
+  // CC BY 4.0 (docs/fuentes/worldbank.md): atribución, sin sugerir respaldo del Banco Mundial.
+  worldbank: 'Fuente: Banco Mundial, Commodity Price Data (The Pink Sheet), CC BY 4.0',
 };
 
 export function citaDe(slug: string): string | null {

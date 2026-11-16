@@ -34,4 +34,44 @@ export const PRODUCTO_FUENTE: MapeoSemilla[] = [
     notas:
       'SIPSA promediosSipsaParcial, idArtiSemana 15: "Banano*" (el asterisco viene de la fuente)',
   },
+  // Banco Mundial (docs/fuentes/worldbank.md): el código es el encabezado exacto de la columna.
+  {
+    producto: 'cafe',
+    fuente: 'worldbank',
+    codigoExterno: 'Coffee, Arabica',
+    presentacion: 'verde arábica (indicador ICO)',
+    notas:
+      'ICO indicator price, other mild Arabicas, average New York and Bremen/Hamburg markets, ex-dock',
+  },
+  {
+    producto: 'cafe',
+    fuente: 'worldbank',
+    codigoExterno: 'Coffee, Robusta',
+    presentacion: 'verde robusta (indicador ICO)',
+    notas:
+      'ICO indicator price, Robustas, average New York and Le Havre/Marseilles markets, ex-dock',
+  },
+  {
+    producto: 'cacao',
+    fuente: 'worldbank',
+    codigoExterno: 'Cocoa',
+    presentacion: 'en grano (ICCO)',
+    notas:
+      'ICCO daily price, average of the first three positions on the terminal markets of New York and London',
+  },
+  {
+    producto: 'banano',
+    fuente: 'worldbank',
+    codigoExterno: 'Banana, US',
+    presentacion: 'importación EE. UU.',
+    notas: 'Bananas (Central & South America), major brands, US import price, f.o.t. US Gulf ports',
+  },
+  {
+    producto: 'banano',
+    fuente: 'worldbank',
+    codigoExterno: 'Banana, Europe',
+    presentacion: 'importación Europa',
+    notas:
+      'Bananas (Central & South America), major brands, f.o.t. Southern Europe, including duties',
+  },
 ];
