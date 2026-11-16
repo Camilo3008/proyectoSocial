@@ -1,0 +1,32 @@
+# Infraestructura local de AgroPrecios.
+# Uso: docker compose up -d db
+# Las variables se toman del archivo .env de la raíz (copiar desde .env.example).
+name: agroprecios
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: agroprecios-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:?Definir DB_USER en .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Definir DB_PASSWORD en .env}
+      POSTGRES_DB: ${DB_NAME:?Definir DB_NAME en .env}
+      # Base adicional para las pruebas e2e (la crea docker/db/init/01-crear-bd-pruebas.sh).
+      DB_NAME_TEST: ${DB_NAME_TEST:-agroprecios_test}
+      TZ: America/Bogota
+      PGTZ: America/Bogota
+    ports:
+      - '127.0.0.1:${DB_PORT:-5432}:5432'
+    volumes:
+      - agroprecios_db_data:/var/lib/postgresql/data
+      - ./docker/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  agroprecios_db_data:
