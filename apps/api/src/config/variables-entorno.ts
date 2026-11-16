@@ -1,11 +1,13 @@
-import { plainToInstance, Type } from 'class-transformer';
+import { plainToInstance, Transform, Type } from 'class-transformer';
 import {
   IsEmail,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
   MinLength,
@@ -84,15 +86,36 @@ export class VariablesEntorno {
   @MinLength(12)
   ADMIN_PASSWORD?: string;
 
-  /** Se volverá obligatorio cuando se implemente la autenticación (RF-07). */
-  @IsOptional()
+  /** Secreto para firmar los JWT del administrador. */
   @IsString()
   @MinLength(32)
-  JWT_SECRET?: string;
+  JWT_SECRET: string;
 
-  @IsOptional()
+  /** Duración del JWT: número + unidad (s, m, h, d). Corta por seguridad. */
   @IsString()
-  JWT_EXPIRES_IN?: string;
+  @Matches(/^\d+[smhd]$/, { message: 'JWT_EXPIRES_IN debe ser como 15m, 1h o 900s' })
+  JWT_EXPIRES_IN = '15m';
+
+  /** Activa los jobs programados de ingesta (desactivar en pruebas). */
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() === 'true' : value,
+  )
+  @IsBoolean()
+  INGESTA_PROGRAMADA = true;
+}
+
+const SEGUNDOS_POR_UNIDAD = { s: 1, m: 60, h: 3600, d: 86_400 } as const;
+
+/** Convierte una duración como "15m" a segundos. */
+export function duracionEnSegundos(duracion: string): number {
+  const coincidencia = /^(\d+)([smhd])$/.exec(duracion);
+  if (!coincidencia) {
+    throw new Error(`Duración inválida: ${duracion}`);
+  }
+  return (
+    Number(coincidencia[1]) *
+    SEGUNDOS_POR_UNIDAD[coincidencia[2] as keyof typeof SEGUNDOS_POR_UNIDAD]
+  );
 }
 
 /** Valida y tipa las variables de entorno. Lanza un error descriptivo si son inválidas. */

@@ -41,6 +41,8 @@ jobs:
       DB_PASSWORD: solo_para_ci
       DB_NAME: agroprecios_test
       DB_NAME_TEST: agroprecios_test
+      JWT_SECRET: secreto_de_ejemplo_solo_para_ci_no_es_real_0123456789
+      INGESTA_PROGRAMADA: 'false'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

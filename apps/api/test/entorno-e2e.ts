@@ -6,3 +6,5 @@ process.env.NODE_ENV = 'test';
 process.env.DB_NAME = process.env.DB_NAME_TEST ?? 'agroprecios_test';
 // Evita que el rate limiting interfiera con las pruebas.
 process.env.THROTTLE_LIMIT = '10000';
+// Los jobs programados no deben correr durante las pruebas.
+process.env.INGESTA_PROGRAMADA = 'false';
