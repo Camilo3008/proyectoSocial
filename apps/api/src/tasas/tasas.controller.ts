@@ -54,7 +54,7 @@ export class TasasController {
   constructor(private readonly tasas: TasasService) {}
 
   @Get('trm')
-  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @Header('Cache-Control', CACHE_CONTROL.datos)
   @ApiOperation({
     summary: 'Serie diaria de la TRM (COP por USD)',
     description: 'Fuente: Superintendencia Financiera de Colombia vía datos.gov.co, CC BY-SA 4.0.',

@@ -10,7 +10,7 @@ export class FuentesController {
   constructor(private readonly catalogo: CatalogoService) {}
 
   @Get()
-  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @Header('Cache-Control', CACHE_CONTROL.datos)
   @ApiOperation({ summary: 'Fuentes de datos con su última ingesta exitosa y su estado' })
   @ApiOkResponse({ type: FuenteRespuesta, isArray: true })
   listar(): Promise<FuenteRespuesta[]> {

@@ -1,5 +1,8 @@
+// minmax(0, 1fr) y min-width: 0 evitan que un <select> con opciones largas
+// ensanche la página y cause desplazamiento horizontal en el celular.
 .filtros {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--esp-3);
   margin-bottom: var(--esp-4);
 }
@@ -7,6 +10,7 @@
 .campo {
   display: grid;
   gap: var(--esp-1);
+  min-width: 0;
 
   span {
     color: var(--color-texto-suave);
@@ -20,6 +24,9 @@
     background: var(--color-superficie);
     color: var(--color-texto);
     font: inherit;
+    width: 100%;
+    max-width: 100%;
+    text-overflow: ellipsis;
   }
 }
 

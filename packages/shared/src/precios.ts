@@ -120,6 +120,8 @@ export interface SerieDisponibleDto {
   desde: string;
   hasta: string;
   cantidad: number;
+  /** true para la serie que usa la pantalla "Hoy" (la que se muestra por defecto). */
+  predeterminada: boolean;
 }
 
 export interface PuntoSerieDto {

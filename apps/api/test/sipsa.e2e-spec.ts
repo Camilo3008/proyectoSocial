@@ -246,6 +246,13 @@ describe('Ingesta SIPSA (e2e)', () => {
       'Neiva, Surabastos · hartón verde',
     ]);
     expect(series[0]?.fuente.cita).toBe(CITA_DANE);
+    // La predeterminada es la que usa "Hoy": Neiva, hartón verde.
+    const predeterminadas = series.filter((s) => s.predeterminada);
+    expect(predeterminadas).toHaveLength(1);
+    expect(predeterminadas[0]).toMatchObject({
+      mercado: { nombre: 'Neiva, Surabastos' },
+      presentacion: 'hartón verde',
+    });
   });
 
   it('GET /api/precios/serie usa la referencia de "Hoy" y resume el rango', async () => {

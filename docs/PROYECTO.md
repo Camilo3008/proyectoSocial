@@ -477,6 +477,11 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-16 | **Etapa 2 (aprobado):** mercados creados automáticamente al ingerir, identificados por `(fuente_id, codigo_externo)` (migración `MercadoCodigoFuente`), con upsert idempotente; nombre, municipio y departamento tal como vienen de la fuente; sin coordenadas inventadas (`NULL`); `ingesta_ejecucion.mercados_nuevos` registra cuántos se crearon | Evita duplicados cuando la fuente renombra un mercado (SIPSA tiene 26 nombres para 23 códigos) y deja trazabilidad |
 | 2026-11-16 | Horarios y ventana de ingesta configurables por entorno: `TRM_CRON`, `SIPSA_CRON` (por defecto 15:30 de lunes a sábado), `SIPSA_DIAS_VENTANA` (45); se validan al arrancar | El autor definirá los intervalos de producción; en desarrollo bastan datos de prueba |
 | 2026-11-16 | Etapa 2 se cierra con plátano (hartón verde y guineo) y banano; pitaya y cacao quedan "próximamente" | No están en el servicio web de SIPSA (pregunta abierta 9) |
+| 2026-11-16 | Endpoint adicional `GET /api/precios/series?producto=` (series comparables disponibles, con la predeterminada marcada) para el selector de Histórico y Nacional | El selector de RF-02 necesita saber qué combinaciones de mercado y presentación existen |
+| 2026-11-16 | "Hoy" y el comparativo eligen mercado por cercanía a Pitalito: Neiva (Huila) → Popayán (Cauca) → Bogotá Corabastos; se usa el primero con datos de los últimos 10 días | Neiva es la central del mismo departamento; sin coordenadas verificadas no se calcula distancia |
+| 2026-11-16 | Cada dato viaja con la cita que exige su licencia (`fuente.cita`: DANE, TRM) y se muestra en la interfaz | Términos de uso del DANE (cita textual) y CC BY-SA de la TRM |
+| 2026-11-16 | `Cache-Control` de precios, tasas y fuentes: `max-age=300, stale-while-revalidate=60` (antes 86400) | Con una ventana larga el navegador mostraba precios de horas atrás después de una ingesta; el modo sin conexión lo da el service worker |
+| 2026-11-16 | Gráficas con Chart.js 4 (MIT), solo los módulos de línea, cargado con `import()` dentro de Histórico (~61 kB gzip, fuera del bundle inicial) | RF-02; CLAUDE.md pide imports selectivos |
 
 ---
 

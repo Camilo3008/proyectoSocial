@@ -221,6 +221,20 @@ export class ConsultasPreciosService {
        ORDER BY max(o.fecha) DESC, f.slug, o.presentacion, m.nombre`,
       [producto.id],
     );
+    // La serie que usa "Hoy" es la predeterminada (p. ej. plátano hartón verde en Neiva).
+    const referencia = await this.ultimaObservacion(
+      producto.id,
+      fechaBogota(),
+      REFERENCIAS_HOY[producto.slug]?.principal,
+    );
+    const esReferencia = (s: (typeof filas)[number]) =>
+      referencia !== null &&
+      s.fuente_slug === referencia.fuente.slug &&
+      (s.mercado_id ?? null) === (referencia.mercadoId ?? null) &&
+      s.presentacion === referencia.presentacion &&
+      s.unidad === referencia.unidad &&
+      s.moneda === referencia.moneda;
+
     return filas.map((s) => ({
       fuente: fuenteDato({ slug: s.fuente_slug, nombre: s.fuente_nombre }),
       mercado:
@@ -233,6 +247,7 @@ export class ConsultasPreciosService {
       desde: s.desde,
       hasta: s.hasta,
       cantidad: s.cantidad,
+      predeterminada: esReferencia(s),
     }));
   }
 

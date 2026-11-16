@@ -40,12 +40,17 @@ export class HistoricoPage {
     () => `${this.api}/precios/series?producto=${encodeURIComponent(this.productoActual())}`,
   );
 
-  /** Serie elegida: la de la URL o, si no hay, la primera disponible. */
+  /** Serie elegida: la de la URL o, si no hay, la de "Hoy" (predeterminada) o la primera. */
   protected readonly serieElegida = computed<SerieDisponibleDto | null>(() => {
     if (!this.series.hasValue()) return null;
     const lista = this.series.value();
     const pedida = `${this.fuente() ?? ''}|${this.mercado() ?? ''}|${this.presentacion() ?? ''}`;
-    return lista.find((s) => claveSerie(s) === pedida) ?? lista[0] ?? null;
+    return (
+      lista.find((s) => claveSerie(s) === pedida) ??
+      lista.find((s) => s.predeterminada) ??
+      lista[0] ??
+      null
+    );
   });
 
   protected readonly datos = httpResource<SeriePrecioDto>(() => {

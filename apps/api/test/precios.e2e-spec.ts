@@ -68,7 +68,8 @@ describe('Precios: carga manual y precio del día (e2e)', () => {
       'pitaya',
     ]);
     expect(hoy.trm?.fuente.licencia).toContain('CC BY-SA');
-    expect(res.headers['cache-control']).toContain('max-age=');
+    // Ventana "stale" corta: el navegador no debe mostrar precios viejos tras una ingesta.
+    expect(res.headers['cache-control']).toBe('public, max-age=300, stale-while-revalidate=60');
   });
 
   it('la carga manual exige token', async () => {

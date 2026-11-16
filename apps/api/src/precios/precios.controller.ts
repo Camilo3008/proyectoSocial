@@ -48,7 +48,7 @@ export class PreciosController {
   constructor(private readonly consultas: ConsultasPreciosService) {}
 
   @Get('hoy')
-  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @Header('Cache-Control', CACHE_CONTROL.datos)
   @ApiOperation({
     summary: 'Último precio de referencia por producto (pantalla "Hoy")',
     description:
@@ -61,7 +61,7 @@ export class PreciosController {
   }
 
   @Get('series')
-  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @Header('Cache-Control', CACHE_CONTROL.datos)
   @ApiOperation({
     summary: 'Series de precios disponibles para un producto',
     description:
@@ -74,7 +74,7 @@ export class PreciosController {
   }
 
   @Get('serie')
-  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @Header('Cache-Control', CACHE_CONTROL.datos)
   @ApiOperation({
     summary: 'Serie histórica de precios con mínimo, máximo y promedio del rango (RF-02)',
     description:
@@ -87,7 +87,7 @@ export class PreciosController {
   }
 
   @Get('comparativo')
-  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @Header('Cache-Control', CACHE_CONTROL.datos)
   @ApiOperation({
     summary: 'Precio de un producto en cada mercado mayorista para una fecha (RF-03)',
     description:

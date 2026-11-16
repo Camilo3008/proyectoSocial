@@ -32,6 +32,7 @@ const SERIES: SerieDisponibleDto[] = [
     desde: '2020-02-01',
     hasta: '2026-11-13',
     cantidad: 1500,
+    predeterminada: true,
   },
   {
     fuente: SIPSA,
@@ -42,6 +43,7 @@ const SERIES: SerieDisponibleDto[] = [
     desde: '2020-02-01',
     hasta: '2026-11-13',
     cantidad: 1500,
+    predeterminada: false,
   },
 ];
 
