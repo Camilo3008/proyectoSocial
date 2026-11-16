@@ -141,7 +141,7 @@ describe('Precios: carga manual y precio del día (e2e)', () => {
     expect(cafe?.complementos).toEqual([
       expect.objectContaining({
         etiqueta: 'Bolsa de Nueva York',
-        mercado: { nombre: 'Bolsa de Nueva York (ICE)' },
+        mercado: expect.objectContaining({ nombre: 'Bolsa de Nueva York (ICE)' }) as object,
         valor: '278.6500',
         moneda: 'USD',
         unidad: 'USc/lb',

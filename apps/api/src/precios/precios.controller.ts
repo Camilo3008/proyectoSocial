@@ -1,9 +1,26 @@
-import { type ObservacionPrecioDto, type PreciosHoyDto } from '@agroprecios/shared';
-import { Body, Controller, Get, Header, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  type ComparativoDto,
+  type ObservacionPrecioDto,
+  type PreciosHoyDto,
+  type SerieDisponibleDto,
+  type SeriePrecioDto,
+} from '@agroprecios/shared';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -12,9 +29,13 @@ import {
 import { AdminGuard, UsuarioActual } from '../auth/admin.guard.js';
 import { type UsuarioAutenticado } from '../auth/auth.service.js';
 import { CACHE_CONTROL } from '../common/cache-control.js';
+import { ConsultasPreciosService } from './consultas-precios.service.js';
 import {
   AnulacionPrecioCuerpo,
   CargaManualPrecioCuerpo,
+  ConsultaComparativo,
+  ConsultaProducto,
+  ConsultaSerie,
   ObservacionPrecioRespuesta,
   ParametroId,
   PreciosHoyRespuesta,
@@ -24,7 +45,7 @@ import { PreciosService } from './precios.service.js';
 @ApiTags('precios')
 @Controller('precios')
 export class PreciosController {
-  constructor(private readonly precios: PreciosService) {}
+  constructor(private readonly consultas: ConsultasPreciosService) {}
 
   @Get('hoy')
   @Header('Cache-Control', CACHE_CONTROL.catalogo)
@@ -32,11 +53,50 @@ export class PreciosController {
     summary: 'Último precio de referencia por producto (pantalla "Hoy")',
     description:
       'Incluye la variación frente al dato anterior comparable, datos complementarios ' +
-      '(p. ej. Bolsa de Nueva York para el café) y la TRM vigente.',
+      '(p. ej. Bolsa de Nueva York para el café), la cita que exige cada fuente y la TRM vigente.',
   })
   @ApiOkResponse({ type: PreciosHoyRespuesta })
   hoy(): Promise<PreciosHoyDto> {
-    return this.precios.hoy();
+    return this.consultas.hoy();
+  }
+
+  @Get('series')
+  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @ApiOperation({
+    summary: 'Series de precios disponibles para un producto',
+    description:
+      'Cada serie es una combinación comparable de fuente, mercado, presentación y unidad.',
+  })
+  @ApiOkResponse({ description: 'Lista de SerieDisponibleDto' })
+  @ApiNotFoundResponse({ description: 'El producto no existe' })
+  series(@Query() { producto }: ConsultaProducto): Promise<SerieDisponibleDto[]> {
+    return this.consultas.series(producto);
+  }
+
+  @Get('serie')
+  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @ApiOperation({
+    summary: 'Serie histórica de precios con mínimo, máximo y promedio del rango (RF-02)',
+    description:
+      'Sin fuente ni presentación usa la referencia de "Hoy". Nunca mezcla presentaciones ni unidades.',
+  })
+  @ApiOkResponse({ description: 'SeriePrecioDto' })
+  @ApiNotFoundResponse({ description: 'No hay datos para esa serie' })
+  serie(@Query() consulta: ConsultaSerie): Promise<SeriePrecioDto> {
+    return this.consultas.serie(consulta);
+  }
+
+  @Get('comparativo')
+  @Header('Cache-Control', CACHE_CONTROL.catalogo)
+  @ApiOperation({
+    summary: 'Precio de un producto en cada mercado mayorista para una fecha (RF-03)',
+    description:
+      'Ordenado de mayor a menor, con la diferencia en % frente al mercado de referencia de la ' +
+      'región (el más cercano a Pitalito con dato ese día).',
+  })
+  @ApiOkResponse({ description: 'ComparativoDto' })
+  comparativo(@Query() consulta: ConsultaComparativo): Promise<ComparativoDto> {
+    return this.consultas.comparativo(consulta.producto, consulta.presentacion, consulta.fecha);
   }
 }
 

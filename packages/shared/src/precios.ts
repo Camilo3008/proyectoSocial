@@ -1,8 +1,15 @@
 import { type Frecuencia } from './catalogo.js';
 
-interface Referencia {
+export interface ReferenciaDto {
   slug: string;
   nombre: string;
+}
+type Referencia = ReferenciaDto;
+
+/** Fuente de un dato, con la cita que su licencia exige mostrar (si la hay). */
+export interface FuenteDatoDto extends ReferenciaDto {
+  /** P. ej. SIPSA: "Fuente: Departamento Administrativo Nacional de Estadística: www.dane.gov.co". */
+  cita: string | null;
 }
 
 /** POST /api/admin/precios (cuerpo): carga manual de una observación. */
@@ -64,8 +71,8 @@ export interface VariacionDto {
 
 /** Un precio de referencia con su procedencia. */
 export interface PrecioReferenciaDto {
-  fuente: Referencia;
-  mercado: { nombre: string } | null;
+  fuente: FuenteDatoDto;
+  mercado: { id: number; nombre: string } | null;
   fecha: string;
   presentacion: string;
   valor: string;
@@ -100,4 +107,61 @@ export interface PreciosHoyDto {
     valor: string;
     fuente: Referencia & { licencia: string | null };
   } | null;
+}
+
+/** Una serie de precios disponible para un producto (GET /api/precios/series). */
+export interface SerieDisponibleDto {
+  fuente: FuenteDatoDto;
+  mercado: { id: number; nombre: string; departamento: string | null } | null;
+  presentacion: string;
+  unidad: string;
+  moneda: string;
+  /** Primera y última fecha con datos. */
+  desde: string;
+  hasta: string;
+  cantidad: number;
+}
+
+export interface PuntoSerieDto {
+  fecha: string;
+  valor: string;
+}
+
+/** GET /api/precios/serie */
+export interface SeriePrecioDto {
+  producto: Referencia;
+  fuente: FuenteDatoDto;
+  mercado: { id: number; nombre: string } | null;
+  presentacion: string;
+  unidad: string;
+  moneda: string;
+  desde: string;
+  hasta: string;
+  items: PuntoSerieDto[];
+  /** Mínimo, máximo y promedio del rango; null si no hay datos. */
+  resumen: { minimo: string; maximo: string; promedio: string; cantidad: number } | null;
+}
+
+/** Un mercado en el comparativo nacional. */
+export interface ComparativoItemDto {
+  mercado: { id: number; nombre: string; departamento: string | null };
+  valor: string;
+  /** Diferencia porcentual frente al mercado de referencia; null si no hay referencia. */
+  diferenciaPct: string | null;
+  esReferencia: boolean;
+}
+
+/** GET /api/precios/comparativo */
+export interface ComparativoDto {
+  producto: Referencia;
+  presentacion: string;
+  unidad: string;
+  moneda: string;
+  /** Fecha comparada (la pedida o la última con datos); null si no hay datos. */
+  fecha: string | null;
+  fuente: FuenteDatoDto | null;
+  /** Mercado de referencia de la región (el más cercano a Pitalito con dato ese día). */
+  referencia: { mercadoId: number; nombre: string; valor: string } | null;
+  /** Ordenados de mayor a menor precio. */
+  items: ComparativoItemDto[];
 }

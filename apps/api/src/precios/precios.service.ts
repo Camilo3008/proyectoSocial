@@ -1,9 +1,4 @@
-import {
-  type ComplementoPrecioDto,
-  type ObservacionPrecioDto,
-  type PrecioReferenciaDto,
-  type PreciosHoyDto,
-} from '@agroprecios/shared';
+import { type ObservacionPrecioDto } from '@agroprecios/shared';
 import {
   BadRequestException,
   ConflictException,
@@ -17,13 +12,11 @@ import { Fuente } from '../catalogo/entities/fuente.entity.js';
 import { Mercado } from '../catalogo/entities/mercado.entity.js';
 import { Pais } from '../catalogo/entities/pais.entity.js';
 import { Producto } from '../catalogo/entities/producto.entity.js';
-import { calcularVariacion } from '../common/decimal.js';
 import { esFechaValida, fechaBogota } from '../common/fechas.js';
 import { calcularDerivados } from '../common/unidades.js';
 import { TasasService } from '../tasas/tasas.service.js';
 import { ObservacionPrecio } from './entities/observacion-precio.entity.js';
 import { CargaManualPrecioCuerpo } from './precios.dto.js';
-import { type CriterioReferencia, REFERENCIAS_HOY } from './referencias-hoy.js';
 
 /** Violación de restricción única en PostgreSQL. */
 const PG_UNICA = '23505';
@@ -37,14 +30,12 @@ interface EntradaHistorial {
   reemplazadoPor: number;
 }
 
-/** Consultas de precios y carga manual con trazabilidad. */
+/** Carga manual de precios con trazabilidad (las consultas están en ConsultasPreciosService). */
 @Injectable()
 export class PreciosService {
   constructor(
     @InjectRepository(ObservacionPrecio)
     private readonly observaciones: Repository<ObservacionPrecio>,
-    @InjectRepository(Producto) private readonly productos: Repository<Producto>,
-    @InjectRepository(Fuente) private readonly fuentes: Repository<Fuente>,
     private readonly dataSource: DataSource,
     private readonly tasas: TasasService,
   ) {}
@@ -230,118 +221,5 @@ export class PreciosService {
       })
       .andWhere('o.presentacion = :presentacion', { presentacion: clave.presentacion })
       .getOne();
-  }
-
-  // ---------------------------------------------------------------------------
-  // Precio del día (RF-01)
-  // ---------------------------------------------------------------------------
-
-  async hoy(ahora = new Date()): Promise<PreciosHoyDto> {
-    const hoy = fechaBogota(ahora);
-    const productos = await this.productos.find({ where: { activo: true }, order: { id: 'ASC' } });
-
-    const items: PreciosHoyDto['items'] = [];
-    const sinDatos: PreciosHoyDto['sinDatos'] = [];
-
-    for (const producto of productos) {
-      const config = REFERENCIAS_HOY[producto.slug];
-      const principal = await this.ultimaObservacion(producto.id, config?.principal);
-      if (!principal) {
-        sinDatos.push({ slug: producto.slug, nombre: producto.nombre });
-        continue;
-      }
-      const complementos: ComplementoPrecioDto[] = [];
-      for (const criterio of config?.complementos ?? []) {
-        const obs = await this.ultimaObservacion(producto.id, criterio);
-        if (obs)
-          complementos.push({ etiqueta: criterio.etiqueta, ...(await this.aReferencia(obs)) });
-      }
-      items.push({
-        producto: { slug: producto.slug, nombre: producto.nombre },
-        ...(await this.aReferencia(principal)),
-        complementos,
-      });
-    }
-
-    return {
-      generadoEn: ahora.toISOString(),
-      hoy,
-      items,
-      sinDatos,
-      trm: await this.trmHoy(hoy),
-    };
-  }
-
-  /** Última observación activa de un producto que cumple el criterio (o de cualquier serie). */
-  private ultimaObservacion(
-    productoId: number,
-    criterio?: CriterioReferencia,
-  ): Promise<ObservacionPrecio | null> {
-    const consulta = this.observaciones
-      .createQueryBuilder('o')
-      .innerJoinAndSelect('o.fuente', 'f')
-      .leftJoinAndSelect('o.mercado', 'm')
-      .where('o.producto_id = :productoId AND o.anulado = false', { productoId })
-      .orderBy('o.fecha', 'DESC')
-      .addOrderBy('o.actualizado_en', 'DESC');
-    if (criterio) {
-      consulta
-        .andWhere('f.slug = :fuente', { fuente: criterio.fuente })
-        .andWhere('o.presentacion = :presentacion', { presentacion: criterio.presentacion });
-      if (criterio.mercado === null) consulta.andWhere('o.mercado_id IS NULL');
-      else consulta.andWhere('m.nombre = :mercado', { mercado: criterio.mercado });
-    }
-    return consulta.getOne();
-  }
-
-  /** Convierte una observación en precio de referencia, con su variación frente a la anterior. */
-  private async aReferencia(obs: ObservacionPrecio): Promise<PrecioReferenciaDto> {
-    // Dato anterior COMPARABLE: misma serie (fuente, mercado, país, presentación) y misma unidad y moneda.
-    const anterior = await this.observaciones
-      .createQueryBuilder('o')
-      // Parámetros explícitos: nunca pasar la entidad (sus relaciones pisarían los nombres).
-      .where('o.producto_id = :productoId AND o.fuente_id = :fuenteId', {
-        productoId: obs.productoId,
-        fuenteId: obs.fuenteId,
-      })
-      .andWhere('COALESCE(o.mercado_id, 0) = :mercadoClave', { mercadoClave: obs.mercadoId ?? 0 })
-      .andWhere("COALESCE(o.pais_iso3, '') = :paisClave", { paisClave: obs.paisIso3 ?? '' })
-      .andWhere('o.presentacion = :presentacion AND o.unidad = :unidad', {
-        presentacion: obs.presentacion,
-        unidad: obs.unidad,
-      })
-      .andWhere('o.moneda = :moneda AND o.periodicidad = :periodicidad', {
-        moneda: obs.moneda,
-        periodicidad: obs.periodicidad,
-      })
-      .andWhere('o.fecha < :fecha AND o.anulado = false', { fecha: obs.fecha })
-      .orderBy('o.fecha', 'DESC')
-      .getOne();
-
-    return {
-      fuente: { slug: obs.fuente.slug, nombre: obs.fuente.nombre },
-      mercado: obs.mercado ? { nombre: obs.mercado.nombre } : null,
-      fecha: obs.fecha,
-      presentacion: obs.presentacion,
-      valor: obs.valor,
-      moneda: obs.moneda,
-      unidad: obs.unidad,
-      valorCopKg: obs.valorCopKg,
-      variacion: anterior
-        ? { ...calcularVariacion(obs.valor, anterior.valor), fechaAnterior: anterior.fecha }
-        : null,
-    };
-  }
-
-  private async trmHoy(hoy: string): Promise<PreciosHoyDto['trm']> {
-    const [tasa, fuente] = await Promise.all([
-      this.tasas.trmVigente(hoy),
-      this.fuentes.findOneBy({ slug: 'trm' }),
-    ]);
-    if (!tasa || !fuente) return null;
-    return {
-      ...tasa,
-      fuente: { slug: fuente.slug, nombre: fuente.nombre, licencia: fuente.licencia },
-    };
   }
 }

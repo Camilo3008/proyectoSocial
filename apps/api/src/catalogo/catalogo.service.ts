@@ -2,12 +2,15 @@ import {
   type EstadoIngesta,
   type FrecuenciaFuente,
   type FuenteDto,
+  type MercadoDto,
   type ProductoDto,
   type TipoFuente,
+  type TipoMercado,
 } from '@agroprecios/shared';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { Mercado } from './entities/mercado.entity.js';
 import { Producto } from './entities/producto.entity.js';
 import { calcularEstadoFuente } from './estado-fuente.js';
 
@@ -27,6 +30,7 @@ interface FilaFuente {
 export class CatalogoService {
   constructor(
     @InjectRepository(Producto) private readonly productos: Repository<Producto>,
+    @InjectRepository(Mercado) private readonly mercados: Repository<Mercado>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -37,6 +41,24 @@ export class CatalogoService {
       nombre,
       descripcion,
       unidadBase,
+    }));
+  }
+
+  /** Mercados, opcionalmente filtrados por tipo, ordenados por departamento y nombre. */
+  async listarMercados(tipo?: TipoMercado): Promise<MercadoDto[]> {
+    const mercados = await this.mercados.find({
+      where: tipo ? { tipo } : {},
+      relations: { fuente: true },
+      order: { departamento: 'ASC', nombre: 'ASC' },
+    });
+    return mercados.map((m) => ({
+      id: m.id,
+      nombre: m.nombre,
+      tipo: m.tipo,
+      municipio: m.municipio,
+      departamento: m.departamento,
+      paisIso3: m.paisIso3,
+      fuente: m.fuente?.slug ?? null,
     }));
   }
 

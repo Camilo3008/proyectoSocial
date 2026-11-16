@@ -120,7 +120,19 @@ class Referencia {
 }
 
 class MercadoRef {
+  @ApiProperty() id: number;
   @ApiProperty() nombre: string;
+}
+
+export class FuenteDatoRespuesta {
+  @ApiProperty() slug: string;
+  @ApiProperty() nombre: string;
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Cita que exige la licencia de la fuente',
+  })
+  cita: string | null;
 }
 
 class MercadoConId {
@@ -155,7 +167,7 @@ class VariacionRespuesta implements VariacionDto {
 
 class ComplementoRespuesta implements ComplementoPrecioDto {
   @ApiProperty() etiqueta: string;
-  @ApiProperty({ type: Referencia }) fuente: Referencia;
+  @ApiProperty({ type: FuenteDatoRespuesta }) fuente: FuenteDatoRespuesta;
   @ApiProperty({ type: MercadoRef, nullable: true }) mercado: MercadoRef | null;
   @ApiProperty() fecha: string;
   @ApiProperty() presentacion: string;
@@ -168,7 +180,7 @@ class ComplementoRespuesta implements ComplementoPrecioDto {
 
 class PrecioHoyItemRespuesta implements PrecioHoyItemDto {
   @ApiProperty({ type: Referencia }) producto: Referencia;
-  @ApiProperty({ type: Referencia }) fuente: Referencia;
+  @ApiProperty({ type: FuenteDatoRespuesta }) fuente: FuenteDatoRespuesta;
   @ApiProperty({ type: MercadoRef, nullable: true }) mercado: MercadoRef | null;
   @ApiProperty() fecha: string;
   @ApiProperty() presentacion: string;
@@ -196,4 +208,66 @@ export class PreciosHoyRespuesta implements PreciosHoyDto {
   @ApiProperty({ type: PrecioHoyItemRespuesta, isArray: true }) items: PrecioHoyItemRespuesta[];
   @ApiProperty({ type: Referencia, isArray: true }) sinDatos: Referencia[];
   @ApiProperty({ type: TrmHoyRespuesta, nullable: true }) trm: TrmHoyRespuesta | null;
+}
+
+export class ConsultaProducto {
+  @ApiProperty({ example: 'platano' })
+  @Matches(/^[a-z0-9-]{2,50}$/)
+  producto: string;
+}
+
+const PATRON_FECHA = /^\d{4}-\d{2}-\d{2}$/;
+
+export class ConsultaSerie extends ConsultaProducto {
+  @ApiPropertyOptional({
+    example: 'sipsa',
+    description: 'Con presentacion; sin ellas se usa la referencia de "Hoy"',
+  })
+  @IsOptional()
+  @Matches(/^[a-z0-9-]{2,30}$/)
+  fuente?: string;
+
+  @ApiPropertyOptional({ example: 7, description: 'Id del mercado (GET /api/mercados)' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  mercado?: number;
+
+  @ApiPropertyOptional({ example: 'hartón verde' })
+  @IsOptional()
+  @Transform(recortar)
+  @IsString()
+  @MaxLength(100)
+  presentacion?: string;
+
+  @ApiPropertyOptional({
+    example: '2026-10-14',
+    description: 'Por defecto: 30 días antes de "hasta"',
+  })
+  @IsOptional()
+  @Matches(PATRON_FECHA, { message: 'desde debe tener el formato AAAA-MM-DD' })
+  desde?: string;
+
+  @ApiPropertyOptional({
+    example: '2026-11-13',
+    description: 'Por defecto: último dato de la serie',
+  })
+  @IsOptional()
+  @Matches(PATRON_FECHA, { message: 'hasta debe tener el formato AAAA-MM-DD' })
+  hasta?: string;
+}
+
+export class ConsultaComparativo extends ConsultaProducto {
+  @ApiPropertyOptional({ example: 'hartón verde' })
+  @IsOptional()
+  @Transform(recortar)
+  @IsString()
+  @MaxLength(100)
+  presentacion?: string;
+
+  @ApiPropertyOptional({ example: '2026-11-13', description: 'Por defecto: último día con datos' })
+  @IsOptional()
+  @Matches(PATRON_FECHA, { message: 'fecha debe tener el formato AAAA-MM-DD' })
+  fecha?: string;
 }

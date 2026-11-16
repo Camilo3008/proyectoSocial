@@ -7,12 +7,13 @@ import { Pais } from './entities/pais.entity.js';
 import { ProductoFuente } from './entities/producto-fuente.entity.js';
 import { Producto } from './entities/producto.entity.js';
 import { FuentesController } from './fuentes.controller.js';
+import { MercadosController } from './mercados.controller.js';
 import { ProductosController } from './productos.controller.js';
 
 /** Productos, fuentes, mercados y países. */
 @Module({
   imports: [TypeOrmModule.forFeature([Producto, Fuente, Pais, Mercado, ProductoFuente])],
-  controllers: [ProductosController, FuentesController],
+  controllers: [ProductosController, FuentesController, MercadosController],
   providers: [CatalogoService],
   exports: [CatalogoService, TypeOrmModule],
 })
