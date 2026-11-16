@@ -10,7 +10,8 @@ queda como stub con `TODO(verificar)`.
 | `fnc` | [fnc.md](fnc.md) | Verificada 2026-11-16 · sin adapter (los términos prohíben la extracción automatizada): carga manual |
 | `sipsa` | [sipsa.md](sipsa.md) | Verificada 2026-11-16 · servicio SOAP oficial; plátano y banano sí, pitaya y cacao no |
 | `worldbank` | [worldbank.md](worldbank.md) | Verificada 2026-11-16 · XLSX mensual; café arábica y robusta, cacao y banano |
-| `faostat` | — | Por verificar |
+| `faostat` | [faostat.md](faostat.md) | Verificada 2026-11-16 · CSV masivo anual (precios al productor por país); café, cacao, banano y plátano |
+| (mapa) | [naturalearth.md](naturalearth.md) | Verificada 2026-11-16 · fronteras de países, dominio público |
 | `trm` | [trm.md](trm.md) | Verificada 2026-11-16 · adapter automático |
 | `manual` | No aplica | Carga desde el panel de administración |
 
