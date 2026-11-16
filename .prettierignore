@@ -5,3 +5,4 @@ coverage/
 package-lock.json
 apps/api/src/database/migrations/
 *.md
+apps/api/test/fixtures/

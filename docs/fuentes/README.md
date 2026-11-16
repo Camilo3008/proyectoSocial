@@ -7,11 +7,11 @@ queda como stub con `TODO(verificar)`.
 
 | Slug | Ficha | Estado |
 |---|---|---|
-| `fnc` | — | Por verificar |
+| `fnc` | [fnc.md](fnc.md) | Verificada 2026-11-16 · sin adapter (los términos prohíben la extracción automatizada): carga manual |
 | `sipsa` | — | Por verificar |
 | `worldbank` | — | Por verificar |
 | `faostat` | — | Por verificar |
-| `trm` | — | Por verificar |
+| `trm` | [trm.md](trm.md) | Verificada 2026-11-16 · adapter automático |
 | `manual` | No aplica | Carga desde el panel de administración |
 
 ## Plantilla
