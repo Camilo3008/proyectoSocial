@@ -1,0 +1,52 @@
+.subtitulo {
+  margin-top: calc(-1 * var(--esp-2));
+  color: var(--color-texto-suave);
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.aviso-cache {
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--radio);
+  background: var(--color-aviso-fondo);
+  color: var(--color-aviso);
+  font-weight: 600;
+}
+
+.lista {
+  display: grid;
+  gap: var(--esp-3);
+  margin: var(--esp-4) 0;
+}
+
+.trm {
+  margin: 0 0 var(--esp-3);
+
+  &__etiqueta {
+    font-weight: 700;
+  }
+
+  &__fuente {
+    display: block;
+    color: var(--color-texto-suave);
+    font-size: var(--texto-xs);
+  }
+}
+
+.pendientes,
+.cargando,
+.descargo {
+  color: var(--color-texto-suave);
+}
+
+.mensaje-error {
+  border-color: var(--color-error);
+  margin: var(--esp-4) 0;
+}
+
+.descargo {
+  margin-top: var(--esp-5);
+  font-size: var(--texto-xs);
+}

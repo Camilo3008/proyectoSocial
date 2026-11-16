@@ -1,0 +1,36 @@
+<article class="tarjeta" [attr.aria-labelledby]="'titulo-' + item().producto.slug">
+  <h2 class="titulo" [id]="'titulo-' + item().producto.slug">{{ titulo() }}</h2>
+
+  <p class="precio">
+    <span class="precio__valor">{{ precio() }}</span>
+    <span class="precio__unidad">{{ unidad() }}</span>
+  </p>
+
+  @if (variacion(); as v) {
+    <p class="variacion variacion--{{ v.tendencia }}">
+      <span aria-hidden="true">{{ v.simbolo }}</span> {{ v.texto }}
+    </p>
+  }
+
+  <p class="procedencia">
+    @if (!esDeHoy()) {
+      <span class="procedencia__aviso">Último dato disponible:</span>
+    }
+    Fuente: {{ item().fuente.nombre }} · <time [attr.datetime]="item().fecha">{{ fecha() }}</time>
+  </p>
+
+  @if (complementos().length > 0) {
+    <ul class="complementos">
+      @for (c of complementos(); track c.etiqueta) {
+        <li>
+          <span class="complementos__etiqueta">{{ c.etiqueta }}:</span>
+          {{ c.precio }} {{ c.unidad }} · {{ c.fecha }}
+        </li>
+      }
+    </ul>
+  }
+
+  @if (nota(); as n) {
+    <p class="nota">{{ n }}</p>
+  }
+</article>

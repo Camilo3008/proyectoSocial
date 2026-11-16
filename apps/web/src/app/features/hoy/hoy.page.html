@@ -1,0 +1,47 @@
+<h1>Precios de hoy</h1>
+
+@if (datos(); as d) {
+  <p class="subtitulo">{{ fechaHoy() }}</p>
+
+  @if (!conexion.enLinea()) {
+    <p class="aviso-cache" role="status">
+      Sin conexión · datos actualizados el {{ actualizado() }}
+    </p>
+  }
+
+  <div class="lista">
+    @for (item of d.items; track item.producto.slug) {
+      <ap-tarjeta-precio [item]="item" [hoy]="d.hoy" />
+    } @empty {
+      <p class="tarjeta">Todavía no hay precios cargados.</p>
+    }
+  </div>
+
+  @if (trm(); as t) {
+    <p class="trm">
+      <span class="trm__etiqueta">Dólar hoy (TRM):</span> {{ t.valor }} · {{ t.fecha }}
+      <span class="trm__fuente"
+        >Fuente: {{ t.fuente }}
+        @if (t.licencia) {
+          · {{ t.licencia }}
+        }
+      </span>
+    </p>
+  }
+
+  @if (d.sinDatos.length > 0) {
+    <p class="pendientes">Próximamente: {{ pendientes() }}.</p>
+  }
+} @else if (precios.error()) {
+  <div class="tarjeta mensaje-error" role="alert">
+    <p>No pudimos cargar los precios. Revisa tu conexión e inténtalo de nuevo.</p>
+    <button type="button" class="boton" (click)="precios.reload()">Reintentar</button>
+  </div>
+} @else {
+  <p role="status" class="cargando">Cargando precios…</p>
+}
+
+<p class="descargo">
+  Los precios son de referencia y provienen de fuentes públicas. No constituyen una oferta de compra
+  ni una asesoría financiera.
+</p>
