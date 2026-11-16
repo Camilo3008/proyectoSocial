@@ -4,17 +4,18 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { GraficaLinea, type PuntoGrafica } from '../../shared/grafica-linea/grafica-linea';
+import { GraficaLinea, type SerieGrafica } from '../../shared/grafica-linea/grafica-linea';
 import { HistoricoPage } from './historico.page';
 
 /** jsdom no tiene <canvas>: la gráfica se reemplaza por un doble de prueba. */
 @Component({
   selector: 'ap-grafica-linea',
-  template: '<p class="grafica-falsa">{{ puntos().length }} puntos</p>',
+  template: '<p class="grafica-falsa">{{ etiquetas().length }} puntos</p>',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class GraficaFalsa {
-  readonly puntos = input.required<PuntoGrafica[]>();
+  readonly etiquetas = input.required<string[]>();
+  readonly series = input.required<SerieGrafica[]>();
   readonly formatear = input<(v: number) => string>();
 }
 

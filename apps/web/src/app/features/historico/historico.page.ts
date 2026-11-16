@@ -10,7 +10,7 @@ import { API_URL } from '../../core/api';
 import { etiquetaUnidad, formatearFecha, formatearPrecio } from '../../core/formato';
 import { notasDePrecio } from '../../core/notas';
 import { claveSerie, desdeDeRango, etiquetaSerie, type Rango, RANGOS } from '../../core/series';
-import { GraficaLinea, type PuntoGrafica } from '../../shared/grafica-linea/grafica-linea';
+import { GraficaLinea, type SerieGrafica } from '../../shared/grafica-linea/grafica-linea';
 
 /** Histórico de precios: serie, rango, gráfica, tabla y resumen (RF-02). */
 @Component({
@@ -75,12 +75,13 @@ export class HistoricoPage {
       s ? formatearPrecio(String(valor), s.moneda, s.unidad) : String(valor);
   });
 
-  protected readonly puntos = computed<PuntoGrafica[]>(() =>
-    (this.serie()?.items ?? []).map((p) => ({
-      etiqueta: formatearFecha(p.fecha),
-      valor: Number(p.valor),
-    })),
+  protected readonly etiquetas = computed(() =>
+    (this.serie()?.items ?? []).map((p) => formatearFecha(p.fecha)),
   );
+  protected readonly lineas = computed<SerieGrafica[]>(() => {
+    const s = this.serie();
+    return s ? [{ nombre: `${s.presentacion}`, valores: s.items.map((p) => Number(p.valor)) }] : [];
+  });
 
   /** Tabla: más reciente primero. */
   protected readonly filas = computed(() =>

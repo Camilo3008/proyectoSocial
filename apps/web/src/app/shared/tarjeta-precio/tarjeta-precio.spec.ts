@@ -10,6 +10,7 @@ const CAFE: PrecioHoyItemDto = {
   mercado: null,
   fecha: '2026-11-13',
   presentacion: 'pergamino seco',
+  periodicidad: 'DIARIA',
   valor: '2075000.0000',
   moneda: 'COP',
   unidad: 'carga 125 kg',
@@ -22,6 +23,7 @@ const CAFE: PrecioHoyItemDto = {
       mercado: { id: 1, nombre: 'Bolsa de Nueva York (ICE)' },
       fecha: '2026-11-13',
       presentacion: 'verde arábica (contrato C)',
+      periodicidad: 'DIARIA',
       valor: '278.6500',
       moneda: 'USD',
       unidad: 'USc/lb',
@@ -121,6 +123,45 @@ describe('TarjetaPrecio', () => {
     expect(enlaces).toEqual([
       '/historico?producto=banano&fuente=sipsa&presentacion=banano&mercado=7',
       '/nacional?producto=banano&presentacion=banano',
+    ]);
+  });
+
+  it('muestra un precio internacional mensual con su mes, el equivalente en pesos y su advertencia', async () => {
+    await montar(
+      {
+        ...CAFE,
+        producto: { slug: 'cacao', nombre: 'Cacao' },
+        fuente: {
+          slug: 'worldbank',
+          nombre: 'Banco Mundial – Commodity Price Data (Pink Sheet)',
+          cita: 'Fuente: Banco Mundial, Commodity Price Data (The Pink Sheet), CC BY 4.0',
+        },
+        mercado: null,
+        fecha: '2026-10-01',
+        periodicidad: 'MENSUAL',
+        presentacion: 'en grano (ICCO)',
+        valor: '5.7500',
+        moneda: 'USD',
+        unidad: 'kg',
+        valorCopKg: '19125.5000',
+        variacion: { absoluta: '-0.1700', porcentaje: '-2.87', fechaAnterior: '2026-09-01' },
+        complementos: [],
+      },
+      '2026-11-16',
+    );
+    const el = fixture.nativeElement as HTMLElement;
+    expect(texto()).toContain('Precio internacional · promedio mensual');
+    expect(el.querySelector('.precio__valor')?.textContent?.replace(/\s/g, ' ')).toBe('US$ 5,75');
+    expect(texto()).toMatch(/≈ \$\s19\.126 por kilo/);
+    expect(texto()).toContain('▼ Bajó 2,87 % frente a septiembre de 2026');
+    expect(texto()).toContain('octubre de 2026');
+    // Un dato mensual no se marca como "último dato disponible".
+    expect(texto()).not.toContain('Último dato disponible');
+    expect(texto()).toContain('no es el precio que se paga en Colombia');
+    expect(texto()).toContain('CC BY 4.0');
+    // Sin mercado: no se ofrece el comparativo nacional.
+    expect(Array.from(el.querySelectorAll('a')).map((a) => a.textContent?.trim())).toEqual([
+      'Ver histórico',
     ]);
   });
 });

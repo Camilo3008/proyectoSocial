@@ -1,0 +1,138 @@
+<h1>El mundo</h1>
+
+<section aria-labelledby="titulo-internacional">
+  <h2 id="titulo-internacional">Precios internacionales</h2>
+  <p class="intro">Cómo se mueve el precio en el mercado mundial, mes a mes.</p>
+
+  <div class="filtros">
+    <label class="campo">
+      <span>Producto</span>
+      <select (change)="cambiar({ producto: $any($event.target).value })">
+        @for (p of productos; track p.slug) {
+          <option [value]="p.slug" [selected]="p.slug === productoActual()">{{ p.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="grupo" role="group" aria-label="Moneda">
+      @for (m of ['COP', 'USD']; track m) {
+        <button
+          type="button"
+          class="opcion"
+          [class.opcion--activa]="m === monedaActual()"
+          [attr.aria-pressed]="m === monedaActual()"
+          (click)="cambiar({ moneda: m })"
+        >
+          {{ m === 'COP' ? 'En pesos' : 'En dólares' }}
+        </button>
+      }
+    </div>
+
+    <div class="grupo" role="group" aria-label="Rango de tiempo">
+      @for (r of rangos; track r.valor) {
+        <button
+          type="button"
+          class="opcion"
+          [class.opcion--activa]="r.valor === rangoActual()"
+          [attr.aria-pressed]="r.valor === rangoActual()"
+          (click)="cambiar({ rango: r.valor })"
+        >
+          {{ r.etiqueta }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (respuesta(); as r) {
+    <ul class="resumen">
+      @for (s of resumen(); track s.presentacion) {
+        <li class="tarjeta">
+          <p class="resumen__titulo">{{ r.producto.nombre }} {{ s.presentacion }}</p>
+          <p class="resumen__valor">{{ s.usd }} <span class="resumen__unidad">por kilo</span></p>
+          @if (s.cop) {
+            <p class="resumen__cop">≈ {{ s.cop }} por kilo</p>
+          }
+          @if (s.variacion; as v) {
+            <p class="resumen__var resumen__var--{{ v.tendencia }}">{{ v.texto }}</p>
+          }
+          <p class="resumen__mes">Promedio de {{ s.mes }}</p>
+        </li>
+      }
+    </ul>
+
+    <div class="tarjeta">
+      @if (monedaActual() === 'COP') {
+        <p class="leyenda-grafica">
+          Precios por kilo en pesos (convertidos con la TRM promedio de cada mes)
+          @if (r.nacional) {
+            y el precio en Colombia
+          }
+        </p>
+      } @else {
+        <p class="leyenda-grafica">Precios por kilo en dólares</p>
+      }
+      <ap-grafica-linea [etiquetas]="etiquetas()" [series]="lineas()" [formatear]="formatear()" />
+    </div>
+
+    @if (notaComparacion(); as nota) {
+      <p class="nota nota--destacada">{{ nota }}</p>
+    }
+    <p class="nota">{{ notaInternacional }}</p>
+    @if (r.fuente.cita; as cita) {
+      <p class="nota cita">{{ cita }}</p>
+    }
+    @if (r.nacional?.fuente?.cita; as cita) {
+      <p class="nota cita">{{ cita }}</p>
+    }
+
+    @if (tabla().filas.length > 0) {
+      <details class="tabla-datos">
+        <summary>Ver los últimos 12 meses en tabla</summary>
+        <div class="tabla-desplazable">
+          <table>
+            <caption class="solo-lectores">
+              Precios internacionales de
+              {{
+                r.producto.nombre
+              }}
+              por mes
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Mes</th>
+                @for (c of tabla().columnas; track c) {
+                  <th scope="col">{{ c }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (f of tabla().filas; track f.fecha) {
+                <tr>
+                  <th scope="row">{{ f.mes }}</th>
+                  @for (v of f.valores; track $index) {
+                    <td>{{ v }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </details>
+    }
+  } @else if (datos.error()) {
+    <div class="tarjeta" role="alert">
+      <p>No pudimos cargar los precios internacionales. Revisa tu conexión e inténtalo de nuevo.</p>
+      <button type="button" class="boton" (click)="datos.reload()">Reintentar</button>
+    </div>
+  } @else {
+    <p role="status" class="cargando">Cargando precios internacionales…</p>
+  }
+</section>
+
+<section class="tarjeta proximamente" aria-labelledby="titulo-globo">
+  <h2 id="titulo-globo">Globo terráqueo</h2>
+  <p>
+    Pronto podrás girar un globo y ver el precio que reciben los productores en otros países (Etapa
+    4).
+  </p>
+</section>

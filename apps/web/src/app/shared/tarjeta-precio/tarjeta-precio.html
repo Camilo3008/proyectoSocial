@@ -1,10 +1,20 @@
 <article class="tarjeta" [attr.aria-labelledby]="'titulo-' + item().producto.slug">
   <h2 class="titulo" [id]="'titulo-' + item().producto.slug">{{ titulo() }}</h2>
 
+  @if (esMensual()) {
+    <p class="etiqueta-internacional">Precio internacional · promedio mensual</p>
+  }
+
   <p class="precio">
     <span class="precio__valor">{{ precio() }}</span>
     <span class="precio__unidad">{{ unidad() }}</span>
   </p>
+
+  @if (equivalentePesos(); as pesos) {
+    <p class="equivalente">
+      ≈ {{ pesos }} por kilo<span class="equivalente__detalle"> (con la TRM promedio del mes)</span>
+    </p>
+  }
 
   @if (variacion(); as v) {
     <p class="variacion variacion--{{ v.tendencia }}">
@@ -13,7 +23,7 @@
   }
 
   <p class="procedencia">
-    @if (!esDeHoy()) {
+    @if (!esDeHoy() && !esMensual()) {
       <span class="procedencia__aviso">Último dato disponible:</span>
     }
     Fuente: {{ item().fuente.nombre }}

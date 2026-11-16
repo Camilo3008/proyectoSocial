@@ -89,3 +89,24 @@
     font-weight: 600;
   }
 }
+
+.etiqueta-internacional {
+  display: inline-block;
+  margin: 0 0 var(--esp-2);
+  padding: 2px var(--esp-2);
+  border-radius: var(--radio-pildora);
+  background: var(--color-neutro-fondo);
+  color: var(--color-neutro);
+  font-size: var(--texto-xs);
+  font-weight: 700;
+}
+
+.equivalente {
+  margin: calc(-1 * var(--esp-1)) 0 var(--esp-2);
+  font-weight: 600;
+
+  &__detalle {
+    color: var(--color-texto-suave);
+    font-weight: 400;
+  }
+}

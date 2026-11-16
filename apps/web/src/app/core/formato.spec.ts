@@ -1,7 +1,10 @@
 import {
   etiquetaUnidad,
   formatearFecha,
+  formatearFechaDato,
   formatearFechaHora,
+  formatearMes,
+  formatearMesCorto,
   formatearPorcentaje,
   formatearPrecio,
   tendencia,
@@ -30,6 +33,13 @@ describe('formato es-CO', () => {
   it('formatea fechas de calendario sin correrse de día', () => {
     expect(formatearFecha('2026-11-13')).toMatch(/^13 nov 2026$/);
     expect(formatearFecha('2026-01-01')).toMatch(/^1 ene 2026$/);
+  });
+
+  it('formatea meses para datos mensuales', () => {
+    expect(formatearMes('2026-10-01')).toBe('octubre de 2026');
+    expect(formatearMesCorto('2026-10-01')).toBe('oct 2026');
+    expect(formatearFechaDato('2026-10-01', 'MENSUAL')).toBe('octubre de 2026');
+    expect(formatearFechaDato('2026-11-13', 'DIARIA')).toMatch(/^13 nov 2026$/);
   });
 
   it('muestra la hora en zona de Colombia', () => {

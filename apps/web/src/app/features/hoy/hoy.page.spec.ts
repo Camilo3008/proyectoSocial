@@ -16,6 +16,7 @@ const RESPUESTA: PreciosHoyDto = {
       mercado: null,
       fecha: '2026-11-13',
       presentacion: 'pergamino seco',
+      periodicidad: 'DIARIA',
       valor: '2075000.0000',
       moneda: 'COP',
       unidad: 'carga 125 kg',

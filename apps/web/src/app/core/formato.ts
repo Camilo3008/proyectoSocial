@@ -80,6 +80,29 @@ export function formatearFecha(fecha: string): string {
   return `${parte(partes, 'day')} ${parte(partes, 'month')} ${parte(partes, 'year')}`;
 }
 
+const mesLargo = new Intl.DateTimeFormat(LOCALE, {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/** "2026-10-01" -> "octubre de 2026" (para datos mensuales). */
+export function formatearMes(fecha: string): string {
+  return mesLargo.format(new Date(`${fecha}T00:00:00Z`));
+}
+
+/** "2026-10-01" -> "oct 2026" (ejes y tablas). */
+export function formatearMesCorto(fecha: string): string {
+  const partes = mesLargo.formatToParts(new Date(`${fecha}T00:00:00Z`));
+  const mes = (partes.find((p) => p.type === 'month')?.value ?? '').slice(0, 3);
+  return `${mes} ${partes.find((p) => p.type === 'year')?.value ?? ''}`;
+}
+
+/** Fecha de un dato según su periodicidad: "13 nov 2026" o "octubre de 2026". */
+export function formatearFechaDato(fecha: string, periodicidad: string): string {
+  return periodicidad === 'MENSUAL' ? formatearMes(fecha) : formatearFecha(fecha);
+}
+
 /** "2026-11-16" -> "lunes, 16 de noviembre". */
 export function formatearFechaLarga(fecha: string): string {
   return fechaLarga.format(new Date(`${fecha}T00:00:00Z`));

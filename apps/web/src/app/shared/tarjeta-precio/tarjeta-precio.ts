@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import {
   etiquetaUnidad,
   formatearFecha,
+  formatearFechaDato,
+  formatearMes,
   formatearPorcentaje,
   formatearPrecio,
   tendencia,
@@ -34,8 +36,18 @@ export class TarjetaPrecio {
     formatearPrecio(this.item().valor, this.item().moneda, this.item().unidad),
   );
   protected readonly unidad = computed(() => etiquetaUnidad(this.item().unidad));
-  protected readonly fecha = computed(() => formatearFecha(this.item().fecha));
+  /** Datos mensuales (precios internacionales): se muestra el mes, no el día. */
+  protected readonly esMensual = computed(() => this.item().periodicidad === 'MENSUAL');
+  protected readonly fecha = computed(() =>
+    formatearFechaDato(this.item().fecha, this.item().periodicidad),
+  );
   protected readonly esDeHoy = computed(() => this.item().fecha === this.hoy());
+  /** Equivalente en pesos de un precio en dólares (con la TRM que usó la API). */
+  protected readonly equivalentePesos = computed(() => {
+    const { moneda, valorCopKg } = this.item();
+    if (moneda === 'COP' || !valorCopKg) return null;
+    return formatearPrecio(valorCopKg, 'COP', 'kg');
+  });
   protected readonly notas = computed(() =>
     notasDePrecio(
       this.item().fuente.slug,
@@ -60,11 +72,14 @@ export class TarjetaPrecio {
     if (!v) return null;
     const t = tendencia(v.absoluta);
     const pct = v.porcentaje ? formatearPorcentaje(v.porcentaje) : null;
-    const desde = formatearFecha(v.fechaAnterior);
+    // "frente al 12 nov 2026" (diario) o "frente a septiembre de 2026" (mensual)
+    const desde = this.esMensual()
+      ? `a ${formatearMes(v.fechaAnterior)}`
+      : `al ${formatearFecha(v.fechaAnterior)}`;
     const texto =
       t === 'igual'
-        ? `Sin cambio frente al ${desde}`
-        : `${t === 'sube' ? 'Subió' : 'Bajó'}${pct ? ` ${pct}` : ''} frente al ${desde}`;
+        ? `Sin cambio frente ${desde}`
+        : `${t === 'sube' ? 'Subió' : 'Bajó'}${pct ? ` ${pct}` : ''} frente ${desde}`;
     return { tendencia: t, simbolo: t === 'sube' ? '▲' : t === 'baja' ? '▼' : '=', texto };
   });
 
@@ -73,7 +88,7 @@ export class TarjetaPrecio {
       etiqueta: c.etiqueta,
       precio: formatearPrecio(c.valor, c.moneda, c.unidad),
       unidad: etiquetaUnidad(c.unidad),
-      fecha: formatearFecha(c.fecha),
+      fecha: formatearFechaDato(c.fecha, c.periodicidad),
     })),
   );
 }
