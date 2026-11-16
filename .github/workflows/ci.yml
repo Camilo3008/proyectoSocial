@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (lint, test, build, e2e)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      db:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: agroprecios
+          POSTGRES_PASSWORD: solo_para_ci
+          POSTGRES_DB: agroprecios_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agroprecios -d agroprecios_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Valores de ejemplo solo para CI (no son secretos reales).
+      NODE_ENV: test
+      CORS_ORIGIN: http://localhost:4200
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: agroprecios
+      DB_PASSWORD: solo_para_ci
+      DB_NAME: agroprecios_test
+      DB_NAME_TEST: agroprecios_test
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint -w packages/shared
+      - run: npm run lint -w apps/api
+      - run: npm run test -w apps/api
+      - run: npm run build -w apps/api
+      - run: npm run test:e2e -w apps/api
+
+  web:
+    name: Web (lint, test, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint -w apps/web
+      - run: npm run test -w apps/web
+      # Incluye la verificación del presupuesto de 200 kB gzip.
+      - run: npm run build -w apps/web
