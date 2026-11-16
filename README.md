@@ -6,7 +6,7 @@ PWA que **recopila y muestra precios de referencia** de café, plátano, banano,
 - Reglas de implementación: [`CLAUDE.md`](CLAUDE.md)
 - Fichas de fuentes de datos: [`docs/fuentes/`](docs/fuentes/)
 
-> Estado: **Etapa 0 (Base)** terminada. Fase 1: solo recopilar y mostrar datos.
+> Estado: **Etapa 1 (Café)** terminada: TRM automática, carga manual del precio FNC y pantalla "Hoy". Fase 1: solo recopilar y mostrar datos.
 
 ## Estructura
 
@@ -83,6 +83,33 @@ API (`-w apps/api`):
 | `seed` | Siembra productos, fuentes, países y el admin (idempotente) |
 
 Web (`-w apps/web`): `start`, `build`, `test`, `lint`.
+
+## Tareas del administrador
+
+Mientras se construye el panel de administración (Etapa 5), estas tareas se hacen desde **Swagger** en `http://localhost:3000/api/docs`:
+
+1. **Iniciar sesión:** `POST /api/auth/login` con `ADMIN_EMAIL` y `ADMIN_PASSWORD`. Copiar el `accessToken`, pulsar **Authorize** y pegarlo. El token dura 15 minutos.
+2. **Cargar el precio del café del día** (boletín de la FNC): `POST /api/admin/precios` con
+
+   ```json
+   {
+     "producto": "cafe",
+     "fuente": "fnc",
+     "fecha": "AAAA-MM-DD",
+     "presentacion": "pergamino seco",
+     "valor": "PRECIO_POR_CARGA_SIN_PUNTOS",
+     "moneda": "COP",
+     "unidad": "carga 125 kg",
+     "referencia": "Boletín FNC del DD/MM/AAAA"
+   }
+   ```
+
+   Para el cierre de Nueva York: `"presentacion": "verde arábica (contrato C)"`, `"moneda": "USD"`, `"unidad": "USc/lb"` y `"mercadoId"` de la Bolsa de Nueva York (ICE). Los valores llevan **punto decimal** (`278.65`), nunca puntos de miles.
+3. **Corregir un precio:** `PATCH /api/admin/precios/{id}/anular` con un `motivo` y volver a cargarlo. El valor anterior queda en el historial.
+4. **Actualizar la TRM a mano:** `POST /api/admin/ingesta/trm`. Se ejecuta sola a las 07:30 y a las 18:30 si `INGESTA_PROGRAMADA=true`.
+5. **Revisar la bitácora:** `GET /api/admin/ingestas`.
+
+> El precio de la FNC solo se puede cargar a mano: sus términos de uso no permiten la extracción automática (ver [`docs/fuentes/fnc.md`](docs/fuentes/fnc.md)).
 
 ## Variables de entorno
 

@@ -424,11 +424,11 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 
 ## 16. Preguntas abiertas (por verificar)
 
-1. ¿La FNC permite la descarga automatizada de su boletín diario? ¿Existe otro canal de datos?
+1. ¿La FNC permite la descarga automatizada de su boletín diario? ¿Existe otro canal de datos? → **Respondida parcialmente (2026-11-16):** sus términos de uso prohíben la extracción automatizada sin autorización escrita y restringen la publicación del contenido (ver `docs/fuentes/fnc.md`). Se usa carga manual. **Pendiente:** solicitar autorización escrita a la FNC para publicar el precio en AgroPrecios y, si es posible, para leer el boletín de forma automática.
 2. ¿Qué códigos de artículo de SIPSA corresponden a plátano, banano, pitaya y cacao? ¿Cuál es el mercado mayorista más cercano a Pitalito con datos?
 3. ¿Cuál es la URL estable y la licencia actual del archivo mensual del Banco Mundial?
 4. ¿Qué licencia y qué cobertura de países y años tiene FAOSTAT para café, cacao, banano y pitaya?
-5. ¿Cuál es el dataset oficial de TRM a usar y en qué formato?
+5. ¿Cuál es el dataset oficial de TRM a usar y en qué formato? → **Respondida (2026-11-16):** dataset `32sa-8pi3` de la Superfinanciera en datos.gov.co, JSON (API Socrata), licencia CC BY-SA 4.0 (ver `docs/fuentes/trm.md`).
 6. ¿Hay precios de las compras de café locales (Pitalito) que se puedan publicar? (Relevante para la Fase 2).
 7. ¿Cuál será el nombre definitivo y el dominio del proyecto?
 
@@ -457,6 +457,15 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-16 | Tipografía del sistema (sin fuentes web) y paleta con contraste AA verificado | Cero descargas extra en conexiones lentas |
 | 2026-11-16 | `packages/shared` solo emite declaraciones `.d.ts` (se compila en `postinstall`) y la API declara los valores de los enums con `satisfies` contra esos tipos | Tipos compartidos sin lógica y sin problemas de `rootDir` entre paquetes |
 | 2026-11-16 | Contraseña del admin con `bcryptjs` (costo 12); el seed solo crea el admin si no existe y nunca sobrescribe su contraseña | JavaScript puro (sin compilación nativa en Windows) |
+| 2026-11-16 | **Etapa 1 (aprobado por el autor):** `fuente.descripcion` y enum propio `frecuencia_fuente` con `A_DEMANDA` (la fuente `manual` lo usa); `observacion_precio.periodicidad` conserva el enum `frecuencia` | RF-06 pide la descripción; "a demanda" no es una periodicidad de un dato |
+| 2026-11-16 | **Etapa 1 (aprobado):** `FuenteAdapter` puede devolver `tasas` además de `observaciones`, y `advertencias` (ejecución `PARCIAL`) | La TRM es una tasa de cambio, no un precio |
+| 2026-11-16 | **FNC sin adapter automático:** el precio del café se registra por carga manual (`POST /api/admin/precios`) | Los términos de uso de la FNC prohíben la extracción automatizada sin autorización escrita (`docs/fuentes/fnc.md`) |
+| 2026-11-16 | TRM: cada rango de vigencia de datos.gov.co se expande a una fila por día en `tasa_cambio`; descarga de las últimas 40 filas por ejecución; jobs a las 07:30 y 18:30 (Bogotá), desactivables con `INGESTA_PROGRAMADA` | Búsqueda directa "TRM de la fecha X" y relleno automático de huecos |
+| 2026-11-16 | Conversiones con `big.js` (MIT, ~6 kB, solo API) y tabla de unidades en código (`kg`, `carga 125 kg`, `arroba`, `lb`, `USc/lb`); la carga manual solo acepta unidades conocidas | Nunca `number` para dinero; los derivados COP/kg y USD/kg siempre se pueden calcular |
+| 2026-11-16 | Carga manual: 409 si ya hay un precio activo con la misma clave; para corregir se anula y se vuelve a cargar, y la fila anulada se reutiliza guardando el valor anterior en `metadata.historial` | Conserva el índice único de la §9 y la trazabilidad (quién, cuándo, motivo y valor anterior) |
+| 2026-11-16 | Autenticación con `@nestjs/jwt` y un guard propio (sin Passport); login limitado a 5 intentos por minuto; JWT HS256 de 15 min | Menos dependencias; protección contra fuerza bruta |
+| 2026-11-16 | `GET /api/precios/hoy` agrega a la forma de la §10: `mercado`, `valorCopKg`, `complementos` (Bolsa de Nueva York para el café), `hoy`, `sinDatos` y `trm` con su licencia | RF-01 pide la Bolsa de NY y la TRM como datos secundarios; la licencia CC BY-SA de la TRM exige atribución |
+| 2026-11-16 | La referencia de "Hoy" por producto se configura en `apps/api/src/precios/referencias-hoy.ts`; el café usa FNC / pergamino seco / sin mercado | Separar el criterio de negocio del código de consulta |
 
 ---
 
