@@ -135,7 +135,7 @@ describe('WorldBankAdapter', () => {
       desde: '2026-10-01',
     });
 
-    expect(fetchFalso.mock.calls.map((c) => c[0])).toEqual([
+    expect(fetchFalso.mock.calls.map((c) => c[0] as string)).toEqual([
       URL_CONFIGURADA,
       PAGINA_WORLDBANK,
       nueva,
