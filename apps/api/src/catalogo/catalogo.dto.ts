@@ -1,12 +1,12 @@
 import {
   type EstadoFuente,
-  type Frecuencia,
+  type FrecuenciaFuente,
   type FuenteDto,
   type ProductoDto,
   type TipoFuente,
 } from '@agroprecios/shared';
 import { ApiProperty } from '@nestjs/swagger';
-import { FRECUENCIAS, TIPOS_FUENTE } from '../common/enums.js';
+import { FRECUENCIAS_FUENTE, TIPOS_FUENTE } from '../common/enums.js';
 
 const ESTADOS_FUENTE: EstadoFuente[] = ['AL_DIA', 'ATRASADA', 'ERROR', 'SIN_DATOS', 'NO_APLICA'];
 
@@ -31,6 +31,9 @@ export class FuenteRespuesta implements FuenteDto {
   @ApiProperty({ example: 'Federación Nacional de Cafeteros' })
   nombre: string;
 
+  @ApiProperty({ type: String, nullable: true })
+  descripcion: string | null;
+
   @ApiProperty({ enum: TIPOS_FUENTE })
   tipo: TipoFuente;
 
@@ -40,8 +43,8 @@ export class FuenteRespuesta implements FuenteDto {
   @ApiProperty({ type: String, nullable: true, description: 'null = por verificar' })
   licencia: string | null;
 
-  @ApiProperty({ enum: FRECUENCIAS })
-  frecuencia: Frecuencia;
+  @ApiProperty({ enum: FRECUENCIAS_FUENTE })
+  frecuencia: FrecuenciaFuente;
 
   @ApiProperty({ type: String, nullable: true, example: '2026-11-14T13:00:00.000Z' })
   ultimaIngestaExitosa: string | null;

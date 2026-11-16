@@ -12,6 +12,10 @@
           </span>
         </div>
 
+        @if (fuente.descripcion) {
+          <p class="fuente__descripcion">{{ fuente.descripcion }}</p>
+        }
+
         <dl class="datos">
           <div>
             <dt>Última actualización</dt>
@@ -26,7 +30,7 @@
           <div>
             <dt>Frecuencia</dt>
             <dd>
-              {{ fuente.tipo === 'MANUAL' ? 'Cuando se necesite' : frecuencia[fuente.frecuencia] }}
+              {{ frecuencia[fuente.frecuencia] }}
             </dd>
           </div>
           <div>

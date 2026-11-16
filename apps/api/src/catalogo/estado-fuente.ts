@@ -1,7 +1,7 @@
 import {
   type EstadoFuente,
   type EstadoIngesta,
-  type Frecuencia,
+  type FrecuenciaFuente,
   type TipoFuente,
 } from '@agroprecios/shared';
 
@@ -12,7 +12,7 @@ const MS_POR_DIA = 86_400_000;
  * atrasada una fuente. Incluyen holgura para fines de semana, festivos y el
  * rezago normal de publicación de cada frecuencia.
  */
-export const DIAS_TOLERANCIA: Record<Frecuencia, number> = {
+export const DIAS_TOLERANCIA: Record<Exclude<FrecuenciaFuente, 'A_DEMANDA'>, number> = {
   DIARIA: 4,
   SEMANAL: 10,
   MENSUAL: 45,
@@ -21,7 +21,7 @@ export const DIAS_TOLERANCIA: Record<Frecuencia, number> = {
 
 export interface DatosEstadoFuente {
   tipo: TipoFuente;
-  frecuencia: Frecuencia;
+  frecuencia: FrecuenciaFuente;
   ultimaIngestaExitosa: Date | null;
   /** Estado de la última ejecución terminada (excluye EN_CURSO). */
   ultimoEstado: EstadoIngesta | null;
@@ -29,7 +29,7 @@ export interface DatosEstadoFuente {
 
 /** Calcula el estado de una fuente para la página de transparencia (RF-06). */
 export function calcularEstadoFuente(datos: DatosEstadoFuente, ahora: Date): EstadoFuente {
-  if (datos.tipo === 'MANUAL') {
+  if (datos.tipo === 'MANUAL' || datos.frecuencia === 'A_DEMANDA') {
     return 'NO_APLICA';
   }
   if (datos.ultimoEstado === 'ERROR') {

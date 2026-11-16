@@ -4,6 +4,7 @@ import {
   type DisparoIngesta,
   type EstadoIngesta,
   type Frecuencia,
+  type FrecuenciaFuente,
   type TipoFuente,
   type TipoMercado,
 } from '@agroprecios/shared';
@@ -20,6 +21,11 @@ export const FRECUENCIAS = [
   'MENSUAL',
   'ANUAL',
 ] as const satisfies readonly Frecuencia[];
+
+export const FRECUENCIAS_FUENTE = [
+  ...FRECUENCIAS,
+  'A_DEMANDA',
+] as const satisfies readonly FrecuenciaFuente[];
 
 export const TIPOS_MERCADO = [
   'MAYORISTA',

@@ -1,6 +1,6 @@
-import { type Frecuencia, type TipoFuente } from '@agroprecios/shared';
+import { type FrecuenciaFuente, type TipoFuente } from '@agroprecios/shared';
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { FRECUENCIAS, TIPOS_FUENTE } from '../../common/enums.js';
+import { FRECUENCIAS_FUENTE, TIPOS_FUENTE } from '../../common/enums.js';
 
 @Entity('fuente')
 @Unique('uq_fuente_slug', ['slug'])
@@ -15,6 +15,10 @@ export class Fuente {
   @Column({ type: 'varchar', length: 150 })
   nombre: string;
 
+  /** Qué aporta la fuente, en lenguaje sencillo (RF-06). */
+  @Column({ type: 'text', nullable: true })
+  descripcion: string | null;
+
   @Column({ type: 'enum', enum: TIPOS_FUENTE, enumName: 'tipo_fuente' })
   tipo: TipoFuente;
 
@@ -25,8 +29,8 @@ export class Fuente {
   @Column({ type: 'text', nullable: true })
   licencia: string | null;
 
-  @Column({ type: 'enum', enum: FRECUENCIAS, enumName: 'frecuencia' })
-  frecuencia: Frecuencia;
+  @Column({ type: 'enum', enum: FRECUENCIAS_FUENTE, enumName: 'frecuencia_fuente' })
+  frecuencia: FrecuenciaFuente;
 
   @Column({ type: 'boolean', default: true })
   activo: boolean;

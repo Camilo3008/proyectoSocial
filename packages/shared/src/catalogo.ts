@@ -1,8 +1,11 @@
 /** Tipo de fuente de datos. */
 export type TipoFuente = 'OFICIAL_NACIONAL' | 'INTERNACIONAL' | 'MANUAL';
 
-/** Frecuencia de publicación esperada de una fuente (y periodicidad de una observación). */
+/** Periodicidad de una observación de precio. */
 export type Frecuencia = 'DIARIA' | 'SEMANAL' | 'MENSUAL' | 'ANUAL';
+
+/** Frecuencia de publicación esperada de una fuente. A_DEMANDA: sin calendario (carga manual). */
+export type FrecuenciaFuente = Frecuencia | 'A_DEMANDA';
 
 /** Tipo de mercado. */
 export type TipoMercado = 'MAYORISTA' | 'BOLSA' | 'REFERENCIA' | 'LOCAL';
@@ -29,11 +32,12 @@ export interface ProductoDto {
 export interface FuenteDto {
   slug: string;
   nombre: string;
+  descripcion: string | null;
   tipo: TipoFuente;
   url: string | null;
   /** null mientras la licencia no se haya verificado y documentado en docs/fuentes. */
   licencia: string | null;
-  frecuencia: Frecuencia;
+  frecuencia: FrecuenciaFuente;
   /** Fin (ISO 8601) de la última ingesta con estado OK, o null si nunca la hubo. */
   ultimaIngestaExitosa: string | null;
   estado: EstadoFuente;

@@ -1,6 +1,6 @@
 import {
   type EstadoIngesta,
-  type Frecuencia,
+  type FrecuenciaFuente,
   type FuenteDto,
   type ProductoDto,
   type TipoFuente,
@@ -14,10 +14,11 @@ import { calcularEstadoFuente } from './estado-fuente.js';
 interface FilaFuente {
   slug: string;
   nombre: string;
+  descripcion: string | null;
   tipo: TipoFuente;
   url: string | null;
   licencia: string | null;
-  frecuencia: Frecuencia;
+  frecuencia: FrecuenciaFuente;
   ultima_exitosa: Date | null;
   ultimo_estado: EstadoIngesta | null;
 }
@@ -42,7 +43,7 @@ export class CatalogoService {
   /** Fuentes activas con su última ingesta exitosa y su estado (RF-06). */
   async listarFuentes(ahora = new Date()): Promise<FuenteDto[]> {
     const filas = await this.dataSource.query<FilaFuente[]>(`
-      SELECT f.slug, f.nombre, f.tipo, f.url, f.licencia, f.frecuencia,
+      SELECT f.slug, f.nombre, f.descripcion, f.tipo, f.url, f.licencia, f.frecuencia,
              exitosa.fin   AS ultima_exitosa,
              ultima.estado AS ultimo_estado
       FROM fuente f
@@ -65,6 +66,7 @@ export class CatalogoService {
     return filas.map((fila) => ({
       slug: fila.slug,
       nombre: fila.nombre,
+      descripcion: fila.descripcion,
       tipo: fila.tipo,
       url: fila.url,
       licencia: fila.licencia,

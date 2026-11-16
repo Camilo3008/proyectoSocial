@@ -1,4 +1,4 @@
-import { type EstadoFuente, type Frecuencia, type TipoFuente } from '@agroprecios/shared';
+import { type EstadoFuente, type FrecuenciaFuente, type TipoFuente } from '@agroprecios/shared';
 
 /** Tono visual de un estado. Siempre va acompañado de texto (no solo color). */
 export type Tono = 'ok' | 'aviso' | 'error' | 'neutro';
@@ -11,11 +11,12 @@ export const ESTADO_FUENTE: Record<EstadoFuente, { texto: string; tono: Tono }> 
   NO_APLICA: { texto: 'Carga manual', tono: 'neutro' },
 };
 
-export const FRECUENCIA: Record<Frecuencia, string> = {
+export const FRECUENCIA: Record<FrecuenciaFuente, string> = {
   DIARIA: 'Diaria',
   SEMANAL: 'Semanal',
   MENSUAL: 'Mensual',
   ANUAL: 'Anual',
+  A_DEMANDA: 'Cuando se necesite',
 };
 
 export const TIPO_FUENTE: Record<TipoFuente, string> = {

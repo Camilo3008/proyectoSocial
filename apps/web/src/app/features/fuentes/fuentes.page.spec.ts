@@ -12,10 +12,11 @@ registerLocaleData(localeEsCo, 'es-CO');
 const FUENTES: FuenteDto[] = [
   {
     slug: 'trm',
-    nombre: 'TRM – Tasa Representativa del Mercado (datos.gov.co)',
+    nombre: 'TRM – Superintendencia Financiera (datos.gov.co)',
+    descripcion: 'Tasa de cambio oficial del dólar en pesos colombianos (TRM).',
     tipo: 'OFICIAL_NACIONAL',
     url: 'https://www.datos.gov.co/',
-    licencia: null,
+    licencia: 'CC BY-SA 4.0 – Superintendencia Financiera de Colombia',
     frecuencia: 'DIARIA',
     ultimaIngestaExitosa: '2026-11-14T13:00:00.000Z',
     estado: 'AL_DIA',
@@ -23,10 +24,11 @@ const FUENTES: FuenteDto[] = [
   {
     slug: 'manual',
     nombre: 'Carga manual del administrador',
+    descripcion: null,
     tipo: 'MANUAL',
     url: null,
     licencia: null,
-    frecuencia: 'DIARIA',
+    frecuencia: 'A_DEMANDA',
     ultimaIngestaExitosa: null,
     estado: 'NO_APLICA',
   },
@@ -69,12 +71,15 @@ describe('FuentesPage', () => {
     const trm = tarjetas[0]!.textContent ?? '';
     expect(trm).toContain('Al día');
     expect(trm).toMatch(/14 nov\.? 2026/);
-    expect(trm).toContain('Por verificar');
+    expect(trm).toContain('CC BY-SA 4.0');
+    expect(trm).toContain('Tasa de cambio oficial');
     expect(tarjetas[0]!.querySelector('a')?.getAttribute('rel')).toContain('noopener');
 
     const manual = tarjetas[1]!.textContent ?? '';
     expect(manual).toContain('Carga manual');
     expect(manual).toContain('Todavía no hay datos');
+    expect(manual).toContain('Por verificar');
+    expect(manual).toContain('Cuando se necesite');
     expect(tarjetas[1]!.querySelector('a')).toBeNull();
   });
 
