@@ -29,6 +29,13 @@ const recortar = ({ value }: { value: unknown }) =>
 
 const UNIDADES_CONOCIDAS = Object.keys(UNIDADES);
 
+/**
+ * Rechaza el carácter de reemplazo U+FFFD: aparece cuando el cliente envía texto
+ * que no es UTF-8 (p. ej. "arábica" desde una consola en Windows-1252).
+ */
+const SIN_CARACTER_INVALIDO = /^[^\uFFFD]*$/;
+const MENSAJE_UTF8 = '$property contiene caracteres inválidos: envíe el texto en UTF-8';
+
 export class CargaManualPrecioCuerpo implements CargaManualPrecioDto {
   @ApiProperty({ example: 'cafe' })
   @Matches(/^[a-z0-9-]{2,50}$/)
@@ -62,6 +69,7 @@ export class CargaManualPrecioCuerpo implements CargaManualPrecioDto {
   @ApiProperty({ example: 'pergamino seco' })
   @Transform(recortar)
   @IsString()
+  @Matches(SIN_CARACTER_INVALIDO, { message: MENSAJE_UTF8 })
   @MinLength(2)
   @MaxLength(100)
   presentacion: string;
@@ -84,6 +92,7 @@ export class CargaManualPrecioCuerpo implements CargaManualPrecioDto {
   @IsOptional()
   @Transform(recortar)
   @IsString()
+  @Matches(SIN_CARACTER_INVALIDO, { message: MENSAJE_UTF8 })
   @MaxLength(300)
   referencia?: string;
 }
@@ -93,6 +102,7 @@ export class AnulacionPrecioCuerpo implements AnulacionPrecioDto {
   @Transform(recortar)
   @IsString()
   @IsNotEmpty()
+  @Matches(SIN_CARACTER_INVALIDO, { message: MENSAJE_UTF8 })
   @MinLength(5)
   @MaxLength(500)
   motivo: string;

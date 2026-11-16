@@ -108,6 +108,8 @@ describe('Precios: carga manual y precio del día (e2e)', () => {
     await cargar({ ...CAFE_13_NOV, producto: 'aguacate' }).expect(400);
     await cargar({ ...CAFE_13_NOV, mercadoId: 99999 }).expect(400);
     await cargar({ ...CAFE_13_NOV, campoExtra: 1 }).expect(400);
+    // Texto que llegó en otra codificación (carácter de reemplazo U+FFFD).
+    await cargar({ ...CAFE_13_NOV, presentacion: 'verde ar\uFFFDbica' }).expect(400);
   });
 
   it('muestra el café del día con variación y el cierre de Nueva York', async () => {
