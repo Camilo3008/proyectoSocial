@@ -79,26 +79,28 @@ async function trmPorFecha(em: EntityManager, fechas: string[]): Promise<Map<str
 }
 
 /**
- * Promedio de la TRM de cada mes pedido (fechas YYYY-MM-01), con 6 decimales.
- * Se usa para series mensuales: su precio es un promedio del mes.
+ * Promedio de la TRM de cada periodo pedido (fechas de inicio YYYY-MM-01 o
+ * YYYY-01-01), con 6 decimales. Se usa para series mensuales y anuales, cuyo
+ * precio es un promedio del periodo.
  */
-async function trmPromedioMensual(
+async function trmPromedio(
   em: EntityManager,
-  meses: string[],
+  inicios: string[],
+  periodo: 'month' | 'year',
 ): Promise<Map<string, string>> {
   const resultado = new Map<string, string>();
-  if (meses.length === 0) return resultado;
-  const ordenados = [...new Set(meses)].sort();
-  const filas = await em.query<{ mes: string; valor: string }[]>(
-    `SELECT to_char(date_trunc('month', fecha), 'YYYY-MM-DD') AS mes,
+  if (inicios.length === 0) return resultado;
+  const ordenados = [...new Set(inicios)].sort();
+  const filas = await em.query<{ inicio: string; valor: string }[]>(
+    `SELECT to_char(date_trunc('${periodo}', fecha), 'YYYY-MM-DD') AS inicio,
             round(avg(valor), 6)::text AS valor
      FROM tasa_cambio
      WHERE moneda_origen = 'USD' AND moneda_destino = 'COP'
-       AND fecha >= $1::date AND fecha < ($2::date + interval '1 month')
+       AND fecha >= $1::date AND fecha < ($2::date + interval '1 ${periodo}')
      GROUP BY 1`,
     [ordenados[0], ordenados.at(-1)],
   );
-  for (const f of filas) resultado.set(f.mes, f.valor);
+  for (const f of filas) resultado.set(f.inicio, f.valor);
   return resultado;
 }
 
@@ -125,17 +127,18 @@ export async function guardarObservaciones(
   const mapeo = await cargarMapeo(em, fuenteId);
   const { ids: idMercado, nuevos } = await upsertMercados(em, fuenteId, observaciones);
   conteo.mercadosNuevos = nuevos;
-  // TRM del día (o la anterior) para datos diarios; promedio del mes para datos mensuales.
-  const trmDiaria = await trmPorFecha(
-    em,
-    observaciones.filter((o) => o.periodicidad !== 'MENSUAL').map((o) => o.fecha),
-  );
-  const trmMensual = await trmPromedioMensual(
-    em,
-    observaciones.filter((o) => o.periodicidad === 'MENSUAL').map((o) => o.fecha),
-  );
-  const trmDe = (o: ObservacionPrecioCruda) =>
-    (o.periodicidad === 'MENSUAL' ? trmMensual.get(o.fecha) : trmDiaria.get(o.fecha)) ?? null;
+  // TRM del día (o la anterior) para datos diarios y semanales; promedio del periodo
+  // para datos mensuales y anuales.
+  const fechasDe = (periodicidades: string[]) =>
+    observaciones.filter((o) => periodicidades.includes(o.periodicidad)).map((o) => o.fecha);
+  const trmDiaria = await trmPorFecha(em, fechasDe(['DIARIA', 'SEMANAL']));
+  const trmMensual = await trmPromedio(em, fechasDe(['MENSUAL']), 'month');
+  const trmAnual = await trmPromedio(em, fechasDe(['ANUAL']), 'year');
+  const trmDe = (o: ObservacionPrecioCruda) => {
+    const tabla =
+      o.periodicidad === 'MENSUAL' ? trmMensual : o.periodicidad === 'ANUAL' ? trmAnual : trmDiaria;
+    return tabla.get(o.fecha) ?? null;
+  };
 
   const sinMapeo = new Set<string>();
   const filas: unknown[][] = [];

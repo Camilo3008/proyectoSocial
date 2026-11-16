@@ -6,3 +6,5 @@ package-lock.json
 apps/api/src/database/migrations/
 *.md
 apps/api/test/fixtures/
+apps/web/public/geo/
+apps/api/src/database/seeds/datos/paises-natural-earth.json

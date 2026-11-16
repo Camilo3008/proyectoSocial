@@ -143,9 +143,21 @@ export class VariablesEntorno {
   })
   WORLDBANK_URL =
     'https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx';
+
+  /**
+   * Horario de la ingesta de FAOSTAT (cron con segundos, zona America/Bogota).
+   * Por defecto el día 1 de cada mes a las 10:00: los datos son anuales.
+   */
+  @IsString()
+  FAOSTAT_CRON = '0 0 10 1 * *';
+
+  /** Descarga masiva de Producer Prices (docs/fuentes/faostat.md). */
+  @IsString()
+  @Matches(/^https:\/\/[^\s]+\.zip$/, { message: 'FAOSTAT_URL debe ser una URL https a un .zip' })
+  FAOSTAT_URL = 'https://bulks-faostat.fao.org/production/Prices_E_All_Data_(Normalized).zip';
 }
 
-const VARIABLES_CRON = ['TRM_CRON', 'SIPSA_CRON', 'WORLDBANK_CRON'] as const;
+const VARIABLES_CRON = ['TRM_CRON', 'SIPSA_CRON', 'WORLDBANK_CRON', 'FAOSTAT_CRON'] as const;
 
 /** Devuelve un mensaje de error si la expresión cron no es válida. */
 function validarCron(expresion: string): string | null {

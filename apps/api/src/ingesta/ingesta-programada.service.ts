@@ -30,6 +30,7 @@ export class IngestaProgramadaService implements OnModuleInit {
     this.programar('trm', this.config.get('TRM_CRON', { infer: true }));
     this.programar('sipsa', this.config.get('SIPSA_CRON', { infer: true }));
     this.programar('worldbank', this.config.get('WORLDBANK_CRON', { infer: true }));
+    this.programar('faostat', this.config.get('FAOSTAT_CRON', { infer: true }));
   }
 
   private programar(slug: string, expresion: string): void {

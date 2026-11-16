@@ -9,6 +9,9 @@ export const CITAS_FUENTE: Readonly<Record<string, string>> = {
   trm: 'Fuente: Superintendencia Financiera de Colombia (datos.gov.co), CC BY-SA 4.0',
   // CC BY 4.0 (docs/fuentes/worldbank.md): atribución, sin sugerir respaldo del Banco Mundial.
   worldbank: 'Fuente: Banco Mundial, Commodity Price Data (The Pink Sheet), CC BY 4.0',
+  // Condiciones de uso de las bases de datos de la FAO, punto 3: formato de cita obligatorio.
+  faostat:
+    'FAO. 2026. FAOSTAT: Precios al productor. Consultado el 16 de noviembre de 2026. https://www.fao.org/faostat/ Licencia: CC-BY-4.0',
 };
 
 export function citaDe(slug: string): string | null {

@@ -15,6 +15,7 @@ export const UNIDADES = {
   'carga 125 kg': { kgPorUnidad: '125', factorMoneda: '1', descripcion: 'carga de 125 kg' },
   arroba: { kgPorUnidad: '12.5', factorMoneda: '1', descripcion: 'arroba (12,5 kg)' },
   lb: { kgPorUnidad: '0.45359237', factorMoneda: '1', descripcion: 'libra' },
+  t: { kgPorUnidad: '1000', factorMoneda: '1', descripcion: 'tonelada' },
   'USc/lb': {
     kgPorUnidad: '0.45359237',
     factorMoneda: '0.01',

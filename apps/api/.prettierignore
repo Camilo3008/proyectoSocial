@@ -1,0 +1,5 @@
+# Prettier ejecutado desde apps/api no lee el .prettierignore de la raíz.
+dist/
+src/database/migrations/
+src/database/seeds/datos/*.json
+test/fixtures/

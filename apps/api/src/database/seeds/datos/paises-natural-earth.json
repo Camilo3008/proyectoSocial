@@ -1,0 +1,872 @@
+{
+  "FJI": {
+    "region": "Oceania",
+    "lat": -17.826099,
+    "lng": 177.975427
+  },
+  "TZA": {
+    "region": "Africa",
+    "lat": -6.051866,
+    "lng": 34.959183
+  },
+  "ESH": {
+    "region": "Africa",
+    "lat": 23.967592,
+    "lng": -12.630304
+  },
+  "CAN": {
+    "region": "Americas",
+    "lat": 60.324287,
+    "lng": -101.9107
+  },
+  "USA": {
+    "region": "Americas",
+    "lat": 39.538479,
+    "lng": -97.482602
+  },
+  "KAZ": {
+    "region": "Asia",
+    "lat": 49.054149,
+    "lng": 68.685548
+  },
+  "UZB": {
+    "region": "Asia",
+    "lat": 41.693603,
+    "lng": 64.005429
+  },
+  "PNG": {
+    "region": "Oceania",
+    "lat": -5.695285,
+    "lng": 143.910216
+  },
+  "IDN": {
+    "region": "Asia",
+    "lat": -0.954404,
+    "lng": 101.892949
+  },
+  "ARG": {
+    "region": "Americas",
+    "lat": -33.501159,
+    "lng": -64.173331
+  },
+  "CHL": {
+    "region": "Americas",
+    "lat": -38.151771,
+    "lng": -72.318871
+  },
+  "COD": {
+    "region": "Africa",
+    "lat": -1.858167,
+    "lng": 23.458829
+  },
+  "SOM": {
+    "region": "Africa",
+    "lat": 3.568925,
+    "lng": 45.19238
+  },
+  "KEN": {
+    "region": "Africa",
+    "lat": 0.549043,
+    "lng": 37.907632
+  },
+  "SDN": {
+    "region": "Africa",
+    "lat": 16.330746,
+    "lng": 29.260657
+  },
+  "TCD": {
+    "region": "Africa",
+    "lat": 15.142959,
+    "lng": 18.645041
+  },
+  "HTI": {
+    "region": "Americas",
+    "lat": 19.263784,
+    "lng": -72.224051
+  },
+  "DOM": {
+    "region": "Americas",
+    "lat": 19.104137,
+    "lng": -70.653998
+  },
+  "RUS": {
+    "region": "Europe",
+    "lat": 58.249357,
+    "lng": 44.686469
+  },
+  "BHS": {
+    "region": "Americas",
+    "lat": 26.401789,
+    "lng": -77.146688
+  },
+  "FLK": {
+    "region": "Americas",
+    "lat": -51.608913,
+    "lng": -58.738602
+  },
+  "NOR": {
+    "region": "Europe",
+    "lat": 61.357092,
+    "lng": 9.679975
+  },
+  "GRL": {
+    "region": "Americas",
+    "lat": 74.319387,
+    "lng": -39.335251
+  },
+  "ATF": {
+    "region": "Africa",
+    "lat": -49.303721,
+    "lng": 69.122136
+  },
+  "TLS": {
+    "region": "Asia",
+    "lat": -8.803705,
+    "lng": 125.854679
+  },
+  "ZAF": {
+    "region": "Africa",
+    "lat": -29.708776,
+    "lng": 23.665734
+  },
+  "LSO": {
+    "region": "Africa",
+    "lat": -29.480158,
+    "lng": 28.246639
+  },
+  "MEX": {
+    "region": "Americas",
+    "lat": 23.919988,
+    "lng": -102.289448
+  },
+  "URY": {
+    "region": "Americas",
+    "lat": -32.961127,
+    "lng": -55.966942
+  },
+  "BRA": {
+    "region": "Americas",
+    "lat": -12.098687,
+    "lng": -49.55945
+  },
+  "BOL": {
+    "region": "Americas",
+    "lat": -16.666015,
+    "lng": -64.593433
+  },
+  "PER": {
+    "region": "Americas",
+    "lat": -12.976679,
+    "lng": -72.90016
+  },
+  "COL": {
+    "region": "Americas",
+    "lat": 3.373111,
+    "lng": -73.174347
+  },
+  "PAN": {
+    "region": "Americas",
+    "lat": 8.72198,
+    "lng": -80.352106
+  },
+  "CRI": {
+    "region": "Americas",
+    "lat": 10.0651,
+    "lng": -84.077922
+  },
+  "NIC": {
+    "region": "Americas",
+    "lat": 12.670697,
+    "lng": -85.069347
+  },
+  "HND": {
+    "region": "Americas",
+    "lat": 14.794801,
+    "lng": -86.887604
+  },
+  "SLV": {
+    "region": "Americas",
+    "lat": 13.685371,
+    "lng": -88.890124
+  },
+  "GTM": {
+    "region": "Americas",
+    "lat": 14.982133,
+    "lng": -90.497134
+  },
+  "BLZ": {
+    "region": "Americas",
+    "lat": 17.202068,
+    "lng": -88.712962
+  },
+  "VEN": {
+    "region": "Americas",
+    "lat": 7.182476,
+    "lng": -64.599381
+  },
+  "GUY": {
+    "region": "Americas",
+    "lat": 5.124317,
+    "lng": -58.942643
+  },
+  "SUR": {
+    "region": "Americas",
+    "lat": 4.143987,
+    "lng": -55.91094
+  },
+  "FRA": {
+    "region": "Europe",
+    "lat": 46.696113,
+    "lng": 2.552275
+  },
+  "ECU": {
+    "region": "Americas",
+    "lat": -1.259076,
+    "lng": -78.188375
+  },
+  "PRI": {
+    "region": "Americas",
+    "lat": 18.234668,
+    "lng": -66.481065
+  },
+  "JAM": {
+    "region": "Americas",
+    "lat": 18.137124,
+    "lng": -77.318767
+  },
+  "CUB": {
+    "region": "Americas",
+    "lat": 21.334024,
+    "lng": -77.975855
+  },
+  "ZWE": {
+    "region": "Africa",
+    "lat": -18.91164,
+    "lng": 29.925444
+  },
+  "BWA": {
+    "region": "Africa",
+    "lat": -22.102634,
+    "lng": 24.179216
+  },
+  "NAM": {
+    "region": "Africa",
+    "lat": -20.575298,
+    "lng": 17.108166
+  },
+  "SEN": {
+    "region": "Africa",
+    "lat": 15.138125,
+    "lng": -14.778586
+  },
+  "MLI": {
+    "region": "Africa",
+    "lat": 18.692713,
+    "lng": -2.038455
+  },
+  "MRT": {
+    "region": "Africa",
+    "lat": 19.587062,
+    "lng": -9.740299
+  },
+  "BEN": {
+    "region": "Africa",
+    "lat": 10.324775,
+    "lng": 2.352018
+  },
+  "NER": {
+    "region": "Africa",
+    "lat": 17.446195,
+    "lng": 9.504356
+  },
+  "NGA": {
+    "region": "Africa",
+    "lat": 9.439799,
+    "lng": 7.50322
+  },
+  "CMR": {
+    "region": "Africa",
+    "lat": 4.585041,
+    "lng": 12.473488
+  },
+  "TGO": {
+    "region": "Africa",
+    "lat": 8.80722,
+    "lng": 1.058113
+  },
+  "GHA": {
+    "region": "Africa",
+    "lat": 7.717639,
+    "lng": -1.036941
+  },
+  "CIV": {
+    "region": "Africa",
+    "lat": 7.49139,
+    "lng": -5.568618
+  },
+  "GIN": {
+    "region": "Africa",
+    "lat": 10.618516,
+    "lng": -10.016402
+  },
+  "GNB": {
+    "region": "Africa",
+    "lat": 12.163712,
+    "lng": -14.52413
+  },
+  "LBR": {
+    "region": "Africa",
+    "lat": 6.447177,
+    "lng": -9.460379
+  },
+  "SLE": {
+    "region": "Africa",
+    "lat": 8.617449,
+    "lng": -11.763677
+  },
+  "BFA": {
+    "region": "Africa",
+    "lat": 12.673048,
+    "lng": -1.36388
+  },
+  "CAF": {
+    "region": "Africa",
+    "lat": 6.989681,
+    "lng": 20.906897
+  },
+  "COG": {
+    "region": "Africa",
+    "lat": 0.142331,
+    "lng": 15.9005
+  },
+  "GAB": {
+    "region": "Africa",
+    "lat": -0.437739,
+    "lng": 11.835939
+  },
+  "GNQ": {
+    "region": "Africa",
+    "lat": 2.333,
+    "lng": 8.9902
+  },
+  "ZMB": {
+    "region": "Africa",
+    "lat": -14.660804,
+    "lng": 26.395298
+  },
+  "MWI": {
+    "region": "Africa",
+    "lat": -13.386737,
+    "lng": 33.608082
+  },
+  "MOZ": {
+    "region": "Africa",
+    "lat": -13.94323,
+    "lng": 37.83789
+  },
+  "SWZ": {
+    "region": "Africa",
+    "lat": -26.533676,
+    "lng": 31.467264
+  },
+  "AGO": {
+    "region": "Africa",
+    "lat": -12.182762,
+    "lng": 17.984249
+  },
+  "BDI": {
+    "region": "Africa",
+    "lat": -3.332836,
+    "lng": 29.917086
+  },
+  "ISR": {
+    "region": "Asia",
+    "lat": 30.911148,
+    "lng": 34.847915
+  },
+  "LBN": {
+    "region": "Asia",
+    "lat": 34.133368,
+    "lng": 35.992892
+  },
+  "MDG": {
+    "region": "Africa",
+    "lat": -18.628288,
+    "lng": 46.704241
+  },
+  "PSE": {
+    "region": "Asia",
+    "lat": 32.047431,
+    "lng": 35.291341
+  },
+  "GMB": {
+    "region": "Africa",
+    "lat": 13.641721,
+    "lng": -14.998318
+  },
+  "TUN": {
+    "region": "Africa",
+    "lat": 33.687263,
+    "lng": 9.007881
+  },
+  "DZA": {
+    "region": "Africa",
+    "lat": 27.397406,
+    "lng": 2.808241
+  },
+  "JOR": {
+    "region": "Asia",
+    "lat": 30.805025,
+    "lng": 36.375991
+  },
+  "ARE": {
+    "region": "Asia",
+    "lat": 23.466285,
+    "lng": 54.547256
+  },
+  "QAT": {
+    "region": "Asia",
+    "lat": 25.237383,
+    "lng": 51.143509
+  },
+  "KWT": {
+    "region": "Asia",
+    "lat": 29.413628,
+    "lng": 47.313999
+  },
+  "IRQ": {
+    "region": "Asia",
+    "lat": 33.09403,
+    "lng": 43.26181
+  },
+  "OMN": {
+    "region": "Asia",
+    "lat": 22.120427,
+    "lng": 57.336553
+  },
+  "VUT": {
+    "region": "Oceania",
+    "lat": -15.37153,
+    "lng": 166.908762
+  },
+  "KHM": {
+    "region": "Asia",
+    "lat": 12.647584,
+    "lng": 104.50487
+  },
+  "THA": {
+    "region": "Asia",
+    "lat": 15.45974,
+    "lng": 101.073198
+  },
+  "LAO": {
+    "region": "Asia",
+    "lat": 19.431821,
+    "lng": 102.533912
+  },
+  "MMR": {
+    "region": "Asia",
+    "lat": 21.573855,
+    "lng": 95.804497
+  },
+  "VNM": {
+    "region": "Asia",
+    "lat": 21.715416,
+    "lng": 105.387292
+  },
+  "PRK": {
+    "region": "Asia",
+    "lat": 39.885252,
+    "lng": 126.444516
+  },
+  "KOR": {
+    "region": "Asia",
+    "lat": 36.384924,
+    "lng": 128.129504
+  },
+  "MNG": {
+    "region": "Asia",
+    "lat": 45.997488,
+    "lng": 104.150405
+  },
+  "IND": {
+    "region": "Asia",
+    "lat": 22.686852,
+    "lng": 79.358105
+  },
+  "BGD": {
+    "region": "Asia",
+    "lat": 24.214956,
+    "lng": 89.684963
+  },
+  "BTN": {
+    "region": "Asia",
+    "lat": 27.536685,
+    "lng": 90.040294
+  },
+  "NPL": {
+    "region": "Asia",
+    "lat": 28.297925,
+    "lng": 83.639914
+  },
+  "PAK": {
+    "region": "Asia",
+    "lat": 29.328389,
+    "lng": 68.545632
+  },
+  "AFG": {
+    "region": "Asia",
+    "lat": 34.164262,
+    "lng": 66.496586
+  },
+  "TJK": {
+    "region": "Asia",
+    "lat": 38.199835,
+    "lng": 72.587276
+  },
+  "KGZ": {
+    "region": "Asia",
+    "lat": 41.66854,
+    "lng": 74.532637
+  },
+  "TKM": {
+    "region": "Asia",
+    "lat": 39.855246,
+    "lng": 58.676647
+  },
+  "IRN": {
+    "region": "Asia",
+    "lat": 32.166225,
+    "lng": 54.931495
+  },
+  "SYR": {
+    "region": "Asia",
+    "lat": 35.006636,
+    "lng": 38.277783
+  },
+  "ARM": {
+    "region": "Asia",
+    "lat": 40.459077,
+    "lng": 44.800564
+  },
+  "SWE": {
+    "region": "Europe",
+    "lat": 65.85918,
+    "lng": 19.01705
+  },
+  "BLR": {
+    "region": "Europe",
+    "lat": 53.821888,
+    "lng": 28.417701
+  },
+  "UKR": {
+    "region": "Europe",
+    "lat": 49.724739,
+    "lng": 32.140865
+  },
+  "POL": {
+    "region": "Europe",
+    "lat": 51.990316,
+    "lng": 19.490468
+  },
+  "AUT": {
+    "region": "Europe",
+    "lat": 47.518859,
+    "lng": 14.130515
+  },
+  "HUN": {
+    "region": "Europe",
+    "lat": 47.086841,
+    "lng": 19.447867
+  },
+  "MDA": {
+    "region": "Europe",
+    "lat": 47.434999,
+    "lng": 28.487904
+  },
+  "ROU": {
+    "region": "Europe",
+    "lat": 45.733237,
+    "lng": 24.972624
+  },
+  "LTU": {
+    "region": "Europe",
+    "lat": 55.103703,
+    "lng": 24.089932
+  },
+  "LVA": {
+    "region": "Europe",
+    "lat": 57.066872,
+    "lng": 25.458723
+  },
+  "EST": {
+    "region": "Europe",
+    "lat": 58.724865,
+    "lng": 25.867126
+  },
+  "DEU": {
+    "region": "Europe",
+    "lat": 50.961733,
+    "lng": 9.678348
+  },
+  "BGR": {
+    "region": "Europe",
+    "lat": 42.508785,
+    "lng": 25.15709
+  },
+  "GRC": {
+    "region": "Europe",
+    "lat": 39.492763,
+    "lng": 21.72568
+  },
+  "TUR": {
+    "region": "Asia",
+    "lat": 39.345388,
+    "lng": 34.508268
+  },
+  "ALB": {
+    "region": "Europe",
+    "lat": 40.654855,
+    "lng": 20.11384
+  },
+  "HRV": {
+    "region": "Europe",
+    "lat": 45.805799,
+    "lng": 16.37241
+  },
+  "CHE": {
+    "region": "Europe",
+    "lat": 46.719114,
+    "lng": 7.463965
+  },
+  "LUX": {
+    "region": "Europe",
+    "lat": 49.733732,
+    "lng": 6.07762
+  },
+  "BEL": {
+    "region": "Europe",
+    "lat": 50.785392,
+    "lng": 4.800448
+  },
+  "NLD": {
+    "region": "Europe",
+    "lat": 52.422211,
+    "lng": 5.61144
+  },
+  "PRT": {
+    "region": "Europe",
+    "lat": 39.606675,
+    "lng": -8.271754
+  },
+  "ESP": {
+    "region": "Europe",
+    "lat": 40.090953,
+    "lng": -3.464718
+  },
+  "IRL": {
+    "region": "Europe",
+    "lat": 53.078726,
+    "lng": -7.798588
+  },
+  "NCL": {
+    "region": "Oceania",
+    "lat": -21.064697,
+    "lng": 165.084004
+  },
+  "SLB": {
+    "region": "Oceania",
+    "lat": -8.029548,
+    "lng": 159.170468
+  },
+  "NZL": {
+    "region": "Oceania",
+    "lat": -39.759,
+    "lng": 172.787
+  },
+  "AUS": {
+    "region": "Oceania",
+    "lat": -24.129522,
+    "lng": 134.04972
+  },
+  "LKA": {
+    "region": "Asia",
+    "lat": 7.581097,
+    "lng": 80.704823
+  },
+  "CHN": {
+    "region": "Asia",
+    "lat": 32.498178,
+    "lng": 106.337289
+  },
+  "TWN": {
+    "region": "Asia",
+    "lat": 23.652408,
+    "lng": 120.868204
+  },
+  "ITA": {
+    "region": "Europe",
+    "lat": 44.732482,
+    "lng": 11.076907
+  },
+  "DNK": {
+    "region": "Europe",
+    "lat": 55.966965,
+    "lng": 9.018163
+  },
+  "GBR": {
+    "region": "Europe",
+    "lat": 54.402739,
+    "lng": -2.116346
+  },
+  "ISL": {
+    "region": "Europe",
+    "lat": 64.779286,
+    "lng": -18.673711
+  },
+  "AZE": {
+    "region": "Asia",
+    "lat": 40.402387,
+    "lng": 47.210994
+  },
+  "GEO": {
+    "region": "Asia",
+    "lat": 41.870087,
+    "lng": 43.735724
+  },
+  "PHL": {
+    "region": "Asia",
+    "lat": 11.198,
+    "lng": 122.465
+  },
+  "MYS": {
+    "region": "Asia",
+    "lat": 2.528667,
+    "lng": 113.83708
+  },
+  "BRN": {
+    "region": "Asia",
+    "lat": 4.448298,
+    "lng": 114.551943
+  },
+  "SVN": {
+    "region": "Europe",
+    "lat": 46.06076,
+    "lng": 14.915312
+  },
+  "FIN": {
+    "region": "Europe",
+    "lat": 63.252361,
+    "lng": 27.276449
+  },
+  "SVK": {
+    "region": "Europe",
+    "lat": 48.734044,
+    "lng": 19.049868
+  },
+  "CZE": {
+    "region": "Europe",
+    "lat": 49.882364,
+    "lng": 15.377555
+  },
+  "ERI": {
+    "region": "Africa",
+    "lat": 15.787401,
+    "lng": 38.285566
+  },
+  "JPN": {
+    "region": "Asia",
+    "lat": 36.142538,
+    "lng": 138.44217
+  },
+  "PRY": {
+    "region": "Americas",
+    "lat": -21.674509,
+    "lng": -60.146394
+  },
+  "YEM": {
+    "region": "Asia",
+    "lat": 15.328226,
+    "lng": 45.874383
+  },
+  "SAU": {
+    "region": "Asia",
+    "lat": 23.806908,
+    "lng": 44.6996
+  },
+  "ATA": {
+    "region": "Antarctica",
+    "lat": -79.843222,
+    "lng": 35.885455
+  },
+  "CYP": {
+    "region": "Asia",
+    "lat": 34.913329,
+    "lng": 33.084182
+  },
+  "MAR": {
+    "region": "Africa",
+    "lat": 31.650723,
+    "lng": -7.187296
+  },
+  "EGY": {
+    "region": "Africa",
+    "lat": 26.186173,
+    "lng": 29.445837
+  },
+  "LBY": {
+    "region": "Africa",
+    "lat": 26.638944,
+    "lng": 18.011015
+  },
+  "ETH": {
+    "region": "Africa",
+    "lat": 8.032795,
+    "lng": 39.0886
+  },
+  "DJI": {
+    "region": "Africa",
+    "lat": 11.976343,
+    "lng": 42.498825
+  },
+  "UGA": {
+    "region": "Africa",
+    "lat": 1.972589,
+    "lng": 32.948555
+  },
+  "RWA": {
+    "region": "Africa",
+    "lat": -1.897196,
+    "lng": 30.103894
+  },
+  "BIH": {
+    "region": "Europe",
+    "lat": 44.091051,
+    "lng": 18.06841
+  },
+  "MKD": {
+    "region": "Europe",
+    "lat": 41.558223,
+    "lng": 21.555839
+  },
+  "SRB": {
+    "region": "Europe",
+    "lat": 44.189919,
+    "lng": 20.787989
+  },
+  "MNE": {
+    "region": "Europe",
+    "lat": 42.803101,
+    "lng": 19.143727
+  },
+  "TTO": {
+    "region": "Americas",
+    "lat": 10.9989,
+    "lng": -60.9184
+  },
+  "SSD": {
+    "region": "Africa",
+    "lat": 7.230477,
+    "lng": 30.390151
+  }
+}

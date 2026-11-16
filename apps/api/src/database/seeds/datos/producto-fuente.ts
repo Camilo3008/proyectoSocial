@@ -74,4 +74,33 @@ export const PRODUCTO_FUENTE: MapeoSemilla[] = [
     notas:
       'Bananas (Central & South America), major brands, f.o.t. Southern Europe, including duties',
   },
+  // FAOSTAT Producer Prices (docs/fuentes/faostat.md): código = Item Code.
+  {
+    producto: 'cafe',
+    fuente: 'faostat',
+    codigoExterno: '656',
+    presentacion: 'verde, precio al productor',
+    notas: 'FAOSTAT PP, Item Code 656: "Coffee, green"',
+  },
+  {
+    producto: 'cacao',
+    fuente: 'faostat',
+    codigoExterno: '661',
+    presentacion: 'en grano, precio al productor',
+    notas: 'FAOSTAT PP, Item Code 661: "Cocoa beans"',
+  },
+  {
+    producto: 'banano',
+    fuente: 'faostat',
+    codigoExterno: '486',
+    presentacion: 'precio al productor',
+    notas: 'FAOSTAT PP, Item Code 486: "Bananas"',
+  },
+  {
+    producto: 'platano',
+    fuente: 'faostat',
+    codigoExterno: '487',
+    presentacion: 'precio al productor',
+    notas: 'FAOSTAT PP, Item Code 487: "Plantains" (no se usa 489, agregado con poca cobertura)',
+  },
 ];

@@ -5,6 +5,7 @@ import { AuthModule } from '../auth/auth.module.js';
 import { Fuente } from '../catalogo/entities/fuente.entity.js';
 import { TasasModule } from '../tasas/tasas.module.js';
 import { FUENTE_ADAPTERS, type FuenteAdapter } from './adapters/fuente-adapter.interface.js';
+import { FaostatAdapter } from './adapters/faostat.adapter.js';
 import { SipsaAdapter } from './adapters/sipsa.adapter.js';
 import { TrmAdapter } from './adapters/trm.adapter.js';
 import { WorldBankAdapter } from './adapters/worldbank.adapter.js';
@@ -26,16 +27,18 @@ import { IngestaService } from './ingesta.service.js';
     TrmAdapter,
     SipsaAdapter,
     WorldBankAdapter,
+    FaostatAdapter,
     // Solo fuentes verificadas en docs/fuentes. La FNC no tiene adapter: sus
     // términos prohíben la extracción automatizada (docs/fuentes/fnc.md).
     {
       provide: FUENTE_ADAPTERS,
-      inject: [TrmAdapter, SipsaAdapter, WorldBankAdapter],
+      inject: [TrmAdapter, SipsaAdapter, WorldBankAdapter, FaostatAdapter],
       useFactory: (
         trm: TrmAdapter,
         sipsa: SipsaAdapter,
         worldbank: WorldBankAdapter,
-      ): FuenteAdapter[] => [trm, sipsa, worldbank],
+        faostat: FaostatAdapter,
+      ): FuenteAdapter[] => [trm, sipsa, worldbank, faostat],
     },
     IngestaService,
     IngestaProgramadaService,

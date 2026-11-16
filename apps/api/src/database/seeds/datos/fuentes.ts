@@ -9,8 +9,8 @@ type FuenteSemilla = Pick<
  * Fuentes de datos (docs/PROYECTO.md §7).
  *
  * Las fuentes verificadas (ficha en docs/fuentes/<slug>.md) llevan su URL y su
- * licencia. TODO(verificar): sipsa y faostat todavía apuntan a la
- * página institucional y tienen la licencia en null ("Por verificar").
+ * licencia. TODO(verificar): la licencia de SIPSA es la de los términos de uso
+ * del portal del DANE (cita obligatoria), que no es una licencia de datos estándar.
  */
 export const FUENTES: FuenteSemilla[] = [
   {
@@ -51,7 +51,8 @@ export const FUENTES: FuenteSemilla[] = [
       'Precio que reciben los productores en cada país, por producto y año. Alimenta el globo terráqueo.',
     tipo: 'INTERNACIONAL',
     url: 'https://www.fao.org/faostat/',
-    licencia: null,
+    licencia:
+      'CC BY 4.0 – FAO, FAOSTAT (con las condiciones de uso de las bases de datos de la FAO)',
     frecuencia: 'ANUAL',
   },
   {
