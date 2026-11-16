@@ -442,6 +442,21 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-15 | PWA con soporte offline como requisito central | Mala conectividad en la vereda |
 | 2026-11-15 | Fase 1 solo recopila y muestra datos; los comercios pasan a la Fase 2 | Reducir el alcance inicial |
 | 2026-11-15 | Globo con MapLibre GL JS (proyección globe) sin tiles externos | Liviano, gratuito y cacheable offline |
+| 2026-11-16 | Versiones base: Node 24 LTS, TypeScript 6.0, NestJS 12, Angular 22, TypeORM 1.1, PostgreSQL 17 | Versiones vigentes y compatibles entre sí. Angular 22 y typescript-eslint exigen TypeScript `>=6.0 <6.1`, así que no se usa TypeScript 7 |
+| 2026-11-16 | API en ESM (`"type": "module"`) con Vitest, como la genera Nest CLI 12; ESLint (typescript-eslint) en vez de oxlint | ESM y Vitest son el estándar actual de Nest. ESLint mantiene una sola herramienta de lint coherente con Angular (angular-eslint) |
+| 2026-11-16 | Web Angular *zoneless*, standalone, OnPush y `httpResource` para lecturas | Menos JavaScript inicial y reactividad con signals |
+| 2026-11-16 | Entidades y migraciones listadas de forma explícita (`database/entidades.ts`, `database/migraciones.ts`), sin globs; el CLI de TypeORM y los seeds corren desde `dist/` | Funciona igual en `src/` (Vitest) y en `dist/`, sin ts-node. Costo: cada migración nueva se agrega a mano al arreglo |
+| 2026-11-16 | La clave única con `COALESCE` de `observacion_precio` y los índices con `fecha DESC` se escriben a mano en la migración (`@Index(..., { synchronize: false })`) | TypeORM no soporta índices con expresiones ni con orden. El upsert debe usar `ON CONFLICT` con las mismas expresiones |
+| 2026-11-16 | Plátano y banano son productos separados (`platano`, `banano`) | Las fuentes (SIPSA, FAOSTAT, Banco Mundial) los reportan como artículos distintos; no se mezclan presentaciones |
+| 2026-11-16 | Países ISO desde `i18n-iso-countries` (MIT); `region`, `lat` y `lng` quedan en `null` hasta la etapa del globo (Natural Earth, dominio público) | Se descartó `world-countries` porque su licencia ODbL es *share-alike* sobre bases derivadas (riesgo legal) |
+| 2026-11-16 | Los seeds de `fuente` usan la página institucional de cada entidad y `licencia = null` ("Por verificar") | No inventar URLs ni licencias: se completan al verificar cada fuente en `docs/fuentes/<slug>.md` |
+| 2026-11-16 | Estado de una fuente en `GET /api/fuentes`: `NO_APLICA` (manual), `ERROR` (última ejecución falló), `SIN_DATOS`, `ATRASADA` o `AL_DIA`, con tolerancia de 4 / 10 / 45 / 400 días para frecuencia diaria / semanal / mensual / anual | Da holgura a fines de semana, festivos y rezagos normales de publicación |
+| 2026-11-16 | `GET /api/salud` reporta por ahora solo la base de datos y responde 503 si falla; el estado por fuente se agrega con la ingesta | No hay ingestas todavía |
+| 2026-11-16 | Lecturas de catálogo con `Cache-Control: public, max-age=300, stale-while-revalidate=86400` y ETag fuerte (304 en revalidación); `/salud` con `no-store` | Los datos cambian como máximo una vez al día |
+| 2026-11-16 | Presupuesto de rendimiento doble: budgets de `angular.json` (450 kB aviso / 600 kB error, sin comprimir) más `apps/web/scripts/verificar-peso.mjs`, que hace fallar el build si el bundle inicial supera 200 kB **gzip** | Los budgets de Angular no miden gzip |
+| 2026-11-16 | Tipografía del sistema (sin fuentes web) y paleta con contraste AA verificado | Cero descargas extra en conexiones lentas |
+| 2026-11-16 | `packages/shared` solo emite declaraciones `.d.ts` (se compila en `postinstall`) y la API declara los valores de los enums con `satisfies` contra esos tipos | Tipos compartidos sin lógica y sin problemas de `rootDir` entre paquetes |
+| 2026-11-16 | Contraseña del admin con `bcryptjs` (costo 12); el seed solo crea el admin si no existe y nunca sobrescribe su contraseña | JavaScript puro (sin compilación nativa en Windows) |
 
 ---
 
