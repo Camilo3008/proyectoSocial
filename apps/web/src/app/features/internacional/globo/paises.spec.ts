@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { DeferBlockBehavior, type ComponentFixture, TestBed } from '@angular/core/testing';
 import { calcularClases, claseDe } from './escala';
-import { soportaWebgl } from './globo';
+import { claseMapa, soportaWebgl } from './globo';
 import { bandera, Paises } from './paises';
 
 const CITA_FAO =
@@ -80,6 +80,15 @@ describe('escala y utilidades del globo', () => {
     expect(bandera('c0')).toBe('');
   });
 
+  it('obtiene la clase Map de MapLibre con export con nombre (Vite) o en default (esbuild)', () => {
+    class MapaFalso {}
+    type Modulo = Parameters<typeof claseMapa>[0];
+    expect(claseMapa({ Map: MapaFalso } as unknown as Modulo)).toBe(MapaFalso);
+    // Build de producción: el módulo UMD/CommonJS solo trae `default` (regresión real).
+    expect(claseMapa({ default: { Map: MapaFalso } } as unknown as Modulo)).toBe(MapaFalso);
+    expect(() => claseMapa({} as Modulo)).toThrow('MapLibre no expone la clase Map');
+  });
+
   it('detecta la falta de WebGL', () => {
     const documento = {
       createElement: () => ({ getContext: () => null }),
@@ -137,6 +146,7 @@ describe('Paises', () => {
     expect(leyenda).toHaveLength(6);
     expect(leyenda.at(-1)).toBe('Sin datos');
     expect(texto()).toContain(CITA_FAO);
+    expect(texto()).toContain('Mapa hecho con Natural Earth (dominio público).');
     expect(el().querySelector('table')).toBeNull();
   });
 

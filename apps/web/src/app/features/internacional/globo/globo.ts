@@ -13,12 +13,32 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import type * as MapLibre from 'maplibre-gl';
 import type { Map as MapaMapLibre } from 'maplibre-gl';
 
 import { COLOR_SIN_DATOS, COLORES_CLASES, calcularClases, claseDe } from './escala';
 
 const COLOR_MAR = '#dfe9f0';
 const CENTRO_COLOMBIA: [number, number] = [-73.17, 3.37];
+
+type ModuloMapLibre = typeof MapLibre;
+
+/**
+ * Clase Map de MapLibre a partir del módulo cargado con import(). MapLibre se
+ * publica como UMD/CommonJS: con el pre-empaquetado de Vite (desarrollo) llega
+ * como export con nombre, pero en el build de producción (esbuild) solo viene en
+ * `default`. Se aceptan las dos formas.
+ */
+export function claseMapa(modulo: ModuloMapLibre): ModuloMapLibre['Map'] {
+  const conDefault = modulo as ModuloMapLibre & { default?: ModuloMapLibre };
+  const Mapa = conDefault.Map ?? conDefault.default?.Map;
+  if (typeof Mapa !== 'function') throw new Error('MapLibre no expone la clase Map');
+  return Mapa;
+}
+
+async function cargarMapLibre(): Promise<ModuloMapLibre['Map']> {
+  return claseMapa(await import('maplibre-gl'));
+}
 
 /** true si el navegador puede crear un contexto WebGL (requisito de MapLibre). */
 export function soportaWebgl(documento: Document): boolean {
@@ -114,7 +134,7 @@ export class Globo {
     }
     try {
       this.cargarEstilos();
-      const { Map: Mapa } = await import('maplibre-gl');
+      const Mapa = await cargarMapLibre();
       const mapa = new Mapa({
         container: this.contenedor().nativeElement,
         attributionControl: false,
@@ -165,7 +185,12 @@ export class Globo {
       });
       this.mapa = mapa;
 
-      mapa.on('error', () => this.sinWebgl.emit());
+      // Un error antes de cargar (WebGL, CSP, GeoJSON) deja el globo inservible: se pasa a la
+      // tabla. Después de cargar, un error puntual se registra pero el globo sigue.
+      mapa.on('error', (e: { error?: unknown }) => {
+        console.error('[globo]', e.error);
+        if (!this.listo()) this.sinWebgl.emit();
+      });
       mapa.on('load', () => {
         this.listo.set(true);
         this.pintar(this.datos(), this.seleccionado());
@@ -182,7 +207,8 @@ export class Globo {
       for (const evento of ['mousedown', 'touchstart', 'wheel', 'dragstart'] as const) {
         mapa.on(evento, () => this.detenerGiro());
       }
-    } catch {
+    } catch (error) {
+      console.error('[globo]', error);
       this.sinWebgl.emit();
     }
   }

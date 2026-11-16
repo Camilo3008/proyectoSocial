@@ -177,6 +177,9 @@
     @if (m.fuente.cita; as cita) {
       <p class="nota cita">{{ cita }}</p>
     }
+    @if (!enTabla()) {
+      <p class="nota">Mapa hecho con Natural Earth (dominio público).</p>
+    }
   }
 } @else if (mapa.error()) {
   <div class="tarjeta" role="alert">
