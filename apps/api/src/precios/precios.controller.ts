@@ -34,6 +34,7 @@ import {
   AnulacionPrecioCuerpo,
   CargaManualPrecioCuerpo,
   ConsultaComparativo,
+  ConsultaListaAdmin,
   ConsultaProducto,
   ConsultaSerie,
   ObservacionPrecioRespuesta,
@@ -107,6 +108,21 @@ export class PreciosController {
 @Controller('admin/precios')
 export class AdminPreciosController {
   constructor(private readonly precios: PreciosService) {}
+
+  @Get()
+  @Header('Cache-Control', CACHE_CONTROL.sinCache)
+  @ApiOperation({
+    summary: 'Últimos precios registrados (por defecto, solo los cargados a mano)',
+    description: 'Más recientes primero, por fecha de registro. Incluye los anulados.',
+  })
+  @ApiOkResponse({ type: ObservacionPrecioRespuesta, isArray: true })
+  listar(@Query() consulta: ConsultaListaAdmin): Promise<ObservacionPrecioDto[]> {
+    return this.precios.listar({
+      limite: consulta.limite,
+      producto: consulta.producto,
+      soloManuales: consulta.soloManuales !== 'false',
+    });
+  }
 
   @Post()
   @Header('Cache-Control', CACHE_CONTROL.sinCache)

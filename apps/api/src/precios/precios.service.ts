@@ -30,6 +30,27 @@ interface EntradaHistorial {
   reemplazadoPor: number;
 }
 
+function aDto(o: ObservacionPrecio): ObservacionPrecioDto {
+  return {
+    id: o.id,
+    producto: { slug: o.producto.slug, nombre: o.producto.nombre },
+    fuente: { slug: o.fuente.slug, nombre: o.fuente.nombre },
+    mercado: o.mercado ? { id: o.mercado.id, nombre: o.mercado.nombre } : null,
+    paisIso3: o.paisIso3,
+    fecha: o.fecha,
+    periodicidad: o.periodicidad,
+    presentacion: o.presentacion,
+    valor: o.valor,
+    moneda: o.moneda,
+    unidad: o.unidad,
+    valorCopKg: o.valorCopKg,
+    valorUsdKg: o.valorUsdKg,
+    anulado: o.anulado,
+    motivoAnulacion: o.motivoAnulacion,
+    creadoEn: o.creadoEn.toISOString(),
+  };
+}
+
 /** Carga manual de precios con trazabilidad (las consultas están en ConsultasPreciosService). */
 @Injectable()
 export class PreciosService {
@@ -172,24 +193,29 @@ export class PreciosService {
       relations: { producto: true, fuente: true, mercado: true },
     });
     if (!o) throw new NotFoundException(`No existe la observación ${id}`);
-    return {
-      id: o.id,
-      producto: { slug: o.producto.slug, nombre: o.producto.nombre },
-      fuente: { slug: o.fuente.slug, nombre: o.fuente.nombre },
-      mercado: o.mercado ? { id: o.mercado.id, nombre: o.mercado.nombre } : null,
-      paisIso3: o.paisIso3,
-      fecha: o.fecha,
-      periodicidad: o.periodicidad,
-      presentacion: o.presentacion,
-      valor: o.valor,
-      moneda: o.moneda,
-      unidad: o.unidad,
-      valorCopKg: o.valorCopKg,
-      valorUsdKg: o.valorUsdKg,
-      anulado: o.anulado,
-      motivoAnulacion: o.motivoAnulacion,
-      creadoEn: o.creadoEn.toISOString(),
-    };
+    return aDto(o);
+  }
+
+  /**
+   * Últimas observaciones para el panel de administración, más recientes primero
+   * (por fecha de registro). Por defecto solo las cargadas a mano.
+   */
+  async listar(filtro: {
+    limite?: number;
+    producto?: string;
+    soloManuales?: boolean;
+  }): Promise<ObservacionPrecioDto[]> {
+    const consulta = this.observaciones
+      .createQueryBuilder('o')
+      .innerJoinAndSelect('o.producto', 'producto')
+      .innerJoinAndSelect('o.fuente', 'fuente')
+      .leftJoinAndSelect('o.mercado', 'mercado')
+      .orderBy('o.creado_en', 'DESC')
+      .addOrderBy('o.id', 'DESC')
+      .take(filtro.limite ?? 50);
+    if (filtro.soloManuales ?? true) consulta.andWhere('o.creado_por IS NOT NULL');
+    if (filtro.producto) consulta.andWhere('producto.slug = :slug', { slug: filtro.producto });
+    return (await consulta.getMany()).map(aDto);
   }
 
   private buscarPorClave(

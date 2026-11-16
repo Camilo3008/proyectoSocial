@@ -25,6 +25,14 @@ describe('API pública (e2e)', () => {
       expect(cuerpo.estado).toBe('ok');
       expect(cuerpo.baseDatos.estado).toBe('ok');
       expect(res.headers['cache-control']).toBe('no-store');
+      // Estado de cada fuente: con la base recién sembrada, ninguna está al día.
+      expect(cuerpo.fuentes.map((f) => f.slug)).toEqual(
+        expect.arrayContaining(['trm', 'sipsa', 'worldbank', 'faostat', 'fnc']),
+      );
+      expect(cuerpo.fuentes.find((f) => f.slug === 'trm')).toMatchObject({
+        estado: 'SIN_DATOS',
+        ultimaIngestaExitosa: null,
+      });
     });
 
     it('incluye encabezados de seguridad de helmet', async () => {

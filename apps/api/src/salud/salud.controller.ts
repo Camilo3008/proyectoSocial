@@ -19,7 +19,9 @@ export class SaludController {
   @Get()
   @SkipThrottle()
   @Header('Cache-Control', CACHE_CONTROL.sinCache)
-  @ApiOperation({ summary: 'Estado de la API y de la base de datos' })
+  @ApiOperation({
+    summary: 'Estado de la API, de la base de datos y de la ingesta de cada fuente',
+  })
   @ApiOkResponse({ type: SaludRespuesta })
   @ApiServiceUnavailableResponse({ type: SaludRespuesta, description: 'Algún componente falla' })
   async obtener(@Res({ passthrough: true }) res: Response): Promise<SaludRespuesta> {

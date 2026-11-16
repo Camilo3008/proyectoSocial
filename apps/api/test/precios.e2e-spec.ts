@@ -206,4 +206,26 @@ describe('Precios: carga manual y precio del día (e2e)', () => {
       .send({ motivo: 'No existe esta observación' })
       .expect(404);
   });
+
+  it('GET /api/admin/precios lista los cargados a mano, más recientes primero', async () => {
+    await request(app.getHttpServer()).get('/api/admin/precios').expect(401);
+
+    const lista = (
+      await request(app.getHttpServer())
+        .get('/api/admin/precios?producto=cafe')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200)
+    ).body as ObservacionPrecioDto[];
+    expect(lista.length).toBeGreaterThan(0);
+    expect(lista.every((o) => o.producto.slug === 'cafe')).toBe(true);
+    const fechas = lista.map((o) => o.creadoEn);
+    expect([...fechas].sort().reverse()).toEqual(fechas);
+    // Las filas de ingesta (sin creado_por) no aparecen por defecto.
+    expect(lista.every((o) => o.fuente.slug !== 'trm')).toBe(true);
+
+    await request(app.getHttpServer())
+      .get('/api/admin/precios?limite=0')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400);
+  });
 });

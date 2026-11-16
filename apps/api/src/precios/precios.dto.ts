@@ -17,6 +17,7 @@ import {
   IsOptional,
   IsString,
   Matches,
+  Max,
   MaxLength,
   Min,
   MinLength,
@@ -106,6 +107,29 @@ export class AnulacionPrecioCuerpo implements AnulacionPrecioDto {
   @MinLength(5)
   @MaxLength(500)
   motivo: string;
+}
+
+export class ConsultaListaAdmin {
+  @ApiPropertyOptional({ default: 50, maximum: 200 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(200)
+  limite?: number;
+
+  @ApiPropertyOptional({ example: 'cafe' })
+  @IsOptional()
+  @Matches(/^[a-z0-9-]{2,50}$/)
+  producto?: string;
+
+  @ApiPropertyOptional({
+    default: true,
+    description: 'true: solo los cargados a mano; false: también los de ingesta',
+  })
+  @IsOptional()
+  @IsIn(['true', 'false'])
+  soloManuales?: 'true' | 'false';
 }
 
 export class ParametroId {
