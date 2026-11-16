@@ -430,12 +430,14 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 ## 16. Preguntas abiertas (por verificar)
 
 1. ¿La FNC permite la descarga automatizada de su boletín diario? ¿Existe otro canal de datos? → **Respondida parcialmente (2026-11-16):** sus términos de uso prohíben la extracción automatizada sin autorización escrita y restringen la publicación del contenido (ver `docs/fuentes/fnc.md`). Se usa carga manual. **Pendiente:** solicitar autorización escrita a la FNC para publicar el precio en AgroPrecios y, si es posible, para leer el boletín de forma automática.
-2. ¿Qué códigos de artículo de SIPSA corresponden a plátano, banano, pitaya y cacao? ¿Cuál es el mercado mayorista más cercano a Pitalito con datos?
+2. ¿Qué códigos de artículo de SIPSA corresponden a plátano, banano, pitaya y cacao? ¿Cuál es el mercado mayorista más cercano a Pitalito con datos? → **Respondida (2026-11-16):** plátano hartón verde (35), plátano guineo (34) y banano (15); pitaya y cacao no están en el servicio web. El mercado del Huila con datos es Neiva, Surabastos (ver `docs/fuentes/sipsa.md`).
 3. ¿Cuál es la URL estable y la licencia actual del archivo mensual del Banco Mundial?
 4. ¿Qué licencia y qué cobertura de países y años tiene FAOSTAT para café, cacao, banano y pitaya?
 5. ¿Cuál es el dataset oficial de TRM a usar y en qué formato? → **Respondida (2026-11-16):** dataset `32sa-8pi3` de la Superfinanciera en datos.gov.co, JSON (API Socrata), licencia CC BY-SA 4.0 (ver `docs/fuentes/trm.md`).
 6. ¿Hay precios de las compras de café locales (Pitalito) que se puedan publicar? (Relevante para la Fase 2).
 7. ¿Cuál será el nombre definitivo y el dominio del proyecto?
+8. **(Pendiente, 2026-11-16)** Escribir al DANE (contacto@dane.gov.co) para preguntar si existe una consulta SIPSA filtrada por fecha o producto. Hoy cada ingesta descarga ~316 MB con todo el histórico. Mientras tanto, la frecuencia se ajusta con `SIPSA_CRON` y `SIPSA_DIAS_VENTANA` (datos de prueba en desarrollo; los intervalos de producción se definirán al desplegar).
+9. **(Pendiente)** Pitaya y cacao no están en el servicio web de SIPSA. Hay que buscar y verificar otra fuente oficial (p. ej. anexos de los boletines SIPSA) antes de mostrarlos.
 
 ---
 
@@ -471,6 +473,10 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-16 | Autenticación con `@nestjs/jwt` y un guard propio (sin Passport); login limitado a 5 intentos por minuto; JWT HS256 de 15 min | Menos dependencias; protección contra fuerza bruta |
 | 2026-11-16 | `GET /api/precios/hoy` agrega a la forma de la §10: `mercado`, `valorCopKg`, `complementos` (Bolsa de Nueva York para el café), `hoy`, `sinDatos` y `trm` con su licencia | RF-01 pide la Bolsa de NY y la TRM como datos secundarios; la licencia CC BY-SA de la TRM exige atribución |
 | 2026-11-16 | La referencia de "Hoy" por producto se configura en `apps/api/src/precios/referencias-hoy.ts`; el café usa FNC / pergamino seco / sin mercado | Separar el criterio de negocio del código de consulta |
+| 2026-11-16 | **Etapa 2 (aprobado por el autor):** SIPSA sin el paquete `soap`: `fetch` con el sobre SOAP 1.2 y parser SAX en streaming `saxes` (ISC, una dependencia, solo API) | La respuesta trae ~316 MB con todo el histórico; un parser que arma el documento completo en memoria no es viable. `fast-xml-parser` (≈1,3 MB, en memoria) y `htmlparser2` (HTML) descartados |
+| 2026-11-16 | **Etapa 2 (aprobado):** mercados creados automáticamente al ingerir, identificados por `(fuente_id, codigo_externo)` (migración `MercadoCodigoFuente`), con upsert idempotente; nombre, municipio y departamento tal como vienen de la fuente; sin coordenadas inventadas (`NULL`); `ingesta_ejecucion.mercados_nuevos` registra cuántos se crearon | Evita duplicados cuando la fuente renombra un mercado (SIPSA tiene 26 nombres para 23 códigos) y deja trazabilidad |
+| 2026-11-16 | Horarios y ventana de ingesta configurables por entorno: `TRM_CRON`, `SIPSA_CRON` (por defecto 15:30 de lunes a sábado), `SIPSA_DIAS_VENTANA` (45); se validan al arrancar | El autor definirá los intervalos de producción; en desarrollo bastan datos de prueba |
+| 2026-11-16 | Etapa 2 se cierra con plátano (hartón verde y guineo) y banano; pitaya y cacao quedan "próximamente" | No están en el servicio web de SIPSA (pregunta abierta 9) |
 
 ---
 

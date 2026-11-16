@@ -19,14 +19,44 @@ https://www.dane.gov.co/index.php/terminos-y-condiciones (revisados el 2026-11-1
 
 **Obligación:** mostrar esa cita textual donde se usen datos de SIPSA. El DANE puede cambiar estas condiciones sin aviso, así que hay que revisarlas periódicamente.
 
-## Operaciones (todas sin parámetros, devuelven TODO el histórico)
+## Operaciones del WSDL (verificadas en el WSDL y el XSD el 2026-11-16)
 
-| Operación | Contenido | Tamaño medido (2026-11-16) |
-|---|---|---|
-| `promediosSipsaParcial` | **Precio diario por mercado mayorista**: mínimo, máximo y promedio en COP/kg, con municipio y departamento. Desde 2020-02-01. | **316 MB**, 711.222 registros, 95 s |
-| `promediosSipsaCiudad` | Precio promedio diario por ciudad. Desde 2020-02-03. | 116 MB, 396.188 registros, 41 s |
-| `promediosSipsaSemanaMadr` | Promedios semanales por mercado | No medido |
-| `promediosSipsaMesMadr`, `promedioAbasSipsaMesMadr`, `consultarInsumosSipsaMesMadr` | Promedios mensuales, abastecimiento e insumos | No medido |
+| Operación | Parámetros (XSD) | Respuesta (tipo XSD) | Contenido | Probada |
+|---|---|---|---|---|
+| `promediosSipsaParcial` | ninguno | `sipsaPromediosMayoristasParcial[]` | **Precio diario por mercado mayorista**: mínimo, máximo y promedio en COP/kg, con municipio y departamento. Desde 2020-02-01 | ✅ **316 MB**, 711.222 registros, 95 s |
+| `promediosSipsaCiudad` | ninguno | `sipsaPromMayoristasCiudad[]` (`ciudad`, `codProducto`, `producto`, `fechaCaptura`, `precioPromedio`, …) | Precio promedio diario por ciudad. Desde 2020-02-03 | ✅ 116 MB, 396.188 registros, 41 s |
+| `promediosSipsaSemanaMadr` | ninguno | `sipsaMayoristasSemanaMadr[]` (`artiId`, `fuenNombre`, `fechaIni`, `minimoKg`, `maximoKg`, `promedioKg`, …) | Promedios semanales por mercado | No (solo esquema) |
+| `promediosSipsaMesMadr` | ninguno | Promedios mensuales | | No (solo esquema) |
+| `promedioAbasSipsaMesMadr` | ninguno | `sipsaAbastecimientosMesMadr[]` (`cantidadTon`, …) | Abastecimiento mensual | No (solo esquema) |
+| `consultarInsumosSipsaMesMadr` | `arg0: xs:int` (significado no documentado en el esquema) | `sipsaInsumosMesMadr[]` | Precios de insumos | No (solo esquema) |
+
+Ninguna de las operaciones de precios acepta filtros: **todas devuelven el histórico completo**.
+
+### Ejemplo de petición (real, la que usa el adapter)
+
+```http
+POST https://appweb.dane.gov.co/sipsaWS/SrvSipsaUpraBeanService
+Content-Type: application/soap+xml; charset=utf-8
+User-Agent: AgroPrecios/0.1 (proyecto social; precios agricolas de referencia)
+
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ser="http://servicios.sipsa.co.gov.dane/">
+  <soap:Body><ser:promediosSipsaParcial/></soap:Body>
+</soap:Envelope>
+```
+
+La respuesta es `HTTP 200`, `application/soap+xml;charset="utf-8"`, con `<S:Envelope><S:Body><ns2:promediosSipsaParcialResponse>` y un `<return>` por registro (ejemplo más abajo).
+
+## Implementación
+
+- **Sin el paquete `soap`:** la petición se arma a mano con `fetch` (el sobre de arriba).
+- **Parser:** [`saxes`](https://www.npmjs.com/package/saxes) 6.x (ISC). Es SAX en streaming: procesa la respuesta a medida que llega, sin tener los 316 MB en memoria; cumple estrictamente el estándar XML, trae tipos de TypeScript y tiene una sola dependencia pequeña (`xmlchars`). Solo se usa en la API (no pesa en el frontend). Se descartaron `fast-xml-parser` (≈1,3 MB, arma el documento completo en memoria) y `htmlparser2` (orientado a HTML).
+- El adapter descarta durante la lectura los artículos sin mapeo y los datos anteriores a la ventana (`SIPSA_DIAS_VENTANA`, 45 días por defecto). El histórico completo se carga una vez con `POST /api/admin/ingesta/sipsa?desde=2020-01-01`.
+- Los mercados se identifican por `fuenId` (`mercado.codigo_externo`), no por el nombre. En la respuesta real hay **26 nombres para 23 códigos**: algunos mercados cambiaron de nombre (p. ej. "Cali, Santa Helena" → "Cali, Santa Elena") y por código no se duplican.
+
+## Primera carga real (2026-11-16)
+
+`POST /api/admin/ingesta/sipsa?desde=2020-01-01`: estado `OK`, 50.114 observaciones (plátano hartón verde, guineo y banano), **23 mercados creados**, 1 min 45 s.
 
 **El adapter usa `promediosSipsaParcial`**, porque es la única que identifica el mercado mayorista (central de abastos).
 
