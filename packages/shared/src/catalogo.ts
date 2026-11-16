@@ -4,6 +4,9 @@ export type TipoFuente = 'OFICIAL_NACIONAL' | 'INTERNACIONAL' | 'MANUAL';
 /** Frecuencia de publicación esperada de una fuente (y periodicidad de una observación). */
 export type Frecuencia = 'DIARIA' | 'SEMANAL' | 'MENSUAL' | 'ANUAL';
 
+/** Tipo de mercado. */
+export type TipoMercado = 'MAYORISTA' | 'BOLSA' | 'REFERENCIA' | 'LOCAL';
+
 /**
  * Estado de una fuente según su última ingesta:
  * - AL_DIA: la última ingesta exitosa está dentro de la frecuencia esperada.
