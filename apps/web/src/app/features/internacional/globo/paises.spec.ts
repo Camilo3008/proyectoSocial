@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { DeferBlockBehavior, type ComponentFixture, TestBed } from '@angular/core/testing';
 import { calcularClases, claseDe } from './escala';
-import { claseMapa, soportaWebgl } from './globo';
+import { claseMapa, RUTA_WORKER, soportaWebgl } from './globo';
 import { bandera, Paises } from './paises';
 
 const CITA_FAO =
@@ -80,13 +80,19 @@ describe('escala y utilidades del globo', () => {
     expect(bandera('c0')).toBe('');
   });
 
-  it('obtiene la clase Map de MapLibre con export con nombre (Vite) o en default (esbuild)', () => {
+  it('obtiene la clase Map de MapLibre (ESM o todo en default) y le indica el worker', () => {
     class MapaFalso {}
     type Modulo = Parameters<typeof claseMapa>[0];
-    expect(claseMapa({ Map: MapaFalso } as unknown as Modulo)).toBe(MapaFalso);
-    // Build de producción: el módulo UMD/CommonJS solo trae `default` (regresión real).
+    const setWorkerUrl = vi.fn();
+    const url = 'https://agroprecios.example/vendor/maplibre-gl-worker.mjs';
+
+    // MapLibre v6 (ESM): exports con nombre; el worker se sirve desde /vendor.
+    expect(claseMapa({ Map: MapaFalso, setWorkerUrl } as unknown as Modulo, url)).toBe(MapaFalso);
+    expect(setWorkerUrl).toHaveBeenCalledWith(url);
+    // Forma UMD/CommonJS en el build de esbuild: todo en `default` (regresión real con v5).
     expect(claseMapa({ default: { Map: MapaFalso } } as unknown as Modulo)).toBe(MapaFalso);
     expect(() => claseMapa({} as Modulo)).toThrow('MapLibre no expone la clase Map');
+    expect(RUTA_WORKER).toBe('vendor/maplibre-gl-worker.mjs');
   });
 
   it('detecta la falta de WebGL', () => {

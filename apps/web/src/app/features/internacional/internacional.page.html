@@ -119,6 +119,8 @@
         </div>
       </details>
     }
+  } @else if (sinDatos()) {
+    <p class="tarjeta">Todavía no hay precios internacionales para este producto.</p>
   } @else if (datos.error()) {
     <div class="tarjeta" role="alert">
       <p>No pudimos cargar los precios internacionales. Revisa tu conexión e inténtalo de nuevo.</p>

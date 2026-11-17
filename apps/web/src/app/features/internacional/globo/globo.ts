@@ -23,21 +23,28 @@ const CENTRO_COLOMBIA: [number, number] = [-73.17, 3.37];
 
 type ModuloMapLibre = typeof MapLibre;
 
+/** Worker de MapLibre v6, copiado a public/vendor por scripts/copiar-vendor.mjs. */
+export const RUTA_WORKER = 'vendor/maplibre-gl-worker.mjs';
+
 /**
- * Clase Map de MapLibre a partir del módulo cargado con import(). MapLibre se
- * publica como UMD/CommonJS: con el pre-empaquetado de Vite (desarrollo) llega
- * como export con nombre, pero en el build de producción (esbuild) solo viene en
- * `default`. Se aceptan las dos formas.
+ * Prepara MapLibre a partir del módulo cargado con import() y devuelve la clase Map.
+ *
+ * - v6 trae el worker en un archivo aparte que busca junto a su propio módulo;
+ *   dentro del bundle de Angular esa ruta no existe, así que se indica con
+ *   setWorkerUrl la copia servida en /vendor.
+ * - Se acepta también el módulo con todo en `default` (forma UMD/CommonJS de
+ *   v5 en el build de esbuild, que ya rompió el globo una vez en producción).
  */
-export function claseMapa(modulo: ModuloMapLibre): ModuloMapLibre['Map'] {
+export function claseMapa(modulo: ModuloMapLibre, urlWorker?: string): ModuloMapLibre['Map'] {
   const conDefault = modulo as ModuloMapLibre & { default?: ModuloMapLibre };
-  const Mapa = conDefault.Map ?? conDefault.default?.Map;
-  if (typeof Mapa !== 'function') throw new Error('MapLibre no expone la clase Map');
-  return Mapa;
+  const api = typeof conDefault.Map === 'function' ? conDefault : conDefault.default;
+  if (typeof api?.Map !== 'function') throw new Error('MapLibre no expone la clase Map');
+  if (urlWorker && typeof api.setWorkerUrl === 'function') api.setWorkerUrl(urlWorker);
+  return api.Map;
 }
 
-async function cargarMapLibre(): Promise<ModuloMapLibre['Map']> {
-  return claseMapa(await import('maplibre-gl'));
+async function cargarMapLibre(baseUri: string): Promise<ModuloMapLibre['Map']> {
+  return claseMapa(await import('maplibre-gl'), new URL(RUTA_WORKER, baseUri).href);
 }
 
 /** true si el navegador puede crear un contexto WebGL (requisito de MapLibre). */
@@ -84,7 +91,9 @@ export function soportaWebgl(documento: Document): boolean {
     .globo {
       position: absolute;
       inset: 0;
-      background: ${COLOR_MAR};
+      /* Distinto del mar (COLOR_MAR) para que se vea el borde de la esfera. */
+      background: var(--color-superficie);
+      border: 1px solid var(--color-borde);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -134,7 +143,7 @@ export class Globo {
     }
     try {
       this.cargarEstilos();
-      const Mapa = await cargarMapLibre();
+      const Mapa = await cargarMapLibre(this.documento.baseURI);
       const mapa = new Mapa({
         container: this.contenedor().nativeElement,
         attributionControl: false,

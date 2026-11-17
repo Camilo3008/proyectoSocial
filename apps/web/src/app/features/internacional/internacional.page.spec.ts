@@ -100,6 +100,23 @@ describe('InternacionalPage', () => {
     peticion.flush(CAFE);
   });
 
+  it('distingue "sin datos" (404) de un fallo de conexión', async () => {
+    http
+      .expectOne((r) => r.url.startsWith('/api/internacional/commodities?'))
+      .flush({ message: 'Sin precios' }, { status: 404, statusText: 'Not Found' });
+    await fixture.whenStable();
+    expect(texto()).toContain('Todavía no hay precios internacionales para este producto.');
+    expect(texto()).not.toContain('Revisa tu conexión');
+
+    fixture.componentRef.setInput('producto', 'cacao');
+    TestBed.tick();
+    http
+      .expectOne((r) => r.url.includes('producto=cacao'))
+      .flush(null, { status: 0, statusText: 'Unknown Error' });
+    await fixture.whenStable();
+    expect(texto()).toContain('Revisa tu conexión');
+  });
+
   it('resume el último mes de cada serie con su variación y el equivalente en pesos', async () => {
     http.expectOne((r) => r.url.startsWith('/api/internacional/commodities?')).flush(CAFE);
     await fixture.whenStable();

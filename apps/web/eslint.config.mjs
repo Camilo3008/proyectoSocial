@@ -5,6 +5,8 @@ import { configuracionBase } from '../../eslint.base.mjs';
 
 export default tseslint.config(
   ...configuracionBase(import.meta.dirname),
+  // Copias de dependencias (scripts/copiar-vendor.mjs): no son código del proyecto.
+  { ignores: ['public/vendor/**'] },
   {
     files: ['**/*.ts'],
     extends: [...angular.configs.tsRecommended],

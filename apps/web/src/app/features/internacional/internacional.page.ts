@@ -1,5 +1,5 @@
 import { type CommoditiesDto } from '@agroprecios/shared';
-import { httpResource } from '@angular/common/http';
+import { HttpErrorResponse, httpResource } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { API_URL } from '../../core/api';
@@ -82,6 +82,11 @@ export class InternacionalPage {
   protected readonly respuesta = computed(() =>
     this.datos.hasValue() ? this.datos.value() : null,
   );
+  /** La API responde 404 cuando el producto aún no tiene precios internacionales. */
+  protected readonly sinDatos = computed(() => {
+    const error = this.datos.error();
+    return error instanceof HttpErrorResponse && error.status === 404;
+  });
   protected readonly notaComparacion = computed(
     () => NOTAS_COMPARACION[this.productoActual()] ?? null,
   );

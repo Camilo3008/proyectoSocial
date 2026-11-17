@@ -8,3 +8,4 @@ apps/api/src/database/migrations/
 apps/api/test/fixtures/
 apps/web/public/geo/
 apps/api/src/database/seeds/datos/paises-natural-earth.json
+apps/web/public/vendor/
