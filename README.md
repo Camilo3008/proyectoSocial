@@ -2,11 +2,15 @@
 
 PWA que **recopila y muestra precios de referencia** de café, plátano, banano, cacao y pitaya (locales, nacionales e internacionales), pensada para los productores de la vereda Charguayaco (Pitalito, Huila): liviana y **funcional sin conexión**.
 
+- **Documentación general** (fuentes, frecuencias, arquitectura, operación): [`docs/DOCUMENTACION.md`](docs/DOCUMENTACION.md)
+- **Pendientes y puntos a revisar:** [`docs/PENDIENTES.md`](docs/PENDIENTES.md)
 - Especificación funcional y técnica: [`docs/PROYECTO.md`](docs/PROYECTO.md)
 - Reglas de implementación: [`CLAUDE.md`](CLAUDE.md)
 - Fichas de fuentes de datos: [`docs/fuentes/`](docs/fuentes/)
+- Despliegue en producción: [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md)
+- Capacitación: [`docs/GUIA-USUARIO.md`](docs/GUIA-USUARIO.md) y [`docs/ENCUESTA.md`](docs/ENCUESTA.md)
 
-> Estado: **Etapa 3 (Internacional)** terminada: precios internacionales del Banco Mundial (café, cacao y banano) comparados con el precio nacional. Fase 1: solo recopilar y mostrar datos.
+> Estado: **Fase 1 completa en código (Etapas 0 a 6)**: precios de hoy, histórico, mercados nacionales, internacional con globo, fuentes, panel de administración, modo sin conexión y preparación del despliegue. Aún no está desplegada (ver pendientes).
 
 ## Estructura
 
@@ -14,8 +18,8 @@ PWA que **recopila y muestra precios de referencia** de café, plátano, banano,
 apps/api         API NestJS + TypeORM + PostgreSQL
 apps/web         PWA Angular
 packages/shared  Tipos compartidos API <-> web (solo interfaces)
-docs/            Especificación y fichas de fuentes
-docker/          Scripts de inicialización de PostgreSQL
+docs/            Especificación, fichas de fuentes, despliegue y capacitación
+docker/          PostgreSQL (init), Caddy (producción) y script de respaldos
 ```
 
 ## Requisitos
@@ -86,7 +90,7 @@ Web (`-w apps/web`): `start`, `build`, `test`, `lint`.
 
 ## Tareas del administrador
 
-Mientras se construye el panel de administración (Etapa 5), estas tareas se hacen desde **Swagger** en `http://localhost:3000/api/docs`:
+Lo habitual se hace desde el **panel web** en `http://localhost:4200/admin` (en producción, `https://<dominio>/admin`): iniciar sesión, ejecutar ingestas, ver la bitácora, cargar el precio del café y anular precios. La carga con `?desde=` (históricos) y lo demás se hace desde **Swagger** en `http://localhost:3000/api/docs`:
 
 1. **Iniciar sesión:** `POST /api/auth/login` con `ADMIN_EMAIL` y `ADMIN_PASSWORD`. Copiar el `accessToken`, pulsar **Authorize** y pegarlo. El token dura 15 minutos.
 2. **Cargar el precio del café del día** (boletín de la FNC): `POST /api/admin/precios` con
@@ -109,6 +113,7 @@ Mientras se construye el panel de administración (Etapa 5), estas tareas se hac
 4. **Actualizar la TRM a mano:** `POST /api/admin/ingesta/trm`. Se ejecuta sola según `TRM_CRON` (07:30 y 18:30 por defecto) si `INGESTA_PROGRAMADA=true`.
 4. **Precios mayoristas (SIPSA):** `POST /api/admin/ingesta/sipsa`. Cada consulta descarga ~316 MB del DANE y tarda ~2 minutos. Se ejecuta sola según `SIPSA_CRON` (15:30 de lunes a sábado) y guarda los últimos `SIPSA_DIAS_VENTANA` días (45). **Primera vez:** cargar el histórico con `POST /api/admin/ingesta/sipsa?desde=2020-01-01`.
 4. **Precios internacionales (Banco Mundial):** `POST /api/admin/ingesta/worldbank` (~0,6 MB, segundos). Se ejecuta sola según `WORLDBANK_CRON` (lunes 9:00). Si la URL cambió, la bitácora lo advierte: actualizar `WORLDBANK_URL`.
+4. **Precio al productor por país (FAOSTAT, globo):** `POST /api/admin/ingesta/faostat` (~12 MB, segundos). Se ejecuta sola según `FAOSTAT_CRON` (día 1 de cada mes, 10:00).
 4. **Primera vez, TRM completa:** `POST /api/admin/ingesta/trm?desde=1990-01-01` (para convertir a pesos el histórico desde 1991) y luego volver a ejecutar la ingesta del Banco Mundial.
 5. **Revisar la bitácora:** `GET /api/admin/ingestas`.
 

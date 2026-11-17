@@ -21,7 +21,9 @@
     "migration:generate": "nest build && typeorm -d dist/database/data-source.js migration:generate --pretty",
     "migration:run": "nest build && typeorm -d dist/database/data-source.js migration:run",
     "migration:revert": "nest build && typeorm -d dist/database/data-source.js migration:revert",
-    "seed": "nest build && node dist/database/seeds/ejecutar-seeds.js"
+    "seed": "nest build && node dist/database/seeds/ejecutar-seeds.js",
+    "migration:run:prod": "typeorm -d dist/database/data-source.js migration:run",
+    "seed:prod": "node dist/database/seeds/ejecutar-seeds.js"
   },
   "dependencies": {
     "@agroprecios/shared": "*",

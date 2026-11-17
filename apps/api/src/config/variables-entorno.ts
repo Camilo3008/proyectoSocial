@@ -42,6 +42,17 @@ export class VariablesEntorno {
   @IsNotEmpty()
   CORS_ORIGIN: string;
 
+  /**
+   * Número de proxies inversos de confianza delante de la API (0 = ninguno).
+   * Con Caddy delante va en 1: así req.ip (y el límite de peticiones por IP)
+   * usa la IP real del cliente de X-Forwarded-For y no la del proxy.
+   */
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(5)
+  TRUST_PROXY = 0;
+
   @IsString()
   @IsNotEmpty()
   DB_HOST: string;

@@ -12,6 +12,10 @@ tmp/
 .env
 .env.*
 !.env.example
+!.env.prod.example
+
+# Respaldos de la base de datos (docker-compose.prod.yml)
+respaldos/
 
 # Pruebas y cobertura
 coverage/

@@ -1,0 +1,16 @@
+# Lo que NO se envía al contexto de construcción de Docker.
+**/node_modules
+**/dist
+**/.angular
+**/coverage
+.git
+.github
+.vscode
+.idea
+# Secretos: nunca dentro de una imagen.
+.env
+.env.*
+respaldos
+docs
+**/test/fixtures
+apps/web/public/vendor

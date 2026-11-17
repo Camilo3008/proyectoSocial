@@ -431,8 +431,8 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 
 1. ¿La FNC permite la descarga automatizada de su boletín diario? ¿Existe otro canal de datos? → **Respondida parcialmente (2026-11-16):** sus términos de uso prohíben la extracción automatizada sin autorización escrita y restringen la publicación del contenido (ver `docs/fuentes/fnc.md`). Se usa carga manual. **Pendiente:** solicitar autorización escrita a la FNC para publicar el precio en AgroPrecios y, si es posible, para leer el boletín de forma automática.
 2. ¿Qué códigos de artículo de SIPSA corresponden a plátano, banano, pitaya y cacao? ¿Cuál es el mercado mayorista más cercano a Pitalito con datos? → **Respondida (2026-11-16):** plátano hartón verde (35), plátano guineo (34) y banano (15); pitaya y cacao no están en el servicio web. El mercado del Huila con datos es Neiva, Surabastos (ver `docs/fuentes/sipsa.md`).
-3. ¿Cuál es la URL estable y la licencia actual del archivo mensual del Banco Mundial?
-4. ¿Qué licencia y qué cobertura de países y años tiene FAOSTAT para café, cacao, banano y pitaya?
+3. ¿Cuál es la URL estable y la licencia actual del archivo mensual del Banco Mundial? → **Respondida (2026-11-16):** XLSX "CMO Historical Data Monthly" (Pink Sheet), licencia CC BY 4.0. La URL cambia con cada edición, por eso es configurable (`WORLDBANK_URL`); ver `docs/fuentes/worldbank.md`.
+4. ¿Qué licencia y qué cobertura de países y años tiene FAOSTAT para café, cacao, banano y pitaya? → **Respondida (2026-11-16):** CC BY 4.0 con cita obligatoria; café, cacao, banano y plátano desde 1991, con unos dos años de rezago (último año: 2024) y cobertura modesta (unos 15 a 35 países por producto y año). La pitaya no está en FAOSTAT. Ver `docs/fuentes/faostat.md`.
 5. ¿Cuál es el dataset oficial de TRM a usar y en qué formato? → **Respondida (2026-11-16):** dataset `32sa-8pi3` de la Superfinanciera en datos.gov.co, JSON (API Socrata), licencia CC BY-SA 4.0 (ver `docs/fuentes/trm.md`).
 6. ¿Hay precios de las compras de café locales (Pitalito) que se puedan publicar? (Relevante para la Fase 2).
 7. ¿Cuál será el nombre definitivo y el dominio del proyecto?
@@ -500,6 +500,12 @@ En la interfaz se muestran el indicador de conexión y la fecha de los datos, y 
 | 2026-11-16 | Panel de administración web en `/admin` (fuera de la navegación pública): ingestas manuales, bitácora, carga manual y anulación. Nuevo `GET /api/admin/precios` (solo ADMIN) para listar lo cargado a mano | Antes solo se podía administrar con Swagger o curl |
 | 2026-11-16 | Token del administrador en `sessionStorage` (se borra al cerrar la pestaña); el interceptor lo envía solo a `/api/admin/**` y cierra la sesión ante un 401 | Menor exposición en equipos compartidos; ninguna petición pública lleva el token |
 | 2026-11-16 | En la carga manual, el valor admite "2.075.000" y "278,65" y se normaliza a punto decimal; con un solo punto y sin coma se toma como decimal (no se adivina) | Evita errores de digitación frecuentes sin introducir ambigüedad |
+| 2026-11-16 | **Etapa 6:** producción con Docker Compose (`db`, `api`, `web`, `respaldo`) y **Caddy** como servidor de la PWA y proxy de `/api` en el mismo dominio, con HTTPS automático (Let's Encrypt) | Un solo dominio (sin CORS cruzado, el SW cachea `/api`), certificados sin mantenimiento manual. Ver `docs/DESPLIEGUE.md` |
+| 2026-11-16 | CSP estricta en la PWA (`script-src 'self'`; `style-src 'unsafe-inline'` por los estilos de componentes de Angular; `blob:` para los workers de MapLibre). Para no tener scripts en línea se desactiva `inlineCritical` (el CSS global pesa ~1 kB) | Protección contra XSS sin hashes que cambien en cada build |
+| 2026-11-16 | Variable `TRUST_PROXY` (0 por defecto; 1 detrás de Caddy) | Sin ella, el límite de peticiones por IP vería a todos los usuarios como la IP del proxy y los bloquearía juntos |
+| 2026-11-16 | Respaldo diario con `pg_dump` (formato custom) a las 2:00 a. m., retención configurable (`RESPALDO_DIAS_RETENCION`, 14 días) | Recuperación ante errores; la copia fuera del servidor queda como tarea operativa |
+| 2026-11-16 | `ACME_EMAIL` obligatorio en producción | Caddy no arranca con el correo vacío (detectado en la prueba del stack) |
+| 2026-11-16 | **MapLibre GL 6.18** en lugar de 5.24 (CLAUDE.md pide "v5+"). El worker de v6 se sirve desde `/vendor` (`setWorkerUrl`) | `npm audit`: vulnerabilidad crítica GHSA-jrc7-96c5-q579 (XSS en `DOM.sanitize`) en ≤ 6.4.0, sin parche en la rama 5. Costo: el globo descarga ~395 kB gzip (antes ~232 kB), solo al abrir "Mundo" y una vez (caché offline). **Revisar** si se prefiere volver a v5 por peso (ver `docs/PENDIENTES.md`) |
 
 ---
 

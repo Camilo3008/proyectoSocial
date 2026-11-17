@@ -18,6 +18,8 @@ export function configurarAplicacion(app: INestApplication): void {
   app.setGlobalPrefix(PREFIJO_API);
   express.set('etag', 'strong');
   express.disable('x-powered-by');
+  const proxies = config.get('TRUST_PROXY', { infer: true });
+  if (proxies > 0) express.set('trust proxy', proxies);
 
   app.use(helmet());
   app.enableCors({
