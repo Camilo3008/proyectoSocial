@@ -208,9 +208,40 @@ echo "$IP $(cut -d' ' -f1,2 /etc/ssh/ssh_host_ed25519_key.pub)"
 Las imágenes de Ubuntu de Google ya traen el acceso por contraseña desactivado.
 No lo active.
 
-## 5. Dominio gratuito (DuckDNS) y variables de producción
+## 5. Dominio (opcional) y variables de producción
 
-### 5.1 DuckDNS
+### 5.0 Empezar sin dominio (recomendado para salir rápido)
+
+El dominio se puede configurar **después**. Mientras tanto, la app se sirve por
+la IP de la VM con HTTP. En `.env.prod` (§5.2) ponga:
+
+```dotenv
+DOMINIO=:80
+CORS_ORIGIN=http://<IP-estatica>
+ACME_EMAIL=<cualquier correo válido>     # obligatorio aunque no se use
+```
+
+Con esto, la app abre en `http://<IP-estatica>` con todas las pantallas y el
+panel `/admin`. Lo que **no** funciona sin HTTPS es instalarla como app y el
+modo sin conexión.
+
+**Agregar el dominio más tarde** no requiere cambiar código ni volver a
+desplegar desde GitHub. Basta con hacer §5.1, cambiar en `.env.prod`
+`DOMINIO=agroprecios.duckdns.org` y
+`CORS_ORIGIN=https://agroprecios.duckdns.org,http://<IP-estatica>`, y ejecutar en
+la VM, como usuario `despliegue`:
+
+```bash
+cd ~/agroprecios && docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+```
+
+> **Atajo con HTTPS sin registrarse en nada:** el servicio público `sslip.io`
+> convierte una IP en un nombre (`34.1.2.3` → `34-1-2-3.sslip.io`). Con
+> `DOMINIO=34-1-2-3.sslip.io`, Caddy debería obtener el certificado de
+> Let's Encrypt sin más pasos. No se ha probado en este proyecto. Si falla, use
+> DuckDNS.
+
+### 5.1 DuckDNS (cuando quiera el dominio)
 
 1. Entre a https://www.duckdns.org e inicie sesión (por ejemplo, con GitHub).
 2. Cree el subdominio, por ejemplo `agroprecios` → `agroprecios.duckdns.org`.
@@ -230,7 +261,8 @@ nano .env.prod
 ```
 
 Pegue el contenido de `.env.prod.example` (está en el repositorio) y cambie
-como mínimo:
+como mínimo lo siguiente. Si empieza sin dominio, use en `DOMINIO` y
+`CORS_ORIGIN` los valores de §5.0:
 
 ```dotenv
 DOMINIO=agroprecios.duckdns.org
@@ -309,6 +341,7 @@ Revíselo antes de forzar nada.
 ### 7.3 Comprobar
 
 ```bash
+# Sin dominio: cambie https://agroprecios.duckdns.org por http://<IP-estatica>
 curl -I https://agroprecios.duckdns.org/            # 200 y certificado válido
 curl https://agroprecios.duckdns.org/api/salud      # "estado":"ok"
 ```

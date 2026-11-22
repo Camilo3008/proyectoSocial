@@ -7,7 +7,7 @@ PWA que **recopila y muestra precios de referencia** de café, plátano, banano,
 - Especificación funcional y técnica: [`docs/PROYECTO.md`](docs/PROYECTO.md)
 - Reglas de implementación: [`CLAUDE.md`](CLAUDE.md)
 - Fichas de fuentes de datos: [`docs/fuentes/`](docs/fuentes/)
-- Despliegue en producción: [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md) · Google Cloud con despliegue automático: [`docs/DESPLIEGUE-GCP.md`](docs/DESPLIEGUE-GCP.md)
+- Despliegue en producción: [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md) · Google Cloud con despliegue automático: [`docs/DESPLIEGUE-GCP.md`](docs/DESPLIEGUE-GCP.md) · Demo en red local: [`docs/DEMO-RED-LOCAL.md`](docs/DEMO-RED-LOCAL.md)
 - Capacitación: [`docs/GUIA-USUARIO.md`](docs/GUIA-USUARIO.md) y [`docs/ENCUESTA.md`](docs/ENCUESTA.md)
 
 > Estado: **Fase 1 completa en código (Etapas 0 a 6)**: precios de hoy, histórico, mercados nacionales, internacional con globo, fuentes, panel de administración, modo sin conexión y preparación del despliegue. Aún no está desplegada (ver pendientes).

@@ -34,7 +34,8 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
-    env_file: .env.prod
+    # .env.prod por defecto; la demo en red local usa ARCHIVO_ENV=.env.lan.
+    env_file: ${ARCHIVO_ENV:-.env.prod}
     environment:
       NODE_ENV: production
       DB_HOST: db
