@@ -35,7 +35,15 @@ Internet ──HTTPS──► Caddy (contenedor "web", puertos 80/443)
   la ingesta de SIPSA procesa en streaming una respuesta de ~316 MB y la de
   FAOSTAT un CSV de ~214 MB. 1 vCPU es suficiente. Disco: 20 GB.
 - Docker Engine y el plugin Docker Compose instalados.
-- Un **dominio** con un registro DNS `A` apuntando a la IP del servidor.
+- Un **dominio** con un registro DNS `A` apuntando a la IP del servidor. No hace
+  falta comprarlo: sirve un subdominio gratuito como `agroprecios.duckdns.org`.
+
+> **Opción elegida (sin costo):** VM `e2-micro` de Google Cloud pagada con los
+> créditos de Google AI Pro, subdominio de DuckDNS y **despliegue automático**
+> desde GitHub al hacer merge en `main`. Paso a paso en
+> [`docs/DESPLIEGUE-GCP.md`](DESPLIEGUE-GCP.md). Alternativa: Oracle Cloud
+> *Always Free* ([`docs/DESPLIEGUE-ORACLE.md`](DESPLIEGUE-ORACLE.md)), que
+> exige tarjeta de crédito.
 - Puertos **80 y 443** abiertos (Caddy los necesita para el certificado).
 
 ## 3. Primer despliegue

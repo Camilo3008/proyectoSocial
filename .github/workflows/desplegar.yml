@@ -1,0 +1,94 @@
+# Despliegue automático a la VM de Google Cloud (ver docs/DESPLIEGUE-GCP.md).
+#
+# Se ejecuta cuando el workflow "CI" termina BIEN después de un push a main, o a
+# mano desde la pestaña Actions (solo sobre main). Las imágenes se construyen
+# aquí (la VM e2-micro tiene 1 GB de RAM y no alcanza para compilar Angular) y
+# se envían por SSH; no se usa un registro de contenedores.
+#
+# Secretos del repositorio (Settings → Secrets and variables → Actions):
+#   VM_HOST          IP pública estática de la VM
+#   VM_USER          usuario de despliegue en la VM (despliegue)
+#   VM_SSH_KEY       llave privada ed25519 exclusiva para este workflow
+#   VM_KNOWN_HOSTS   línea "<IP> ssh-ed25519 AAAA..." con la llave de host de la VM
+name: Desplegar
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Nunca dos despliegues a la vez; uno nuevo espera a que termine el anterior.
+concurrency:
+  group: desplegar-produccion
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    name: Construir y desplegar
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERSION: ${{ github.event.workflow_run.head_sha || github.sha }}
+      DESTINO: ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}
+    steps:
+      - name: Verificar secretos
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          VM_KNOWN_HOSTS: ${{ secrets.VM_KNOWN_HOSTS }}
+        run: |
+          faltan=""
+          for nombre in VM_HOST VM_USER VM_SSH_KEY VM_KNOWN_HOSTS; do
+            eval "valor=\${$nombre}"
+            [ -n "$valor" ] || faltan="$faltan $nombre"
+          done
+          if [ -n "$faltan" ]; then
+            echo "::error::Faltan secretos del repositorio:$faltan (ver docs/DESPLIEGUE-GCP.md §6)"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.VERSION }}
+
+      - name: Construir imágenes
+        run: |
+          docker build -f apps/api/Dockerfile -t "agroprecios-api:$VERSION" .
+          docker build -f apps/web/Dockerfile -t "agroprecios-web:$VERSION" .
+
+      - name: Configurar SSH
+        env:
+          SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VM_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -o BatchMode=yes "$DESTINO" 'docker version --format "Docker {{.Server.Version}} en la VM"'
+
+      - name: Copiar archivos de despliegue
+        run: |
+          ssh "$DESTINO" 'mkdir -p ~/agroprecios/docker/respaldo'
+          scp docker-compose.prod.yml scripts/desplegar-remoto.sh "$DESTINO:agroprecios/"
+          scp docker/respaldo/respaldar.sh "$DESTINO:agroprecios/docker/respaldo/"
+
+      - name: Enviar imágenes
+        run: |
+          docker save "agroprecios-api:$VERSION" "agroprecios-web:$VERSION" \
+            | gzip -1 \
+            | ssh "$DESTINO" 'gunzip | docker load'
+
+      - name: Aplicar la versión
+        run: ssh "$DESTINO" "sh ~/agroprecios/desplegar-remoto.sh $VERSION"

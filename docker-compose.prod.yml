@@ -1,5 +1,6 @@
 # Despliegue de AgroPrecios en un servidor (VPS) con Docker.
-# Uso (ver docs/DESPLIEGUE.md):
+# Despliegue automático desde GitHub a Google Cloud: docs/DESPLIEGUE-GCP.md.
+# Uso manual en un servidor con el código (ver docs/DESPLIEGUE.md):
 #   cp .env.prod.example .env.prod   # y completar con valores REALES (nunca subirlo)
 #   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
 #   docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm api npm run migration:run:prod
@@ -26,6 +27,9 @@ services:
       retries: 10
 
   api:
+    # Nombre fijo: en el servidor (Google Cloud) la imagen llega ya construida
+    # desde GitHub Actions y no se compila allí (ver docs/DESPLIEGUE-GCP.md).
+    image: agroprecios-api:latest
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -42,6 +46,7 @@ services:
         condition: service_healthy
 
   web:
+    image: agroprecios-web:latest
     build:
       context: .
       dockerfile: apps/web/Dockerfile
