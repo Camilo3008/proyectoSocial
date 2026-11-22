@@ -11,11 +11,12 @@ import { etiquetaUnidad, formatearFecha, formatearPrecio } from '../../core/form
 import { notasDePrecio } from '../../core/notas';
 import { claveSerie, desdeDeRango, etiquetaSerie, type Rango, RANGOS } from '../../core/series';
 import { GraficaLinea, type SerieGrafica } from '../../shared/grafica-linea/grafica-linea';
+import { SelectorProducto } from '../../shared/selector-producto/selector-producto';
 
 /** Histórico de precios: serie, rango, gráfica, tabla y resumen (RF-02). */
 @Component({
   selector: 'ap-historico-page',
-  imports: [GraficaLinea, RouterLink],
+  imports: [GraficaLinea, RouterLink, SelectorProducto],
   templateUrl: './historico.page.html',
   styleUrl: './historico.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

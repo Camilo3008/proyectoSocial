@@ -1,8 +1,44 @@
-<h1>Precios de hoy</h1>
+<section class="portada" aria-labelledby="titulo-hoy">
+  <div class="portada__texto">
+    <h1 id="titulo-hoy">Precios de hoy</h1>
+    @if (fechaHoy(); as f) {
+      <p class="subtitulo">{{ f }}</p>
+    }
+    <p class="portada__lema">
+      Consulte el precio de referencia antes de vender su cosecha. Así sabe si le están pagando
+      bien.
+    </p>
+  </div>
+</section>
+
+<details class="ayuda">
+  <summary>¿Cómo leer estas tarjetas?</summary>
+  <div class="ayuda__cuerpo">
+    <ul>
+      <li>
+        El <strong>número grande</strong> es el precio de referencia. Debajo dice si es por kilo,
+        por arroba o por carga.
+      </li>
+      <li>
+        <span class="muestra muestra--sube">▲ Subió</span> en verde: el precio está más alto que la
+        vez anterior.
+      </li>
+      <li>
+        <span class="muestra muestra--baja">▼ Bajó</span> en rojo: el precio está más bajo que la
+        vez anterior.
+      </li>
+      <li>
+        Al final de cada tarjeta verá <strong>de dónde sale el dato y de qué fecha es</strong>.
+      </li>
+      <li>
+        Toque <strong>«Ver histórico»</strong> para ver cómo ha cambiado el precio en los últimos
+        días o meses.
+      </li>
+    </ul>
+  </div>
+</details>
 
 @if (datos(); as d) {
-  <p class="subtitulo">{{ fechaHoy() }}</p>
-
   @if (!conexion.enLinea()) {
     <p class="aviso-cache" role="status">
       Sin conexión · datos actualizados el {{ actualizado() }}
@@ -18,15 +54,22 @@
   </div>
 
   @if (trm(); as t) {
-    <p class="trm">
-      <span class="trm__etiqueta">Dólar hoy (TRM):</span> {{ t.valor }} · {{ t.fecha }}
-      <span class="trm__fuente"
-        >Fuente: {{ t.fuente }}
-        @if (t.licencia) {
-          · {{ t.licencia }}
-        }
-      </span>
-    </p>
+    <div class="tarjeta trm">
+      <span class="trm__icono" aria-hidden="true">US$</span>
+      <p class="trm__texto">
+        <span class="trm__etiqueta">Dólar hoy (TRM):</span> {{ t.valor }} · {{ t.fecha }}
+        <span class="trm__ayuda"
+          >Es el valor oficial del dólar en Colombia. Sirve para pasar los precios internacionales a
+          pesos.</span
+        >
+        <span class="trm__fuente"
+          >Fuente: {{ t.fuente }}
+          @if (t.licencia) {
+            · {{ t.licencia }}
+          }
+        </span>
+      </p>
+    </div>
   }
 
   @if (d.sinDatos.length > 0) {
@@ -39,7 +82,77 @@
   </div>
 } @else {
   <p role="status" class="cargando">Cargando precios…</p>
+  <div class="lista" aria-hidden="true">
+    <div class="esqueleto esqueleto--tarjeta"></div>
+    <div class="esqueleto esqueleto--tarjeta"></div>
+  </div>
 }
+
+<a class="mundo" routerLink="/internacional">
+  <svg class="mundo__globo" viewBox="0 0 120 120" aria-hidden="true">
+    <defs>
+      <radialGradient id="hoy-mar" cx="40%" cy="35%" r="70%">
+        <stop offset="0" stop-color="#cfe6f2" />
+        <stop offset="1" stop-color="#7fb1cc" />
+      </radialGradient>
+    </defs>
+    <circle cx="60" cy="60" r="56" fill="url(#hoy-mar)" />
+    <!-- Continentes estilizados (América del Sur al centro) -->
+    <path
+      d="M44 22c8-4 18-2 22 4 3 5-2 9 2 14 5 6 14 8 15 16 1 9-7 14-9 22-2 9-1 18-8 22-5 3-8-4-8-10 0-8-6-13-8-20-2-8 3-13 0-20-3-6-12-6-13-13-1-7 2-12 7-15z"
+      fill="#fe9929"
+    />
+    <path d="M58 64c4 2 6 7 3 11-3 3-7 0-7-4 0-3 1-6 4-7z" fill="#993404" />
+    <path d="M86 26c9 2 16 10 17 20-6-2-10-7-14-6-4 1-7-3-6-7 0-4 1-7 3-7z" fill="#fec44f" />
+    <path d="M16 46c4-2 9 0 10 5 1 6-4 9-8 8-4-2-5-10-2-13z" fill="#fee391" />
+    <ellipse cx="60" cy="60" rx="56" ry="56" fill="none" stroke="#fff" stroke-opacity=".5" />
+  </svg>
+  <span class="mundo__texto">
+    <span class="mundo__titulo">Vea los precios en el mundo</span>
+    <span class="mundo__detalle"
+      >Un globo terráqueo con lo que le pagan al productor de café, cacao y banano en otros
+      países.</span
+    >
+    <span class="mundo__boton">Abrir el globo <span aria-hidden="true">→</span></span>
+  </span>
+</a>
+
+<nav class="accesos" aria-label="Más información">
+  <h2 class="accesos__titulo">¿Qué más quiere saber?</h2>
+  <ul>
+    <li>
+      <a routerLink="/historico">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 3v18h18" />
+          <path d="M7 15l4-4 3 3 5-6" />
+        </svg>
+        <span><strong>¿Cómo ha cambiado el precio?</strong> Gráficas por días, meses y años.</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/nacional">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+        </svg>
+        <span
+          ><strong>Precios en otras plazas</strong> Compare plátano y banano entre ciudades.</span
+        >
+      </a>
+    </li>
+    <li>
+      <a routerLink="/fuentes">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11v6M12 7.5h.01" />
+        </svg>
+        <span
+          ><strong>¿De dónde salen los datos?</strong> Fuentes oficiales y fecha de cada
+          actualización.</span
+        >
+      </a>
+    </li>
+  </ul>
+</nav>
 
 <p class="descargo">
   Los precios son de referencia y provienen de fuentes públicas. No constituyen una oferta de compra

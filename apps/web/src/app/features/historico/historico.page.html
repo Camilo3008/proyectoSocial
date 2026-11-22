@@ -1,20 +1,32 @@
-<h1>Histórico</h1>
+<header class="encabezado-pagina">
+  <span class="encabezado-pagina__icono" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <path d="M3 3v18h18" />
+      <path d="M7 15l4-4 3 3 5-6" />
+    </svg>
+  </span>
+  <div>
+    <h1>Histórico</h1>
+    <p>Vea cómo ha subido o bajado el precio con el tiempo. Siga los pasos de abajo.</p>
+  </div>
+</header>
 
 <div class="filtros">
-  <label class="campo">
-    <span>Producto</span>
-    <select [value]="productoActual()" (change)="cambiarProducto($any($event.target).value)">
-      @if (productos.hasValue()) {
-        @for (p of productos.value(); track p.slug) {
-          <option [value]="p.slug" [selected]="p.slug === productoActual()">{{ p.nombre }}</option>
-        }
-      }
-    </select>
-  </label>
+  @if (productos.hasValue()) {
+    <ap-selector-producto
+      paso="1"
+      titulo="Elija el producto"
+      [opciones]="productos.value()"
+      [actual]="productoActual()"
+      (elegir)="cambiarProducto($event)"
+    />
+  }
 
   @if (series.hasValue() && series.value().length > 0) {
     <label class="campo">
-      <span>Mercado y presentación</span>
+      <span class="paso"
+        ><span class="paso__numero" aria-hidden="true">2</span> ¿Dónde y en qué presentación?</span
+      >
       <select (change)="cambiarSerie($any($event.target).value)">
         @for (s of series.value(); track claveSerie(s)) {
           <option [value]="claveSerie(s)" [selected]="claveSerie(s) === claveElegida()">
@@ -25,25 +37,31 @@
     </label>
   }
 
-  <div class="rangos" role="group" aria-label="Rango de fechas">
-    @for (r of rangos; track r.valor) {
-      <button
-        type="button"
-        class="rango"
-        [class.rango--activo]="r.valor === rangoActual()"
-        [attr.aria-pressed]="r.valor === rangoActual()"
-        (click)="cambiarRango(r.valor)"
-      >
-        {{ r.etiqueta }}
-      </button>
-    }
+  <div>
+    <p class="paso">
+      <span class="paso__numero" aria-hidden="true">3</span> ¿Cuánto tiempo quiere ver?
+    </p>
+    <div class="grupo" role="group" aria-label="Rango de fechas">
+      @for (r of rangos; track r.valor) {
+        <button
+          type="button"
+          class="opcion rango"
+          [class.opcion--activa]="r.valor === rangoActual()"
+          [class.rango--activo]="r.valor === rangoActual()"
+          [attr.aria-pressed]="r.valor === rangoActual()"
+          (click)="cambiarRango(r.valor)"
+        >
+          {{ r.etiqueta }}
+        </button>
+      }
+    </div>
   </div>
 </div>
 
 @if (series.hasValue() && series.value().length === 0) {
   <p class="tarjeta">Todavía no hay datos de este producto.</p>
 } @else if (serie(); as s) {
-  <section class="tarjeta" aria-labelledby="titulo-serie">
+  <section class="tarjeta serie producto--{{ s.producto.slug }}" aria-labelledby="titulo-serie">
     <h2 id="titulo-serie" class="titulo-serie">
       {{ s.producto.nombre }} {{ s.presentacion }}
       @if (s.mercado) {
@@ -56,36 +74,41 @@
         Del {{ r.desde }} al {{ r.hasta }} · {{ r.cantidad }} datos · precios {{ r.unidad }}
       </p>
       <dl class="resumen">
-        <div>
+        <div class="resumen__item resumen__item--min">
           <dt>Mínimo</dt>
           <dd>{{ r.minimo }}</dd>
         </div>
-        <div>
+        <div class="resumen__item">
           <dt>Promedio</dt>
           <dd>{{ r.promedio }}</dd>
         </div>
-        <div>
+        <div class="resumen__item resumen__item--max">
           <dt>Máximo</dt>
           <dd>{{ r.maximo }}</dd>
         </div>
       </dl>
+      <p class="ayuda-resumen">
+        <strong>Mínimo</strong> es el precio más bajo en este tiempo, <strong>máximo</strong> el más
+        alto y <strong>promedio</strong> el precio normal.
+      </p>
 
       <ap-grafica-linea [etiquetas]="etiquetas()" [series]="lineas()" [formatear]="formatear()" />
+      <p class="nota">Toque la gráfica para ver el precio de cada día.</p>
     } @else {
       <p>No hay datos en este rango. Pruebe con un rango más amplio.</p>
     }
 
     <p class="procedencia">Fuente: {{ s.fuente.nombre }}</p>
     @for (n of notas(); track n) {
-      <p class="nota">{{ n }}</p>
+      <p class="nota nota--destacada">{{ n }}</p>
     }
     @if (s.fuente.cita; as cita) {
       <p class="nota cita">{{ cita }}</p>
     }
     @if (s.mercado) {
-      <p>
+      <p class="enlaces">
         <a
-          class="enlace"
+          class="boton boton--secundario"
           routerLink="/nacional"
           [queryParams]="{ producto: s.producto.slug, presentacion: s.presentacion }"
           >Comparar con otros mercados</a
@@ -97,37 +120,39 @@
   @if (filas().length > 0) {
     <details class="tabla-datos">
       <summary>Ver los datos en tabla</summary>
-      <table>
-        <caption class="solo-lectores">
-          Precios de
-          {{
-            s.producto.nombre
-          }}
-          {{
-            s.presentacion
-          }}, del más reciente al más antiguo
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Fecha</th>
-            <th scope="col">Precio</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (f of filas(); track f.fecha) {
+      <div class="tabla-desplazable">
+        <table class="tabla">
+          <caption class="solo-lectores">
+            Precios de
+            {{
+              s.producto.nombre
+            }}
+            {{
+              s.presentacion
+            }}, del más reciente al más antiguo
+          </caption>
+          <thead>
             <tr>
-              <td>
-                <time [attr.datetime]="f.fecha">{{ f.fechaTexto }}</time>
-              </td>
-              <td>{{ f.precio }}</td>
+              <th scope="col">Fecha</th>
+              <th scope="col">Precio</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (f of filas(); track f.fecha) {
+              <tr>
+                <td>
+                  <time [attr.datetime]="f.fecha">{{ f.fechaTexto }}</time>
+                </td>
+                <td>{{ f.precio }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </details>
   }
 } @else if (datos.error() || series.error()) {
-  <div class="tarjeta" role="alert">
+  <div class="tarjeta mensaje-error" role="alert">
     <p>No pudimos cargar el histórico. Revisa tu conexión e inténtalo de nuevo.</p>
     <button type="button" class="boton" (click)="series.reload(); datos.reload()">
       Reintentar
@@ -135,4 +160,5 @@
   </div>
 } @else {
   <p role="status" class="cargando">Cargando histórico…</p>
+  <div class="esqueleto esqueleto--grafica" aria-hidden="true"></div>
 }

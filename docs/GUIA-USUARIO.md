@@ -66,13 +66,21 @@ Desde aquí, con **"Comparar con otros mercados"**, se ven los precios de la
 misma presentación en otras centrales de abasto del país.
 
 ### Mundo
-- **Precios internacionales:** cómo se mueve el precio en el mercado mundial,
-  mes a mes, en pesos o en dólares.
-- **Globo terráqueo:** cada país tiene un color según lo que reciben sus
-  productores (más oscuro = más alto). Toque un país para ver su precio, cómo
+También se llega tocando la tarjeta **"Vea los precios en el mundo"** en Hoy.
+
+- **Globo terráqueo (arriba, en grande):** cada país tiene un color según lo
+  que reciben sus productores, de amarillo (más barato) a café oscuro (más
+  caro); en gris, los países sin datos. Arrástrelo con el dedo para girarlo,
+  use **+** y **−** para acercar o alejar, y **"Centrar en Colombia"** o
+  **"Ver todo el mundo"** para volver. Toque un país para ver su precio, cómo
   ha cambiado en los últimos años y cuánto más o menos recibe que Colombia. Si
   el celular no puede mostrar el globo, aparece una **tabla** con los mismos
   datos ("Ver como tabla").
+- **Precios internacionales, mes a mes (debajo):** cómo se mueve el precio en
+  el mercado mundial, en pesos o en dólares.
+
+En Mundo, Histórico y Nacional los filtros van **numerados (1, 2, 3)**: primero
+se toca el producto (botones con su dibujo), luego se elige lo demás.
 
 ### Fuentes
 Quién publica cada dato, cada cuánto se actualiza y cuándo se actualizó por

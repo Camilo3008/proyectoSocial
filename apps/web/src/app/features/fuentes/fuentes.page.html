@@ -1,10 +1,44 @@
-<h1>Fuentes de datos</h1>
-<p class="intro">De dónde vienen los precios y cuándo se actualizaron por última vez.</p>
+<header class="encabezado-pagina">
+  <span class="encabezado-pagina__icono" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v6M12 7.5h.01" />
+    </svg>
+  </span>
+  <div>
+    <h1>Fuentes de datos</h1>
+    <p>De dónde vienen los precios y cuándo se actualizaron por última vez.</p>
+  </div>
+</header>
+
+<ul class="confianza" aria-label="Por qué confiar en estos precios">
+  <li>
+    <span class="confianza__icono" aria-hidden="true">🏛️</span>
+    <span
+      ><strong>Fuentes oficiales.</strong> Los precios vienen de entidades públicas como la
+      Federación de Cafeteros, el DANE y el Banco Mundial.</span
+    >
+  </li>
+  <li>
+    <span class="confianza__icono" aria-hidden="true">🔄</span>
+    <span
+      ><strong>Se actualizan solos.</strong> La aplicación los descarga automáticamente; aquí ve la
+      fecha de la última vez.</span
+    >
+  </li>
+  <li>
+    <span class="confianza__icono" aria-hidden="true">📵</span>
+    <span
+      ><strong>Funcionan sin señal.</strong> Si se queda sin internet, verá los últimos precios
+      guardados en el celular.</span
+    >
+  </li>
+</ul>
 
 @if (fuentes.hasValue()) {
   <ul class="lista" aria-label="Fuentes de datos">
     @for (fuente of fuentes.value(); track fuente.slug) {
-      <li class="tarjeta fuente">
+      <li class="tarjeta fuente fuente--{{ estado[fuente.estado].tono }}">
         <div class="fuente__cabecera">
           <h2 class="fuente__nombre">{{ fuente.nombre }}</h2>
           <span class="insignia insignia--{{ estado[fuente.estado].tono }}">
@@ -48,6 +82,7 @@
             Sitio oficial<span class="solo-lectores">
               de {{ fuente.nombre }} (se abre en otra pestaña)</span
             >
+            <span aria-hidden="true">↗</span>
           </a>
         }
       </li>

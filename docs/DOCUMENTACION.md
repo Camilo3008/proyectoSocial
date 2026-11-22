@@ -183,4 +183,5 @@ historial.
 | `docs/GUIA-USUARIO.md` | Guía de uso para la capacitación |
 | `docs/ENCUESTA.md` | Plantilla de encuesta de uso y utilidad |
 | `docs/solicitudes/solicitud-autorizacion-fnc.md` | Borrador de carta a la FNC |
+| `docs/ANALISIS-MODULOS.md` | Ventajas, desventajas y riesgos de cada módulo |
 | `docs/PENDIENTES.md` | Pendientes y puntos que requieren revisión |

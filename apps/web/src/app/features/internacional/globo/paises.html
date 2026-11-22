@@ -1,21 +1,18 @@
-<p class="intro">
-  Lo que recibe el productor en cada país, en dólares por kilo. Toca un país para ver su detalle.
-</p>
-
-<div class="filtros">
-  <label class="campo">
-    <span>Producto</span>
-    <select (change)="cambiar({ productoPais: $any($event.target).value, anio: null, pais: null })">
-      @for (p of productos; track p.slug) {
-        <option [value]="p.slug" [selected]="p.slug === productoActual()">{{ p.nombre }}</option>
-      }
-    </select>
-  </label>
+<div class="filtros filtros--globo">
+  <ap-selector-producto
+    paso="1"
+    titulo="Elija el producto"
+    [opciones]="productos"
+    [actual]="productoActual()"
+    (elegir)="cambiar({ productoPais: $event, anio: null, pais: null })"
+  />
 
   @if (datosMapa(); as m) {
     @if (m.aniosDisponibles.length > 0) {
       <label class="campo">
-        <span>Año</span>
+        <span class="paso"
+          ><span class="paso__numero" aria-hidden="true">2</span> ¿De qué año?</span
+        >
         <select (change)="cambiar({ anio: $any($event.target).value })">
           @for (a of m.aniosDisponibles; track a) {
             <option [value]="a" [selected]="a === m.anio">{{ a }}</option>
@@ -25,27 +22,30 @@
     }
   }
 
-  <div class="grupo" role="group" aria-label="Forma de ver los países">
-    @if (!sinWebgl()) {
+  <div>
+    <p class="paso"><span class="paso__numero" aria-hidden="true">3</span> ¿Cómo lo quiere ver?</p>
+    <div class="grupo" role="group" aria-label="Forma de ver los países">
+      @if (!sinWebgl()) {
+        <button
+          type="button"
+          class="opcion"
+          [class.opcion--activa]="!enTabla()"
+          [attr.aria-pressed]="!enTabla()"
+          (click)="cambiar({ vista: null })"
+        >
+          Ver globo
+        </button>
+      }
       <button
         type="button"
         class="opcion"
-        [class.opcion--activa]="!enTabla()"
-        [attr.aria-pressed]="!enTabla()"
-        (click)="cambiar({ vista: null })"
+        [class.opcion--activa]="enTabla()"
+        [attr.aria-pressed]="enTabla()"
+        (click)="cambiar({ vista: 'tabla' })"
       >
-        Ver globo
+        Ver como tabla
       </button>
-    }
-    <button
-      type="button"
-      class="opcion"
-      [class.opcion--activa]="enTabla()"
-      [attr.aria-pressed]="enTabla()"
-      (click)="cambiar({ vista: 'tabla' })"
-    >
-      Ver como tabla
-    </button>
+    </div>
   </div>
 </div>
 
@@ -59,115 +59,146 @@
   @if (m.items.length === 0) {
     <p class="tarjeta">Todavía no hay precios por país para este producto.</p>
   } @else {
-    @if (!enTabla()) {
-      <div class="contenedor-globo">
-        @defer (on viewport) {
-          <ap-globo
-            [datos]="m.items"
-            [seleccionado]="pais() ?? null"
-            (paisTocado)="elegirPais($event.iso3)"
-            (sinWebgl)="sinWebgl.set(true)"
-          />
-        } @placeholder {
-          <div class="globo-espera">Cargando globo…</div>
-        } @loading (minimum 200ms) {
-          <div class="globo-espera" role="status">Cargando globo…</div>
-        } @error {
-          <div class="globo-espera">No se pudo cargar el globo. Usa la vista de tabla.</div>
-        }
-      </div>
+    <div class="escenario" [class.escenario--tabla]="enTabla()">
+      @if (!enTabla()) {
+        <div class="escenario__globo">
+          <ol class="instrucciones" aria-label="Cómo usar el globo">
+            <li><span aria-hidden="true">👆</span> Arrastre con el dedo para girarlo</li>
+            <li><span aria-hidden="true">🔍</span> Toque <b>+</b> o <b>−</b> para acercar</li>
+            <li><span aria-hidden="true">📍</span> Toque un país para ver su precio</li>
+          </ol>
 
-      <ul class="leyenda" aria-label="Leyenda de colores (dólares por kilo)">
-        @for (l of leyenda(); track l.color) {
-          <li><span class="muestra" [style.background]="l.color"></span>{{ l.texto }}</li>
-        }
-        <li><span class="muestra" [style.background]="colorSinDatos"></span>Sin datos</li>
-      </ul>
-    }
-
-    @if (ficha(); as f) {
-      <article class="tarjeta ficha" aria-live="polite" aria-labelledby="titulo-ficha">
-        <div class="ficha__cabecera">
-          <h3 id="titulo-ficha">
-            <span aria-hidden="true">{{ bandera(f.pais.iso2) }}</span> {{ f.pais.nombre }}
-          </h3>
-          <button type="button" class="boton boton--secundario" (click)="cerrarFicha()">
-            Cerrar
-          </button>
-        </div>
-        @if (f.ultimo; as u) {
-          <p class="ficha__valor">{{ usdKg(u.valorUsdKg) }} <span>por kilo</span></p>
-          @if (u.valorCopKg) {
-            <p>≈ {{ copKg(u.valorCopKg) }} por kilo (con la TRM promedio del año)</p>
-          }
-          <p class="ficha__detalle">
-            {{ f.producto.nombre }} {{ f.presentacion }}, año {{ u.anio }}.
-            @if (u.valorMonedaLocalT) {
-              En moneda local: {{ numero(u.valorMonedaLocalT) }} por tonelada.
+          <div class="contenedor-globo">
+            @defer (on viewport) {
+              <ap-globo
+                [datos]="m.items"
+                [seleccionado]="pais() ?? null"
+                (paisTocado)="elegirPais($event.iso3)"
+                (sinWebgl)="sinWebgl.set(true)"
+              />
+            } @placeholder {
+              <div class="globo-espera">Cargando globo…</div>
+            } @loading (minimum 200ms) {
+              <div class="globo-espera" role="status">Cargando globo…</div>
+            } @error {
+              <div class="globo-espera">No se pudo cargar el globo. Usa la vista de tabla.</div>
             }
-          </p>
-          @if (f.comparacion) {
-            <p class="ficha__comparacion">{{ f.comparacion }}</p>
-          }
-          @if (f.barras.length > 1) {
-            <ol class="barras" aria-label="Precio de los últimos años">
-              @for (b of f.barras; track b.anio) {
-                <li>
-                  <span class="barras__barra" [style.height.%]="b.alto"></span>
-                  <span class="barras__anio">{{ b.anio }}</span>
-                  <span class="solo-lectores">{{ b.texto }}</span>
-                </li>
+          </div>
+
+          <div class="leyenda-caja">
+            <p class="leyenda-caja__titulo">
+              Colores del globo: precio al productor en dólares por kilo
+            </p>
+            <ul class="leyenda" aria-label="Leyenda de colores (dólares por kilo)">
+              @for (l of leyenda(); track l.color) {
+                <li><span class="muestra" [style.background]="l.color"></span>{{ l.texto }}</li>
               }
-            </ol>
-          }
-        } @else {
-          <p>No hay precios de {{ f.producto.nombre }} para este país.</p>
-        }
-        <p class="nota">
-          Fuente: {{ f.fuente.nombre }}
-          @if (f.ultimo; as u) {
-            · {{ u.anio }}
-          }
-        </p>
-      </article>
-    } @else if (detalle.isLoading()) {
-      <p role="status" class="cargando">Cargando país…</p>
-    }
+              <li><span class="muestra" [style.background]="colorSinDatos"></span>Sin datos</li>
+            </ul>
+            <p class="leyenda-caja__guia" aria-hidden="true">
+              <span>← Más barato</span><span>Más caro →</span>
+            </p>
+          </div>
+        </div>
+      }
 
-    @if (enTabla()) {
-      <div class="tabla-desplazable">
-        <table>
-          <caption>
-            Precio al productor de
-            {{
-              m.producto.nombre
-            }}
-            por país en
-            {{
-              m.anio
-            }}
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col">País</th>
-              <th scope="col">Dólares por kilo</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (i of m.items; track i.iso3) {
-              <tr [class.fila--colombia]="i.iso3 === 'COL'">
-                <th scope="row">
-                  <button type="button" class="enlace-pais" (click)="elegirPais(i.iso3)">
-                    <span aria-hidden="true">{{ bandera(i.iso2) }}</span> {{ i.nombre }}
-                  </button>
-                </th>
-                <td>{{ usdKg(i.valorUsdKg) }}</td>
-              </tr>
+      <aside class="escenario__lado">
+        @if (ficha(); as f) {
+          <article class="tarjeta ficha" aria-live="polite" aria-labelledby="titulo-ficha">
+            <div class="ficha__cabecera">
+              <h3 id="titulo-ficha">
+                <span aria-hidden="true">{{ bandera(f.pais.iso2) }}</span> {{ f.pais.nombre }}
+              </h3>
+              <button type="button" class="boton boton--secundario" (click)="cerrarFicha()">
+                Cerrar
+              </button>
+            </div>
+            @if (f.ultimo; as u) {
+              <p class="ficha__valor">{{ usdKg(u.valorUsdKg) }} <span>por kilo</span></p>
+              @if (u.valorCopKg) {
+                <p class="ficha__pesos">
+                  ≈ {{ copKg(u.valorCopKg) }} por kilo (con la TRM promedio del año)
+                </p>
+              }
+              <p class="ficha__detalle">
+                {{ f.producto.nombre }} {{ f.presentacion }}, año {{ u.anio }}.
+                @if (u.valorMonedaLocalT) {
+                  En moneda local: {{ numero(u.valorMonedaLocalT) }} por tonelada.
+                }
+              </p>
+              @if (f.comparacion) {
+                <p class="ficha__comparacion">{{ f.comparacion }}</p>
+              }
+              @if (f.barras.length > 1) {
+                <p class="ficha__subtitulo">Precio de los últimos años</p>
+                <ol class="barras" aria-label="Precio de los últimos años">
+                  @for (b of f.barras; track b.anio) {
+                    <li>
+                      <span class="barras__barra" [style.height.%]="b.alto"></span>
+                      <span class="barras__anio">{{ b.anio }}</span>
+                      <span class="solo-lectores">{{ b.texto }}</span>
+                    </li>
+                  }
+                </ol>
+              }
+            } @else {
+              <p>No hay precios de {{ f.producto.nombre }} para este país.</p>
             }
-          </tbody>
-        </table>
-      </div>
-    }
+            <p class="nota">
+              Fuente: {{ f.fuente.nombre }}
+              @if (f.ultimo; as u) {
+                · {{ u.anio }}
+              }
+            </p>
+          </article>
+        } @else if (detalle.isLoading()) {
+          <p role="status" class="cargando tarjeta">Cargando país…</p>
+        } @else if (!enTabla()) {
+          <div class="pista">
+            <span class="pista__icono" aria-hidden="true">📍</span>
+            <p>
+              <strong>Toque un país en el globo</strong> para ver cuánto le pagan al productor allá
+              y compararlo con Colombia.
+            </p>
+          </div>
+        }
+
+        @if (enTabla()) {
+          <div class="tabla-desplazable tabla-paises">
+            <table class="tabla">
+              <caption>
+                Precio al productor de
+                {{
+                  m.producto.nombre
+                }}
+                por país en
+                {{
+                  m.anio
+                }}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">País</th>
+                  <th scope="col">Dólares por kilo</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (i of m.items; track i.iso3) {
+                  <tr [class.fila--colombia]="i.iso3 === 'COL'">
+                    <th scope="row">
+                      <button type="button" class="enlace-pais" (click)="elegirPais(i.iso3)">
+                        <span aria-hidden="true">{{ bandera(i.iso2) }}</span> {{ i.nombre }}
+                      </button>
+                    </th>
+                    <td>{{ usdKg(i.valorUsdKg) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </aside>
+    </div>
 
     <p class="nota">
       Precio promedio que recibe el productor en todo el año, según cada país informa a la FAO.
@@ -182,10 +213,11 @@
     }
   }
 } @else if (mapa.error()) {
-  <div class="tarjeta" role="alert">
+  <div class="tarjeta mensaje-error" role="alert">
     <p>No pudimos cargar los precios por país. Revisa tu conexión e inténtalo de nuevo.</p>
     <button type="button" class="boton" (click)="mapa.reload()">Reintentar</button>
   </div>
 } @else {
   <p role="status" class="cargando">Cargando precios por país…</p>
+  <div class="esqueleto globo-esqueleto" aria-hidden="true"></div>
 }

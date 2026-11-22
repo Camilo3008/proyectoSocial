@@ -1,6 +1,65 @@
+:host {
+  display: block;
+}
+
+// --tono y --tono-suave vienen de .producto--<slug> (styles.scss).
+.tarjeta-precio {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-top: 6px solid var(--tono, var(--color-acento));
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-alta);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  background: var(--tono-suave, var(--color-acento-suave));
+
+  &__icono {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--color-superficie);
+    box-shadow: var(--sombra);
+
+    ap-icono-producto {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+
+  &__texto {
+    min-width: 0;
+  }
+}
+
 .titulo {
-  margin: 0 0 var(--esp-2);
+  margin: 0;
+  color: var(--tono, var(--color-texto));
   font-size: var(--texto-lg);
+  font-weight: 800;
+}
+
+.que-es {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-xs);
+  line-height: 1.35;
+}
+
+.cuerpo {
+  flex: 1;
+  padding: var(--esp-4);
 }
 
 .precio {
@@ -8,23 +67,25 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--esp-1) var(--esp-2);
-  margin: 0 0 var(--esp-2);
+  margin: 0 0 var(--esp-3);
 
   &__valor {
     font-size: var(--texto-precio);
     font-weight: 800;
-    letter-spacing: -0.01em;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
 
   &__unidad {
     color: var(--color-texto-suave);
+    font-weight: 600;
   }
 }
 
 .variacion {
   display: inline-block;
-  margin: 0 0 var(--esp-2);
+  margin: 0 0 var(--esp-3);
   padding: var(--esp-1) var(--esp-3);
   border-radius: var(--radio-pildora);
   font-weight: 700;
@@ -46,8 +107,22 @@
 }
 
 .procedencia {
+  display: flex;
+  gap: var(--esp-2);
   margin: 0;
   color: var(--color-texto-suave);
+  font-size: var(--texto-xs);
+
+  svg {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
 
   &__aviso {
     color: var(--color-aviso);
@@ -57,8 +132,10 @@
 
 .complementos {
   margin: var(--esp-3) 0 0;
-  padding: var(--esp-3) 0 0;
-  border-top: 1px solid var(--color-borde);
+  padding: var(--esp-3);
+  border-radius: var(--radio-sm);
+  background: var(--color-superficie-2);
+  border: 1px solid var(--color-borde);
   list-style: none;
 
   &__etiqueta {
@@ -66,44 +143,79 @@
   }
 }
 
-.nota {
-  margin: var(--esp-2) 0 0;
-  color: var(--color-texto-suave);
+.notas {
+  margin-top: var(--esp-3);
+  padding: var(--esp-3);
+  border-left: 4px solid var(--color-info);
+  border-radius: 0 var(--radio-sm) var(--radio-sm) 0;
+  background: var(--color-info-fondo);
+}
+
+.nota-tarjeta {
+  margin: 0;
+  color: var(--color-texto);
   font-size: var(--texto-xs);
+
+  & + & {
+    margin-top: var(--esp-2);
+  }
 }
 
 .cita {
+  color: var(--color-texto-suave);
   font-style: italic;
 }
 
 .acciones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--esp-4);
-  margin: var(--esp-2) 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--esp-2);
+  padding: 0 var(--esp-4) var(--esp-4);
+}
 
-  a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--alto-tactil);
-    font-weight: 600;
+.accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-2);
+  min-height: var(--alto-tactil);
+  padding: 0 var(--esp-3);
+  border: 2px solid var(--color-acento);
+  border-radius: var(--radio-pildora);
+  color: var(--color-acento-oscuro);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--color-acento-suave);
+  }
+
+  svg {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 }
 
 .etiqueta-internacional {
   display: inline-block;
   margin: 0 0 var(--esp-2);
-  padding: 2px var(--esp-2);
+  padding: 2px var(--esp-3);
   border-radius: var(--radio-pildora);
-  background: var(--color-neutro-fondo);
-  color: var(--color-neutro);
+  background: var(--color-info-fondo);
+  color: var(--color-info);
   font-size: var(--texto-xs);
   font-weight: 700;
 }
 
 .equivalente {
-  margin: calc(-1 * var(--esp-1)) 0 var(--esp-2);
-  font-weight: 600;
+  margin: calc(-1 * var(--esp-2)) 0 var(--esp-3);
+  font-weight: 700;
 
   &__detalle {
     color: var(--color-texto-suave);

@@ -8,7 +8,7 @@
   position: absolute;
   left: var(--esp-2);
   top: -4rem;
-  z-index: 10;
+  z-index: 20;
   padding: var(--esp-2) var(--esp-4);
   background: var(--color-superficie);
   border-radius: var(--radio);
@@ -18,46 +18,69 @@
   }
 }
 
+// Encabezado verde con el logo (grano de café y hoja).
 .encabezado {
-  display: flex;
-  align-items: center;
-  min-height: 3.5rem;
-  padding: 0 var(--esp-4);
   padding-top: env(safe-area-inset-top);
-  background: var(--color-superficie);
-  border-bottom: 1px solid var(--color-borde);
+  background: var(--degradado-marca);
+  color: #fff;
+
+  &__interior {
+    display: flex;
+    align-items: center;
+    min-height: 4rem;
+    max-width: var(--ancho-contenido);
+    margin: 0 auto;
+    padding: var(--esp-2) var(--esp-4);
+  }
 }
 
 .marca {
   display: inline-flex;
   align-items: center;
-  gap: var(--esp-2);
+  gap: var(--esp-3);
   min-height: var(--alto-tactil);
-  color: var(--color-texto);
-  font-size: var(--texto-lg);
-  font-weight: 700;
+  color: #fff;
   text-decoration: none;
 
-  &__icono {
-    width: 1.75rem;
-    height: 1.75rem;
-    color: var(--color-acento);
+  &__logo {
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.25));
+  }
+
+  &__texto {
+    display: grid;
+    line-height: 1.2;
+  }
+
+  &__nombre {
+    font-size: var(--texto-lg);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  &__lema {
+    font-size: var(--texto-xs);
+    opacity: 0.92;
   }
 }
 
 .aviso-offline {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--esp-2);
   padding: var(--esp-3) var(--esp-4);
   background: var(--color-aviso-fondo);
+  border-bottom: 2px solid var(--color-oro);
   color: var(--color-aviso);
-  font-weight: 600;
+  font-weight: 700;
 
   &__icono {
     flex: none;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
     fill: none;
     stroke: currentColor;
     stroke-width: 2;
@@ -69,12 +92,12 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--esp-2) var(--esp-3);
+  justify-content: center;
+  gap: var(--esp-2) var(--esp-4);
   padding: var(--esp-3) var(--esp-4);
   background: var(--color-acento-suave);
   color: var(--color-acento-oscuro);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .contenido {
@@ -82,26 +105,28 @@
   width: 100%;
   max-width: var(--ancho-contenido);
   margin: 0 auto;
-  padding: var(--esp-4);
-  padding-bottom: calc(var(--alto-barra-inferior) + var(--esp-5) + env(safe-area-inset-bottom));
+  padding: var(--esp-5) var(--esp-4);
+  padding-bottom: calc(var(--alto-barra-inferior) + var(--esp-6) + env(safe-area-inset-bottom));
 
   &:focus {
     outline: none;
   }
 }
 
+// Barra inferior: la pestaña activa lleva una "píldora" verde detrás del ícono.
 .barra-inferior {
   position: fixed;
   inset: auto 0 0;
-  z-index: 5;
+  z-index: 10;
   background: var(--color-superficie);
   border-top: 1px solid var(--color-borde);
+  box-shadow: 0 -2px 12px rgb(60 40 20 / 0.08);
   padding-bottom: env(safe-area-inset-bottom);
 
   ul {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    max-width: var(--ancho-contenido);
+    max-width: 40rem;
     margin: 0 auto;
     padding: 0;
     list-style: none;
@@ -116,16 +141,29 @@
     min-height: var(--alto-barra-inferior);
     color: var(--color-texto-suave);
     font-size: var(--texto-xs);
+    font-weight: 600;
     text-decoration: none;
 
     &.activa {
       color: var(--color-acento-oscuro);
-      font-weight: 700;
+      font-weight: 800;
+
+      .barra-inferior__icono {
+        background: var(--color-acento-suave);
+      }
 
       svg {
         stroke-width: 2.4;
       }
     }
+  }
+
+  &__icono {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 2rem;
+    border-radius: var(--radio-pildora);
   }
 
   svg {
@@ -136,5 +174,61 @@
     stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+}
+
+// En pantallas grandes la navegación sube al encabezado (mismo <nav>).
+@media (min-width: 64rem) {
+  .encabezado {
+    position: sticky;
+    top: 0;
+    z-index: 9;
+  }
+
+  .barra-inferior {
+    position: fixed;
+    inset: 0 max(var(--esp-4), calc((100vw - var(--ancho-contenido)) / 2 + var(--esp-4))) auto auto;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+
+    ul {
+      display: flex;
+      gap: var(--esp-1);
+      max-width: none;
+      min-height: 4rem;
+      align-items: center;
+    }
+
+    a {
+      flex-direction: row;
+      gap: var(--esp-2);
+      min-height: var(--alto-tactil);
+      padding: 0 var(--esp-4) 0 var(--esp-2);
+      border-radius: var(--radio-pildora);
+      color: #fff;
+
+      &:hover {
+        background: rgb(255 255 255 / 0.12);
+      }
+
+      &.activa {
+        background: #fff;
+        color: var(--color-acento-oscuro);
+
+        .barra-inferior__icono {
+          background: transparent;
+        }
+      }
+    }
+
+    &__icono {
+      width: 2rem;
+    }
+  }
+
+  .contenido {
+    padding-bottom: var(--esp-7);
   }
 }

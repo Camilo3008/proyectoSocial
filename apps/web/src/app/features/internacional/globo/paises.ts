@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { API_URL } from '../../../core/api';
 import { formatearNumero, formatearPorcentaje, formatearPrecio } from '../../../core/formato';
+import { SelectorProducto } from '../../../shared/selector-producto/selector-producto';
 import { COLOR_SIN_DATOS, COLORES_CLASES, calcularClases } from './escala';
 import { Globo } from './globo';
 
@@ -36,7 +37,7 @@ const copKg = (v: string) => formatearPrecio(v, 'COP', 'kg');
  */
 @Component({
   selector: 'ap-paises',
-  imports: [Globo],
+  imports: [Globo, SelectorProducto],
   templateUrl: './paises.html',
   styleUrl: './paises.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

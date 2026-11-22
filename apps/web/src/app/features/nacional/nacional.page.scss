@@ -1,61 +1,62 @@
-.intro,
+:host {
+  display: block;
+  max-width: var(--ancho-lectura);
+  margin: 0 auto;
+}
+
 .subtitulo,
-.procedencia,
-.cargando {
+.procedencia {
   color: var(--color-texto-suave);
-}
-
-.filtros {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--esp-3);
-  margin-bottom: var(--esp-4);
-}
-
-.campo {
-  display: grid;
-  gap: var(--esp-1);
-  min-width: 0;
-
-  span {
-    color: var(--color-texto-suave);
-  }
-
-  select {
-    min-height: var(--alto-tactil);
-    padding: 0 var(--esp-3);
-    border: 1px solid var(--color-borde);
-    border-radius: var(--radio);
-    background: var(--color-superficie);
-    color: var(--color-texto);
-    font: inherit;
-    width: 100%;
-    max-width: 100%;
-    text-overflow: ellipsis;
-  }
 }
 
 .titulo {
   margin-bottom: var(--esp-1);
 }
 
+// Ranking numerado con un contador CSS (1, 2, 3…).
 .lista {
   display: grid;
-  gap: var(--esp-2);
-  margin: var(--esp-3) 0;
+  gap: var(--esp-3);
+  margin: var(--esp-4) 0;
   padding: 0;
   list-style: none;
+  counter-reset: puesto;
 }
 
-// Mercado a la izquierda y precio siempre a la derecha; la diferencia, en su propia línea.
+// Puesto y mercado a la izquierda, precio siempre a la derecha; la barra y la
+// diferencia, en sus propias líneas.
 .fila {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  gap: var(--esp-1) var(--esp-3);
+  gap: var(--esp-2) var(--esp-3);
+  padding-left: 3.75rem;
+  counter-increment: puesto;
+
+  &::before {
+    content: counter(puesto);
+    position: absolute;
+    top: var(--esp-4);
+    left: var(--esp-4);
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--color-cafe-suave);
+    color: var(--color-cafe);
+    font-weight: 800;
+  }
 
   &--referencia {
     border: 2px solid var(--color-acento);
+    background: linear-gradient(0deg, var(--color-superficie), var(--color-acento-suave));
+
+    &::before {
+      background: var(--color-acento);
+      color: #fff;
+    }
   }
 
   &__mercado {
@@ -65,7 +66,7 @@
   }
 
   &__nombre {
-    font-weight: 700;
+    font-weight: 800;
   }
 
   &__depto {
@@ -74,17 +75,35 @@
   }
 
   &__valor {
-    font-size: var(--texto-lg);
+    font-size: var(--texto-xl);
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     text-align: right;
     white-space: nowrap;
   }
 
+  &__barra {
+    grid-column: 1 / -1;
+    height: 0.625rem;
+    border-radius: var(--radio-pildora);
+    background: var(--color-neutro-fondo);
+    overflow: hidden;
+
+    div {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--color-cafe);
+    }
+  }
+
+  &--referencia &__barra div {
+    background: var(--color-acento);
+  }
+
   &__dif {
     grid-column: 1 / -1;
     font-size: var(--texto-xs);
-    font-weight: 600;
+    font-weight: 700;
 
     &--mas {
       color: var(--color-ok);
@@ -102,20 +121,5 @@
 
 .insignia {
   justify-self: start;
-  padding: 2px var(--esp-2);
-  border-radius: var(--radio-pildora);
-  background: var(--color-acento-suave);
-  color: var(--color-acento-oscuro);
-  font-size: var(--texto-xs);
-  font-weight: 700;
-}
-
-.nota {
-  margin: var(--esp-2) 0 0;
-  color: var(--color-texto-suave);
-  font-size: var(--texto-xs);
-}
-
-.cita {
-  font-style: italic;
+  margin-top: var(--esp-1);
 }

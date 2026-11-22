@@ -1,65 +1,98 @@
-<article class="tarjeta" [attr.aria-labelledby]="'titulo-' + item().producto.slug">
-  <h2 class="titulo" [id]="'titulo-' + item().producto.slug">{{ titulo() }}</h2>
+<article
+  class="tarjeta-precio producto--{{ item().producto.slug }}"
+  [attr.aria-labelledby]="'titulo-' + item().producto.slug"
+>
+  <header class="cabecera">
+    <span class="cabecera__icono"><ap-icono-producto [producto]="item().producto.slug" /></span>
+    <div class="cabecera__texto">
+      <h2 class="titulo" [id]="'titulo-' + item().producto.slug">{{ titulo() }}</h2>
+      <p class="que-es">{{ queEs() }}</p>
+    </div>
+  </header>
 
-  @if (esMensual()) {
-    <p class="etiqueta-internacional">Precio internacional · promedio mensual</p>
-  }
-
-  <p class="precio">
-    <span class="precio__valor">{{ precio() }}</span>
-    <span class="precio__unidad">{{ unidad() }}</span>
-  </p>
-
-  @if (equivalentePesos(); as pesos) {
-    <p class="equivalente">
-      ≈ {{ pesos }} por kilo<span class="equivalente__detalle"> (con la TRM promedio del mes)</span>
-    </p>
-  }
-
-  @if (variacion(); as v) {
-    <p class="variacion variacion--{{ v.tendencia }}">
-      <span aria-hidden="true">{{ v.simbolo }}</span> {{ v.texto }}
-    </p>
-  }
-
-  <p class="procedencia">
-    @if (!esDeHoy() && !esMensual()) {
-      <span class="procedencia__aviso">Último dato disponible:</span>
+  <div class="cuerpo">
+    @if (esMensual()) {
+      <p class="etiqueta-internacional">Precio internacional · promedio mensual</p>
     }
-    Fuente: {{ item().fuente.nombre }}
-    @if (item().mercado; as m) {
-      · {{ m.nombre }}
+
+    <p class="precio">
+      <span class="precio__valor">{{ precio() }}</span>
+      <span class="precio__unidad">{{ unidad() }}</span>
+    </p>
+
+    @if (equivalentePesos(); as pesos) {
+      <p class="equivalente">
+        ≈ {{ pesos }} por kilo<span class="equivalente__detalle">
+          (con la TRM promedio del mes)</span
+        >
+      </p>
     }
-    · <time [attr.datetime]="item().fecha">{{ fecha() }}</time>
-  </p>
 
-  @if (complementos().length > 0) {
-    <ul class="complementos">
-      @for (c of complementos(); track c.etiqueta) {
-        <li>
-          <span class="complementos__etiqueta">{{ c.etiqueta }}:</span>
-          {{ c.precio }} {{ c.unidad }} · {{ c.fecha }}
-        </li>
-      }
-    </ul>
-  }
+    @if (variacion(); as v) {
+      <p class="variacion variacion--{{ v.tendencia }}">
+        <span aria-hidden="true">{{ v.simbolo }}</span> {{ v.texto }}
+      </p>
+    }
 
-  @for (n of notas(); track n) {
-    <p class="nota">{{ n }}</p>
-  }
+    <p class="procedencia">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="17" rx="2" />
+        <path d="M3 9h18M8 2v4M16 2v4" />
+      </svg>
+      <span>
+        @if (!esDeHoy() && !esMensual()) {
+          <span class="procedencia__aviso">Último dato disponible:</span>
+        }
+        Fuente: {{ item().fuente.nombre }}
+        @if (item().mercado; as m) {
+          · {{ m.nombre }}
+        }
+        · <time [attr.datetime]="item().fecha">{{ fecha() }}</time>
+      </span>
+    </p>
 
-  @if (item().fuente.cita; as cita) {
-    <p class="nota cita">{{ cita }}</p>
-  }
+    @if (complementos().length > 0) {
+      <ul class="complementos">
+        @for (c of complementos(); track c.etiqueta) {
+          <li>
+            <span class="complementos__etiqueta">{{ c.etiqueta }}:</span>
+            {{ c.precio }} {{ c.unidad }} · {{ c.fecha }}
+          </li>
+        }
+      </ul>
+    }
 
-  <p class="acciones">
-    <a routerLink="/historico" [queryParams]="enlaceHistorico()">Ver histórico</a>
+    @if (notas().length > 0 || item().fuente.cita) {
+      <div class="notas">
+        @for (n of notas(); track n) {
+          <p class="nota-tarjeta">{{ n }}</p>
+        }
+        @if (item().fuente.cita; as cita) {
+          <p class="nota-tarjeta cita">{{ cita }}</p>
+        }
+      </div>
+    }
+  </div>
+
+  <footer class="acciones">
+    <a class="accion" routerLink="/historico" [queryParams]="enlaceHistorico()">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 3v18h18" />
+        <path d="M7 15l4-4 3 3 5-6" />
+      </svg>
+      Ver histórico</a
+    >
     @if (item().mercado) {
       <a
+        class="accion"
         routerLink="/nacional"
         [queryParams]="{ producto: item().producto.slug, presentacion: item().presentacion }"
-        >Comparar mercados</a
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+        </svg>
+        Comparar mercados</a
       >
     }
-  </p>
+  </footer>
 </article>

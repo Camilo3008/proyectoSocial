@@ -41,7 +41,7 @@ const ESTILOS: { variable: string; respaldo: string; trazo: number[] }[] = [
   styles: `
     .contenedor {
       position: relative;
-      height: 16rem;
+      height: 18rem;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -99,7 +99,7 @@ export class GraficaLinea {
         borderColor: color,
         backgroundColor: color,
         borderDash: estilo.trazo,
-        borderWidth: 2,
+        borderWidth: 3,
         pointRadius: etiquetas.length > 60 ? 0 : 3,
         spanGaps: true,
         tension: 0,

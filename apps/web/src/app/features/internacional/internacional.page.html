@@ -1,52 +1,86 @@
-<h1>El mundo</h1>
+<header class="encabezado-pagina">
+  <span class="encabezado-pagina__icono" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+    </svg>
+  </span>
+  <div>
+    <h1>Precios en el mundo</h1>
+    <p>Compare lo que se paga por su producto en Colombia y en otros países.</p>
+  </div>
+</header>
 
-<section aria-labelledby="titulo-internacional">
-  <h2 id="titulo-internacional">Precios internacionales</h2>
-  <p class="intro">Cómo se mueve el precio en el mercado mundial, mes a mes.</p>
+<section class="seccion-globo" aria-labelledby="titulo-globo">
+  <h2 id="titulo-globo" class="solo-lectores">Precio al productor en otros países</h2>
+  <ap-paises
+    [producto]="productoPais()"
+    [anio]="anio()"
+    [vista]="vista()"
+    [pais]="pais()"
+    (cambio)="cambiar($event)"
+  />
+</section>
+
+<section class="seccion-bolsa" aria-labelledby="titulo-internacional">
+  <h2 id="titulo-internacional" class="seccion-bolsa__titulo">
+    Precios internacionales, mes a mes
+  </h2>
+  <p class="intro">
+    Así se mueve el precio en el mercado mundial (las bolsas). Cuando sube afuera, suele subir
+    también en Colombia.
+  </p>
 
   <div class="filtros">
-    <label class="campo">
-      <span>Producto</span>
-      <select (change)="cambiar({ producto: $any($event.target).value })">
-        @for (p of productos; track p.slug) {
-          <option [value]="p.slug" [selected]="p.slug === productoActual()">{{ p.nombre }}</option>
-        }
-      </select>
-    </label>
+    <ap-selector-producto
+      paso="1"
+      titulo="Elija el producto"
+      [opciones]="productos"
+      [actual]="productoActual()"
+      (elegir)="cambiar({ producto: $event })"
+    />
 
-    <div class="grupo" role="group" aria-label="Moneda">
-      @for (m of ['COP', 'USD']; track m) {
-        <button
-          type="button"
-          class="opcion"
-          [class.opcion--activa]="m === monedaActual()"
-          [attr.aria-pressed]="m === monedaActual()"
-          (click)="cambiar({ moneda: m })"
-        >
-          {{ m === 'COP' ? 'En pesos' : 'En dólares' }}
-        </button>
-      }
+    <div>
+      <p class="paso"><span class="paso__numero" aria-hidden="true">2</span> ¿En qué moneda?</p>
+      <div class="grupo" role="group" aria-label="Moneda">
+        @for (m of ['COP', 'USD']; track m) {
+          <button
+            type="button"
+            class="opcion"
+            [class.opcion--activa]="m === monedaActual()"
+            [attr.aria-pressed]="m === monedaActual()"
+            (click)="cambiar({ moneda: m })"
+          >
+            {{ m === 'COP' ? 'En pesos' : 'En dólares' }}
+          </button>
+        }
+      </div>
     </div>
 
-    <div class="grupo" role="group" aria-label="Rango de tiempo">
-      @for (r of rangos; track r.valor) {
-        <button
-          type="button"
-          class="opcion"
-          [class.opcion--activa]="r.valor === rangoActual()"
-          [attr.aria-pressed]="r.valor === rangoActual()"
-          (click)="cambiar({ rango: r.valor })"
-        >
-          {{ r.etiqueta }}
-        </button>
-      }
+    <div>
+      <p class="paso">
+        <span class="paso__numero" aria-hidden="true">3</span> ¿Cuánto tiempo quiere ver?
+      </p>
+      <div class="grupo" role="group" aria-label="Rango de tiempo">
+        @for (r of rangos; track r.valor) {
+          <button
+            type="button"
+            class="opcion"
+            [class.opcion--activa]="r.valor === rangoActual()"
+            [attr.aria-pressed]="r.valor === rangoActual()"
+            (click)="cambiar({ rango: r.valor })"
+          >
+            {{ r.etiqueta }}
+          </button>
+        }
+      </div>
     </div>
   </div>
 
   @if (respuesta(); as r) {
     <ul class="resumen">
       @for (s of resumen(); track s.presentacion) {
-        <li class="tarjeta">
+        <li class="resumen__tarjeta producto--{{ r.producto.slug }}">
           <p class="resumen__titulo">{{ r.producto.nombre }} {{ s.presentacion }}</p>
           <p class="resumen__valor">{{ s.usd }} <span class="resumen__unidad">por kilo</span></p>
           @if (s.cop) {
@@ -72,6 +106,7 @@
         <p class="leyenda-grafica">Precios por kilo en dólares</p>
       }
       <ap-grafica-linea [etiquetas]="etiquetas()" [series]="lineas()" [formatear]="formatear()" />
+      <p class="nota">Toque la gráfica para ver el precio de cada mes.</p>
     </div>
 
     @if (notaComparacion(); as nota) {
@@ -89,7 +124,7 @@
       <details class="tabla-datos">
         <summary>Ver los últimos 12 meses en tabla</summary>
         <div class="tabla-desplazable">
-          <table>
+          <table class="tabla">
             <caption class="solo-lectores">
               Precios internacionales de
               {{
@@ -122,22 +157,11 @@
   } @else if (sinDatos()) {
     <p class="tarjeta">Todavía no hay precios internacionales para este producto.</p>
   } @else if (datos.error()) {
-    <div class="tarjeta" role="alert">
+    <div class="tarjeta mensaje-error" role="alert">
       <p>No pudimos cargar los precios internacionales. Revisa tu conexión e inténtalo de nuevo.</p>
       <button type="button" class="boton" (click)="datos.reload()">Reintentar</button>
     </div>
   } @else {
     <p role="status" class="cargando">Cargando precios internacionales…</p>
   }
-</section>
-
-<section class="seccion-paises" aria-labelledby="titulo-globo">
-  <h2 id="titulo-globo">Precio al productor en otros países</h2>
-  <ap-paises
-    [producto]="productoPais()"
-    [anio]="anio()"
-    [vista]="vista()"
-    [pais]="pais()"
-    (cambio)="cambiar($event)"
-  />
 </section>

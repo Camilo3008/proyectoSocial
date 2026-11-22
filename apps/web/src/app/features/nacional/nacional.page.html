@@ -1,19 +1,42 @@
-<h1>Mercados nacionales</h1>
-<p class="intro">Precio del día en cada central mayorista, de mayor a menor.</p>
+<header class="encabezado-pagina">
+  <span class="encabezado-pagina__icono" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
+  </span>
+  <div>
+    <h1>Mercados nacionales</h1>
+    <p class="intro">Precio del día en cada central mayorista, de mayor a menor.</p>
+  </div>
+</header>
+
+<details class="ayuda">
+  <summary>¿Qué es una central mayorista?</summary>
+  <div class="ayuda__cuerpo">
+    <p>
+      Es una plaza de mercado grande (central de abastos) donde se vende al por mayor. Su precio es
+      más alto que el que recibe el productor en la finca, porque incluye el transporte y la
+      ganancia del comerciante.
+    </p>
+    <p>
+      La plaza marcada como <strong>«Referencia de la región»</strong> sirve para comparar: en las
+      demás verá cuánto más caro o más barato está el producto.
+    </p>
+  </div>
+</details>
 
 <div class="filtros">
-  <label class="campo">
-    <span>Producto</span>
-    <select (change)="cambiar({ producto: $any($event.target).value, presentacion: null })">
-      @for (p of productos; track p.slug) {
-        <option [value]="p.slug" [selected]="p.slug === productoActual()">{{ p.nombre }}</option>
-      }
-    </select>
-  </label>
+  <ap-selector-producto
+    paso="1"
+    titulo="Elija el producto"
+    [opciones]="productos"
+    [actual]="productoActual()"
+    (elegir)="cambiar({ producto: $event, presentacion: null })"
+  />
 
   @if (presentaciones().length > 1) {
     <label class="campo">
-      <span>Presentación</span>
+      <span class="paso"
+        ><span class="paso__numero" aria-hidden="true">2</span> Elija la presentación</span
+      >
       <select
         (change)="cambiar({ producto: productoActual(), presentacion: $any($event.target).value })"
       >
@@ -45,10 +68,13 @@
               <span class="fila__depto">{{ f.departamento }}</span>
             }
             @if (f.esReferencia) {
-              <span class="insignia">Referencia de la región</span>
+              <span class="insignia insignia--ok">Referencia de la región</span>
             }
           </div>
           <span class="fila__valor">{{ f.precio }}</span>
+          <div class="fila__barra" aria-hidden="true">
+            <div [style.width.%]="f.ancho"></div>
+          </div>
           @if (f.diferencia) {
             <span class="fila__dif fila__dif--{{ f.tono }}">{{ f.diferencia }}</span>
           }
@@ -65,9 +91,9 @@
       <p class="nota cita">{{ fuente.cita }}</p>
     }
   }
-  <p class="nota">{{ notaMayorista }}</p>
+  <p class="nota nota--destacada">{{ notaMayorista }}</p>
 } @else if (comparativo.error()) {
-  <div class="tarjeta" role="alert">
+  <div class="tarjeta mensaje-error" role="alert">
     <p>No pudimos cargar el comparativo. Revisa tu conexión e inténtalo de nuevo.</p>
     <button type="button" class="boton" (click)="comparativo.reload()">Reintentar</button>
   </div>

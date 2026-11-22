@@ -10,6 +10,7 @@ import {
   formatearPrecio,
 } from '../../core/formato';
 import { NOTA_MAYORISTA } from '../../core/notas';
+import { SelectorProducto } from '../../shared/selector-producto/selector-producto';
 
 /** Productos con precios por mercado mayorista (SIPSA). */
 const PRODUCTOS_NACIONALES = [
@@ -20,6 +21,7 @@ const PRODUCTOS_NACIONALES = [
 /** Comparativo nacional: un producto en todos los mercados mayoristas (RF-03). */
 @Component({
   selector: 'ap-nacional-page',
+  imports: [SelectorProducto],
   templateUrl: './nacional.page.html',
   styleUrl: './nacional.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,6 +71,8 @@ export class NacionalPage {
   protected readonly filas = computed(() => {
     const d = this.datos();
     if (!d) return [];
+    // Largo de la barra de cada mercado frente al más caro (solo visual).
+    const maximo = Math.max(...d.items.map((i) => Number(i.valor)), 0);
     return d.items.map((i, posicion) => {
       let diferencia: string | null = null;
       if (!i.esReferencia && i.diferenciaPct !== null && d.referencia) {
@@ -94,6 +98,7 @@ export class NacionalPage {
                 ? 'menos'
                 : 'igual',
         esReferencia: i.esReferencia,
+        ancho: maximo > 0 ? Math.max(2, Math.round((Number(i.valor) / maximo) * 100)) : 0,
       };
     });
   });

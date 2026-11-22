@@ -12,6 +12,7 @@ import {
 } from '../../core/formato';
 import { NOTA_INTERNACIONAL, NOTAS_COMPARACION } from '../../core/notas';
 import { GraficaLinea, type SerieGrafica } from '../../shared/grafica-linea/grafica-linea';
+import { SelectorProducto } from '../../shared/selector-producto/selector-producto';
 import { Paises } from './globo/paises';
 
 type Moneda = 'COP' | 'USD';
@@ -44,7 +45,7 @@ function desdeHaceAnios(anios: number | null): string {
  */
 @Component({
   selector: 'ap-internacional-page',
-  imports: [GraficaLinea, Paises],
+  imports: [GraficaLinea, Paises, SelectorProducto],
   templateUrl: './internacional.page.html',
   styleUrl: './internacional.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -3,85 +3,113 @@
   min-width: 0;
 }
 
-.intro,
-.cargando {
-  color: var(--color-texto-suave);
-}
-
-.filtros {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--esp-3);
-  margin-bottom: var(--esp-4);
-}
-
-.campo {
-  display: grid;
-  gap: var(--esp-1);
-  min-width: 0;
-
-  span {
-    color: var(--color-texto-suave);
-  }
-
-  select {
-    width: 100%;
-    min-height: var(--alto-tactil);
-    padding: 0 var(--esp-3);
-    border: 1px solid var(--color-borde);
-    border-radius: var(--radio);
-    background: var(--color-superficie);
-    color: var(--color-texto);
-    font: inherit;
+@media (min-width: 48rem) {
+  .filtros--globo {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
   }
 }
 
-.grupo {
+// Globo grande al centro; en pantallas anchas, la ficha del país al lado.
+.escenario {
+  display: grid;
+  gap: var(--esp-4);
+
+  @media (min-width: 64rem) {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    align-items: start;
+
+    &--tabla {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: var(--ancho-lectura);
+    }
+  }
+
+  &__globo {
+    min-width: 0;
+  }
+
+  &__lado {
+    display: grid;
+    gap: var(--esp-3);
+    min-width: 0;
+  }
+}
+
+.instrucciones {
   display: flex;
   flex-wrap: wrap;
   gap: var(--esp-2);
-}
+  margin: 0 0 var(--esp-3);
+  padding: 0;
+  list-style: none;
 
-.opcion {
-  min-height: var(--alto-tactil);
-  padding: 0 var(--esp-3);
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio-pildora);
-  background: var(--color-superficie);
-  color: var(--color-texto);
-  cursor: pointer;
-
-  &--activa {
-    border-color: var(--color-acento);
-    background: var(--color-acento);
-    color: #fff;
-    font-weight: 700;
+  li {
+    padding: var(--esp-1) var(--esp-3);
+    border-radius: var(--radio-pildora);
+    background: var(--color-info-fondo);
+    color: var(--color-info);
+    font-weight: 600;
   }
 }
 
+// En el celular el globo ocupa todo el ancho de la pantalla.
 .contenedor-globo {
   position: relative;
-  max-width: 100%;
+  min-height: clamp(24rem, 72vh, 46rem);
+  margin-inline: calc(-1 * var(--esp-4));
   overflow: hidden;
-  min-height: min(70vh, 26rem);
+  background: #0f2533;
+
+  @media (min-width: 40rem) {
+    margin-inline: 0;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-alta);
+  }
 }
 
 .globo-espera {
   display: grid;
   place-items: center;
-  height: min(70vh, 26rem);
+  height: clamp(24rem, 72vh, 46rem);
+  background: radial-gradient(circle at 50% 45%, #1f4a63 0%, #0f2533 60%, #08161f 100%);
+  color: #fff;
+  font-weight: 700;
+}
+
+.globo-esqueleto {
+  height: clamp(24rem, 72vh, 46rem);
+}
+
+.leyenda-caja {
+  margin-top: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio);
-  background: #dfe9f0;
-  color: var(--color-texto-suave);
+  background: var(--color-superficie);
+
+  &__titulo {
+    margin: 0 0 var(--esp-2);
+    font-weight: 700;
+  }
+
+  &__guia {
+    display: flex;
+    justify-content: space-between;
+    margin: var(--esp-1) 0 0;
+    color: var(--color-texto-suave);
+    font-size: var(--texto-xs);
+  }
 }
 
 .leyenda {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--esp-2) var(--esp-4);
-  margin: var(--esp-3) 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: var(--esp-2);
+  margin: 0;
   padding: 0;
   list-style: none;
+  font-size: var(--texto-xs);
   font-variant-numeric: tabular-nums;
 
   li {
@@ -92,15 +120,32 @@
 }
 
 .muestra {
-  display: inline-block;
-  width: 1.25rem;
-  height: 1.25rem;
-  border: 1px solid var(--color-borde);
-  border-radius: 0.25rem;
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid rgb(0 0 0 / 0.15);
+  border-radius: 0.375rem;
+}
+
+.pista {
+  display: flex;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  border: 2px dashed var(--color-borde-fuerte);
+  border-radius: var(--radio);
+  background: var(--color-superficie-2);
+
+  p {
+    margin: 0;
+  }
+
+  &__icono {
+    font-size: 1.75rem;
+  }
 }
 
 .ficha {
-  margin: var(--esp-4) 0;
+  border-top: 6px solid var(--color-cafe);
 
   p {
     margin: 0 0 var(--esp-2);
@@ -114,14 +159,15 @@
 
     h3 {
       margin: 0;
-      font-size: var(--texto-lg);
+      font-size: var(--texto-xl);
     }
   }
 
   &__valor {
     margin-top: var(--esp-3) !important;
-    font-size: var(--texto-xl);
+    font-size: var(--texto-precio);
     font-weight: 800;
+    line-height: 1.1;
     font-variant-numeric: tabular-nums;
 
     span {
@@ -131,11 +177,24 @@
     }
   }
 
+  &__pesos {
+    font-weight: 700;
+  }
+
   &__detalle {
     color: var(--color-texto-suave);
   }
 
   &__comparacion {
+    padding: var(--esp-2) var(--esp-3);
+    border-radius: var(--radio-sm);
+    background: var(--color-cafe-suave);
+    color: var(--color-cafe);
+    font-weight: 700;
+  }
+
+  &__subtitulo {
+    margin-top: var(--esp-3) !important;
     font-weight: 700;
   }
 }
@@ -144,8 +203,8 @@
   display: flex;
   align-items: flex-end;
   gap: var(--esp-2);
-  height: 6rem;
-  margin: var(--esp-3) 0;
+  height: 7rem;
+  margin: 0 0 var(--esp-3);
   padding: 0;
   list-style: none;
 
@@ -160,8 +219,8 @@
 
   &__barra {
     display: block;
-    border-radius: 0.25rem 0.25rem 0 0;
-    background: var(--color-acento);
+    border-radius: 0.375rem 0.375rem 0 0;
+    background: linear-gradient(180deg, #d95f0e, #993404);
   }
 
   &__anio {
@@ -170,63 +229,24 @@
   }
 }
 
-.nota {
-  margin: var(--esp-2) 0 0;
-  color: var(--color-texto-suave);
-  font-size: var(--texto-xs);
-
-  &--destacada {
-    padding: var(--esp-2) var(--esp-3);
-    border-left: 4px solid var(--color-aviso);
-    background: var(--color-aviso-fondo);
-    color: var(--color-aviso);
-    font-weight: 600;
-  }
-}
-
-.cita {
-  font-style: italic;
-}
-
-.tabla-desplazable {
-  max-height: 28rem;
+.tabla-paises {
+  max-height: 32rem;
   overflow: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--color-superficie);
-  font-variant-numeric: tabular-nums;
 
   caption {
-    padding: var(--esp-2) 0;
+    padding: var(--esp-2) var(--esp-3);
     text-align: left;
-    font-weight: 600;
-  }
-
-  th,
-  td {
-    padding: 0 var(--esp-3);
-    border-bottom: 1px solid var(--color-borde);
-    text-align: right;
-  }
-
-  th[scope='row'],
-  thead th:first-child {
-    text-align: left;
+    font-weight: 700;
   }
 
   thead th {
     position: sticky;
     top: 0;
-    padding: var(--esp-2) var(--esp-3);
-    background: var(--color-superficie);
   }
 }
 
 .fila--colombia {
-  background: var(--color-acento-suave);
+  background: var(--color-acento-suave) !important;
   font-weight: 700;
 }
 

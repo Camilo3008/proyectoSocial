@@ -16,10 +16,20 @@ import {
 import type * as MapLibre from 'maplibre-gl';
 import type { Map as MapaMapLibre } from 'maplibre-gl';
 
+import { formatearPrecio } from '../../../core/formato';
 import { COLOR_SIN_DATOS, COLORES_CLASES, calcularClases, claseDe } from './escala';
 
-const COLOR_MAR = '#dfe9f0';
+const COLOR_MAR = '#a9cde0';
+const COLOR_SELECCION = '#0b3d5c';
 const CENTRO_COLOMBIA: [number, number] = [-73.17, 3.37];
+
+/** Etiqueta flotante que sigue al cursor sobre un país. */
+interface Etiqueta {
+  x: number;
+  y: number;
+  nombre: string;
+  precio: string | null;
+}
 
 type ModuloMapLibre = typeof MapLibre;
 
@@ -67,9 +77,26 @@ export function soportaWebgl(documento: Document): boolean {
   selector: 'ap-globo',
   template: `
     <div #contenedor class="globo" aria-hidden="true"></div>
-    <button type="button" class="boton centrar" (click)="centrarEnColombia()">
-      Centrar en Colombia
-    </button>
+
+    @if (etiqueta(); as e) {
+      <div class="etiqueta" aria-hidden="true" [style.left.px]="e.x" [style.top.px]="e.y">
+        <strong>{{ e.nombre }}</strong>
+        <span>{{ e.precio ?? 'Sin datos' }}</span>
+      </div>
+    }
+
+    <div class="controles" role="group" aria-label="Controles del globo">
+      <button type="button" class="control" (click)="acercar()" aria-label="Acercar">+</button>
+      <button type="button" class="control" (click)="alejar()" aria-label="Alejar">−</button>
+    </div>
+    <div class="acciones">
+      <button type="button" class="boton centrar" (click)="centrarEnColombia()">
+        Centrar en Colombia
+      </button>
+      <button type="button" class="boton boton--secundario" (click)="verTodo()">
+        Ver todo el mundo
+      </button>
+    </div>
   `,
   styles: `
     /* Alto fijo y mapa en posición absoluta: el lienzo de MapLibre no aporta
@@ -78,22 +105,64 @@ export function soportaWebgl(documento: Document): boolean {
       display: block;
       position: relative;
       width: 100%;
-      height: min(70vh, 26rem);
+      height: clamp(24rem, 72vh, 46rem);
       overflow: hidden;
-      border-radius: var(--radio);
-    }
-    .centrar {
-      position: absolute;
-      right: 0.75rem;
-      bottom: 0.75rem;
-      box-shadow: var(--sombra);
+      border-radius: inherit;
     }
     .globo {
       position: absolute;
       inset: 0;
-      /* Distinto del mar (COLOR_MAR) para que se vea el borde de la esfera. */
+      /* "Espacio" oscuro alrededor de la esfera para que resalte el planeta. */
+      background: radial-gradient(circle at 50% 45%, #1f4a63 0%, #0f2533 60%, #08161f 100%);
+    }
+    .etiqueta {
+      position: absolute;
+      z-index: 2;
+      display: grid;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radio-sm);
       background: var(--color-superficie);
-      border: 1px solid var(--color-borde);
+      box-shadow: var(--sombra-alta);
+      color: var(--color-texto);
+      pointer-events: none;
+      transform: translate(-50%, calc(-100% - 12px));
+      white-space: nowrap;
+    }
+    .controles {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+    .control {
+      width: var(--alto-tactil);
+      height: var(--alto-tactil);
+      border: 0;
+      border-radius: 50%;
+      background: var(--color-superficie);
+      box-shadow: var(--sombra-alta);
+      color: var(--color-texto);
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .control:hover {
+      background: var(--color-acento-suave);
+    }
+    .acciones {
+      position: absolute;
+      left: 0.75rem;
+      right: 0.75rem;
+      bottom: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+    .acciones .boton {
+      box-shadow: var(--sombra-alta);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -112,6 +181,7 @@ export class Globo {
   private readonly contenedor = viewChild.required<ElementRef<HTMLDivElement>>('contenedor');
   private mapa: MapaMapLibre | null = null;
   private readonly listo = signal(false);
+  protected readonly etiqueta = signal<Etiqueta | null>(null);
   private girando = true;
   private animacion: number | null = null;
 
@@ -133,7 +203,30 @@ export class Globo {
   /** Lleva el globo a Colombia y detiene la rotación. */
   centrarEnColombia(): void {
     this.detenerGiro();
-    this.mapa?.flyTo({ center: CENTRO_COLOMBIA, zoom: 2.2, essential: true });
+    this.mapa?.flyTo({ center: CENTRO_COLOMBIA, zoom: this.zoomInicial() + 1, essential: true });
+  }
+
+  /** Vuelve a mostrar el planeta completo. */
+  verTodo(): void {
+    this.detenerGiro();
+    this.mapa?.flyTo({ zoom: this.zoomInicial(), essential: true });
+  }
+
+  acercar(): void {
+    this.detenerGiro();
+    this.mapa?.zoomIn();
+  }
+
+  alejar(): void {
+    this.detenerGiro();
+    this.mapa?.zoomOut();
+  }
+
+  /** Zoom con el que el planeta entero cabe en el contenedor (según su lado más corto). */
+  private zoomInicial(): number {
+    const { clientWidth, clientHeight } = this.contenedor().nativeElement;
+    const lado = Math.min(clientWidth || 400, clientHeight || 400);
+    return Math.max(0.6, Math.min(2.2, Math.log2(lado / 400) + 1.3));
   }
 
   private async iniciar(): Promise<void> {
@@ -148,7 +241,7 @@ export class Globo {
         container: this.contenedor().nativeElement,
         attributionControl: false,
         center: CENTRO_COLOMBIA,
-        zoom: 1.3,
+        zoom: this.zoomInicial(),
         style: {
           version: 8,
           projection: { type: 'globe' },
@@ -178,14 +271,14 @@ export class Globo {
                 'line-color': [
                   'case',
                   ['boolean', ['feature-state', 'seleccionado'], false],
-                  '#d1495b',
+                  COLOR_SELECCION,
                   '#ffffff',
                 ],
                 'line-width': [
                   'case',
                   ['boolean', ['feature-state', 'seleccionado'], false],
-                  2.5,
-                  0.5,
+                  3,
+                  0.6,
                 ],
               },
             },
@@ -211,7 +304,22 @@ export class Globo {
           this.paisTocado.emit({ iso3: props.iso3, nombre: props.nombre ?? props.iso3 });
       });
       mapa.on('mouseenter', 'paises-relleno', () => (mapa.getCanvas().style.cursor = 'pointer'));
-      mapa.on('mouseleave', 'paises-relleno', () => (mapa.getCanvas().style.cursor = ''));
+      mapa.on('mouseleave', 'paises-relleno', () => {
+        mapa.getCanvas().style.cursor = '';
+        this.etiqueta.set(null);
+      });
+      // Etiqueta flotante con el nombre y el precio del país bajo el cursor.
+      mapa.on('mousemove', 'paises-relleno', (e) => {
+        const props = e.features?.[0]?.properties as { iso3?: string; nombre?: string } | undefined;
+        if (!props?.iso3) return;
+        const dato = this.datos().find((d) => d.iso3 === props.iso3);
+        this.etiqueta.set({
+          x: e.point.x,
+          y: e.point.y,
+          nombre: dato?.nombre ?? props.nombre ?? props.iso3,
+          precio: dato ? `${formatearPrecio(dato.valorUsdKg, 'USD', 'kg')} por kilo` : null,
+        });
+      });
       // La rotación inicial se detiene al primer toque, clic, arrastre o rueda.
       for (const evento of ['mousedown', 'touchstart', 'wheel', 'dragstart'] as const) {
         mapa.on(evento, () => this.detenerGiro());

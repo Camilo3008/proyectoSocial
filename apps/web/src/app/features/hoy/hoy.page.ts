@@ -1,6 +1,7 @@
 import { type PreciosHoyDto } from '@agroprecios/shared';
 import { httpResource } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { API_URL } from '../../core/api';
 import { ConexionService } from '../../core/conexion.service';
 import {
@@ -14,7 +15,7 @@ import { TarjetaPrecio } from '../../shared/tarjeta-precio/tarjeta-precio';
 /** Pantalla principal: precio de referencia del día por producto (RF-01). */
 @Component({
   selector: 'ap-hoy-page',
-  imports: [TarjetaPrecio],
+  imports: [TarjetaPrecio, RouterLink],
   templateUrl: './hoy.page.html',
   styleUrl: './hoy.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,9 +1,13 @@
 // Escala de colores de la coropleta. Está separada de globo.ts para que la
 // página la use sin traer el componente del globo al chunk de la ruta (@defer).
 
-/** Escala secuencial apta para daltonismo (viridis, de menor a mayor precio). */
-export const COLORES_CLASES = ['#fde725', '#5ec962', '#21918c', '#3b528b', '#440154'];
-export const COLOR_SIN_DATOS = '#c9ccc6';
+/**
+ * Escala secuencial apta para daltonismo (ColorBrewer YlOrBr, de menor a mayor
+ * precio): de amarillo claro a café oscuro, acorde con la paleta de la app.
+ */
+export const COLORES_CLASES = ['#fee391', '#fec44f', '#fe9929', '#d95f0e', '#993404'];
+// Gris frío: se distingue del amarillo más claro de la escala y del mar.
+export const COLOR_SIN_DATOS = '#d3d6da';
 
 /** Límites de las 5 clases (quintiles) a partir de los valores en USD/kg. */
 export function calcularClases(valores: number[]): number[] {

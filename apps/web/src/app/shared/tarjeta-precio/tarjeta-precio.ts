@@ -11,11 +11,12 @@ import {
   tendencia,
 } from '../../core/formato';
 import { notasDePrecio } from '../../core/notas';
+import { IconoProducto } from '../icono-producto/icono-producto';
 
 /** Tarjeta con el precio de referencia de un producto (RF-01). */
 @Component({
   selector: 'ap-tarjeta-precio',
-  imports: [RouterLink],
+  imports: [RouterLink, IconoProducto],
   templateUrl: './tarjeta-precio.html',
   styleUrl: './tarjeta-precio.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,6 +32,20 @@ export class TarjetaPrecio {
     return presentacion.toLowerCase() === producto.nombre.toLowerCase()
       ? producto.nombre
       : `${producto.nombre} ${presentacion}`;
+  });
+  /** Qué tipo de precio es, en palabras sencillas, según la fuente. */
+  protected readonly queEs = computed(() => {
+    const { fuente } = this.item();
+    switch (fuente.slug) {
+      case 'fnc':
+        return 'Precio de referencia de la Federación Nacional de Cafeteros';
+      case 'sipsa':
+        return 'Precio al por mayor en una central de abastos';
+      case 'worldbank':
+        return 'Precio en el mercado mundial';
+      default:
+        return `Precio publicado por ${fuente.nombre}`;
+    }
   });
   protected readonly precio = computed(() =>
     formatearPrecio(this.item().valor, this.item().moneda, this.item().unidad),

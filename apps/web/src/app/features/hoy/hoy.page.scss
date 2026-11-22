@@ -1,52 +1,239 @@
+:host {
+  display: block;
+}
+
+.portada {
+  margin-bottom: var(--esp-4);
+
+  h1 {
+    margin-bottom: var(--esp-1);
+    font-size: 1.875rem;
+  }
+
+  &__lema {
+    max-width: 40rem;
+    margin: var(--esp-2) 0 0;
+    color: var(--color-texto-suave);
+  }
+}
+
 .subtitulo {
-  margin-top: calc(-1 * var(--esp-2));
-  color: var(--color-texto-suave);
+  display: inline-block;
+  margin: 0;
+  padding: var(--esp-1) var(--esp-3);
+  border-radius: var(--radio-pildora);
+  background: var(--color-cafe-suave);
+  color: var(--color-cafe);
+  font-weight: 700;
 
   &::first-letter {
     text-transform: uppercase;
   }
 }
 
-.aviso-cache {
-  padding: var(--esp-2) var(--esp-3);
-  border-radius: var(--radio);
-  background: var(--color-aviso-fondo);
-  color: var(--color-aviso);
-  font-weight: 600;
+.muestra {
+  padding: 0 var(--esp-2);
+  border-radius: var(--radio-pildora);
+  font-weight: 700;
+
+  &--sube {
+    background: var(--color-ok-fondo);
+    color: var(--color-ok);
+  }
+
+  &--baja {
+    background: var(--color-error-fondo);
+    color: var(--color-error);
+  }
 }
 
+.aviso-cache {
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--radio-sm);
+  background: var(--color-aviso-fondo);
+  color: var(--color-aviso);
+  font-weight: 700;
+}
+
+// minmax(0, 1fr): sin esto el texto largo de una tarjeta ensancha la página en el celular.
 .lista {
   display: grid;
-  gap: var(--esp-3);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
   margin: var(--esp-4) 0;
+
+  @media (min-width: 48rem) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 80rem) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.esqueleto--tarjeta {
+  height: 18rem;
 }
 
 .trm {
-  margin: 0 0 var(--esp-3);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  margin: 0 0 var(--esp-4);
 
-  &__etiqueta {
-    font-weight: 700;
+  &__icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--color-acento-suave);
+    color: var(--color-acento-oscuro);
+    font-size: var(--texto-xs);
+    font-weight: 800;
   }
 
+  &__texto {
+    margin: 0;
+    font-size: var(--texto-lg);
+  }
+
+  &__etiqueta {
+    font-weight: 800;
+  }
+
+  &__ayuda,
   &__fuente {
     display: block;
     color: var(--color-texto-suave);
     font-size: var(--texto-xs);
   }
+
+  &__ayuda {
+    margin-top: var(--esp-1);
+  }
 }
 
-.pendientes,
-.cargando,
-.descargo {
+.pendientes {
   color: var(--color-texto-suave);
 }
 
-.mensaje-error {
-  border-color: var(--color-error);
-  margin: var(--esp-4) 0;
+// Tarjeta grande que invita a abrir el globo (sin cargar MapLibre aquí).
+.mundo {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-4);
+  margin: var(--esp-5) 0;
+  padding: var(--esp-5);
+  border-radius: var(--radio);
+  background: radial-gradient(circle at 20% 30%, #23506b 0%, #102a3a 75%);
+  box-shadow: var(--sombra-alta);
+  color: #fff;
+  text-decoration: none;
+
+  &:hover .mundo__boton {
+    background: #fff;
+    color: #102a3a;
+  }
+
+  &__globo {
+    flex: none;
+    width: 7rem;
+    height: 7rem;
+    filter: drop-shadow(0 0 12px rgb(127 177 204 / 0.6));
+  }
+
+  &__texto {
+    display: grid;
+    gap: var(--esp-2);
+  }
+
+  &__titulo {
+    font-size: var(--texto-xl);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  &__detalle {
+    opacity: 0.92;
+  }
+
+  &__boton {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-2);
+    min-height: var(--alto-tactil);
+    padding: 0 var(--esp-5);
+    border: 2px solid #fff;
+    border-radius: var(--radio-pildora);
+    font-weight: 800;
+  }
+
+  @media (max-width: 30rem) {
+    flex-direction: column;
+    text-align: center;
+
+    &__boton {
+      justify-self: center;
+    }
+  }
 }
 
-.descargo {
-  margin-top: var(--esp-5);
-  font-size: var(--texto-xs);
+.accesos {
+  &__titulo {
+    font-size: var(--texto-lg);
+  }
+
+  ul {
+    display: grid;
+    gap: var(--esp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @media (min-width: 48rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  a {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--esp-3);
+    height: 100%;
+    min-height: var(--alto-tactil);
+    padding: var(--esp-4);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    background: var(--color-superficie);
+    box-shadow: var(--sombra);
+    color: var(--color-texto-suave);
+    text-decoration: none;
+
+    &:hover {
+      border-color: var(--color-acento);
+    }
+  }
+
+  strong {
+    display: block;
+    color: var(--color-acento-oscuro);
+  }
+
+  svg {
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: var(--esp-2);
+    border-radius: var(--radio-sm);
+    background: var(--color-acento-suave);
+    color: var(--color-acento-oscuro);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 }
