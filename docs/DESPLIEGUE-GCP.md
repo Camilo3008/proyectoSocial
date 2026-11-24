@@ -117,7 +117,7 @@ Si llega un aviso, revise en **Facturación → Informes** qué está costando.
 | SO y almacenamiento | Imagen | **Ubuntu 24.04 LTS** (x86/64; **no** la variante *Minimal* ni Arm) |
 | | Tipo de disco | **Disco persistente estándar** (cambiarlo: por defecto propone *balanced*) |
 | | Tamaño | **30 GB** |
-| Protección de datos | Copias / instantáneas | **Ninguna** (las instantáneas cuestan; los respaldos van a Drive, §8) |
+| Protección de datos | Copias / instantáneas | **Ninguna** (las instantáneas cuestan; los respaldos van a Drive, §12.3) |
 | Herramientas de redes | Firewall | Marcar **Permitir tráfico HTTP** y **Permitir tráfico HTTPS** |
 | | Interfaz de red → IPv4 externa | **Reservar dirección IP estática** con el nombre `agroprecios-ip` |
 | Observabilidad | Ops Agent | **Desmarcado** (consume RAM) |
@@ -163,21 +163,22 @@ sudo sh get-docker.sh
 docker --version && docker compose version
 ```
 
-### 4.4 Usuario de despliegue
+### 4.4 Acceso para GitHub Actions (con su propio usuario)
 
-Un usuario dedicado, sin contraseña, que solo entra con llave SSH. GitHub
-Actions lo usa para publicar.
+Para salir rápido, GitHub Actions entra con **el mismo usuario que usa la
+consola SSH del navegador**. El usuario dedicado `despliegue` queda para después
+(§12.2).
+
+En la consola SSH de la VM:
 
 ```bash
-sudo adduser --disabled-password --gecos "" despliegue
-sudo usermod -aG docker despliegue
-sudo -iu despliegue mkdir -p /home/despliegue/.ssh /home/despliegue/agroprecios
-sudo chmod 700 /home/despliegue/.ssh
+whoami                                  # anote este nombre: será el secreto VM_USER (§6)
+sudo usermod -aG docker "$USER"         # permite usar docker sin sudo
+mkdir -p ~/agroprecios ~/.ssh && chmod 700 ~/.ssh
 ```
 
-> Pertenecer al grupo `docker` equivale en la práctica a ser administrador de la
-> VM. Por eso la llave de este usuario solo se guarda en los secretos de GitHub
-> (§6) y en ningún otro lado.
+Cierre la ventana SSH y abra otra para que el grupo `docker` tome efecto.
+Compruebe con `docker ps`: no debe pedir `sudo`.
 
 En **su PC** (PowerShell o Git Bash), genere una llave **exclusiva** para GitHub
 Actions:
@@ -187,108 +188,84 @@ ssh-keygen -t ed25519 -C "github-actions-agroprecios" -f agroprecios-actions -N 
 # Crea dos archivos: agroprecios-actions (privada) y agroprecios-actions.pub (pública)
 ```
 
-Copie el contenido de `agroprecios-actions.pub` y agréguelo en la VM:
+Copie el contenido de `agroprecios-actions.pub` y **agréguelo** en la VM. Use
+`>>` y no `>`: el archivo ya tiene la llave de la consola del navegador y no hay
+que borrarla.
 
 ```bash
-echo 'ssh-ed25519 AAAA...pegar-aqui... github-actions-agroprecios' \
-  | sudo tee /home/despliegue/.ssh/authorized_keys
-sudo chmod 600 /home/despliegue/.ssh/authorized_keys
-sudo chown -R despliegue:despliegue /home/despliegue/.ssh
+echo 'ssh-ed25519 AAAA...pegar-aqui... github-actions-agroprecios' >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
 ```
 
-Obtenga la **llave de host** de la VM, que se usa para el secreto
-`VM_KNOWN_HOSTS` y evita conectarse a un servidor falso:
+De nuevo **en la consola SSH de la VM** (no en su PC), obtenga la **llave de
+host** de la VM, que se usa para el secreto `VM_KNOWN_HOSTS` y evita conectarse
+a un servidor falso. Pegue las tres líneas juntas:
 
 ```bash
-IP=$(curl -s -H "Metadata-Flavor: Google" \n  http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
+IP=$(curl -s -H "Metadata-Flavor: Google" \
+  http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 echo "$IP $(cut -d' ' -f1,2 /etc/ssh/ssh_host_ed25519_key.pub)"
 # Resultado: 34.x.x.x ssh-ed25519 AAAA...   ← copiar esta línea completa
 ```
 
+> **Riesgo asumido:** su usuario tiene `sudo` sin contraseña, así que la llave
+> que guarda en GitHub da control total de la VM. Por eso esa llave solo vive en
+> los secretos de GitHub (§6) y se borra de su PC. El usuario dedicado (§12.2)
+> no elimina este riesgo del todo (pertenecer a `docker` también equivale a ser
+> administrador), pero lo separa de su cuenta personal.
+
 Las imágenes de Ubuntu de Google ya traen el acceso por contraseña desactivado.
 No lo active.
 
-## 5. Dominio (opcional) y variables de producción
+## 5. Variables de producción (`.env.prod`, solo en la VM; nunca en git)
 
-### 5.0 Empezar sin dominio (recomendado para salir rápido)
+Se arranca **sin dominio**: la app se sirve por la IP de la VM con HTTP. El
+dominio con HTTPS se agrega después sin volver a desplegar (§12.1).
 
-El dominio se puede configurar **después**. Mientras tanto, la app se sirve por
-la IP de la VM con HTTP. En `.env.prod` (§5.2) ponga:
+Todo se hace en la consola SSH de la VM.
 
-```dotenv
-DOMINIO=:80
-CORS_ORIGIN=http://<IP-estatica>
-ACME_EMAIL=<cualquier correo válido>     # obligatorio aunque no se use
-```
-
-Con esto, la app abre en `http://<IP-estatica>` con todas las pantallas y el
-panel `/admin`. Lo que **no** funciona sin HTTPS es instalarla como app y el
-modo sin conexión.
-
-**Agregar el dominio más tarde** no requiere cambiar código ni volver a
-desplegar desde GitHub. Basta con hacer §5.1, cambiar en `.env.prod`
-`DOMINIO=agroprecios.duckdns.org` y
-`CORS_ORIGIN=https://agroprecios.duckdns.org,http://<IP-estatica>`, y ejecutar en
-la VM, como usuario `despliegue`:
+**Paso 1 — Generar las tres claves** (antes de abrir el editor, porque dentro
+del editor no se pueden ejecutar comandos):
 
 ```bash
-cd ~/agroprecios && docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+for n in DB_PASSWORD ADMIN_PASSWORD JWT_SECRET; do
+  echo "$n=$(openssl rand -base64 36 | tr -d '/+=')"
+done
 ```
 
-> **Atajo con HTTPS sin registrarse en nada:** el servicio público `sslip.io`
-> convierte una IP en un nombre (`34.1.2.3` → `34-1-2-3.sslip.io`). Con
-> `DOMINIO=34-1-2-3.sslip.io`, Caddy debería obtener el certificado de
-> Let's Encrypt sin más pasos. No se ha probado en este proyecto. Si falla, use
-> DuckDNS.
+Salen tres líneas listas para copiar, cada una con unos 48 caracteres al azar
+(cumplen los mínimos de 12 y 32). Por ejemplo, inventado:
+`ADMIN_PASSWORD=q7Hn2kLx9TzR4wVb...`. Copie la de `ADMIN_PASSWORD` en su
+gestor de contraseñas **ya mismo**: es la clave para entrar a `/admin`.
 
-### 5.1 DuckDNS (cuando quiera el dominio)
-
-1. Entre a https://www.duckdns.org e inicie sesión (por ejemplo, con GitHub).
-2. Cree el subdominio, por ejemplo `agroprecios` → `agroprecios.duckdns.org`.
-3. En **current ip** escriba la IP estática de la VM → **update ip**.
-4. Compruebe desde su PC: `nslookup agroprecios.duckdns.org` debe devolver esa IP.
-
-Con IP estática no hace falta un actualizador automático.
-
-### 5.2 `.env.prod` (solo en la VM; nunca en git)
-
-En la consola SSH de la VM:
+**Paso 2 — Crear el archivo:**
 
 ```bash
-sudo -iu despliegue
 cd ~/agroprecios
 nano .env.prod
 ```
 
-Pegue el contenido de `.env.prod.example` (está en el repositorio) y cambie
-como mínimo lo siguiente. Si empieza sin dominio, use en `DOMINIO` y
-`CORS_ORIGIN` los valores de §5.0:
+Pegue el contenido completo de `.env.prod.example` (está en el repositorio;
+clic derecho pega en la consola del navegador) y cambie estas líneas:
 
 ```dotenv
-DOMINIO=agroprecios.duckdns.org
-CORS_ORIGIN=https://agroprecios.duckdns.org
-ACME_EMAIL=<correo-que-se-revise>
-DB_PASSWORD=<aleatoria>
-ADMIN_EMAIL=<correo-del-administrador>
-ADMIN_PASSWORD=<aleatoria, mínimo 12 caracteres>
-JWT_SECRET=<aleatoria, mínimo 32 caracteres>
+DOMINIO=:80
+CORS_ORIGIN=http://<IP-estatica>
+ACME_EMAIL=<su correo>
+DB_PASSWORD=<la del paso 1>
+ADMIN_EMAIL=<su correo>
+ADMIN_PASSWORD=<la del paso 1>
+JWT_SECRET=<la del paso 1>
 ```
 
-Para generar cada valor aleatorio:
+`ACME_EMAIL` todavía no se usa sin dominio, pero tiene que tener un valor.
+Las demás líneas de la plantilla se dejan como vienen.
 
-```bash
-openssl rand -base64 36 | tr -d '/+='
-```
+**Paso 3 — Guardar y salir de nano:** `Ctrl+O`, `Enter` (confirma el nombre),
+`Ctrl+X`. Para revisar que quedó bien: `cat .env.prod`.
 
-Guarde (`Ctrl+O`, `Enter`, `Ctrl+X`) y protéjalo:
-
-```bash
-chmod 600 .env.prod
-exit
-```
-
-Guarde `ADMIN_PASSWORD` en un gestor de contraseñas: es la clave del panel
-`/admin`.
+Sin HTTPS funcionan todas las pantallas y el panel `/admin`. Lo que **no**
+funciona es instalarla como app ni el modo sin conexión; eso llega con §12.1.
 
 ## 6. Conectar GitHub con la VM
 
@@ -298,13 +275,13 @@ repository secret**. Cree estos cuatro:
 | Secreto | Valor |
 |---|---|
 | `VM_HOST` | La IP estática de la VM |
-| `VM_USER` | `despliegue` |
+| `VM_USER` | El nombre que mostró `whoami` en §4.4 |
 | `VM_SSH_KEY` | El contenido **completo** del archivo `agroprecios-actions` (la llave privada, incluidas las líneas `-----BEGIN…` y `-----END…`) |
 | `VM_KNOWN_HOSTS` | La línea `34.x.x.x ssh-ed25519 AAAA...` del §4.4 |
 
 Después, **borre la llave privada de su PC** (`agroprecios-actions`): ya vive
 solo en GitHub. Si algún día hace falta otra, genere una nueva y reemplace el
-secreto y `authorized_keys`.
+secreto y la línea en `authorized_keys`.
 
 > El puerto 22 (SSH) de la VM queda abierto a internet porque GitHub Actions
 > usa IPs variables. Es aceptable porque solo se entra con llave y no hay
@@ -341,19 +318,18 @@ Revíselo antes de forzar nada.
 ### 7.3 Comprobar
 
 ```bash
-# Sin dominio: cambie https://agroprecios.duckdns.org por http://<IP-estatica>
-curl -I https://agroprecios.duckdns.org/            # 200 y certificado válido
-curl https://agroprecios.duckdns.org/api/salud      # "estado":"ok"
+curl -I http://<IP-estatica>/             # 200
+curl http://<IP-estatica>/api/salud       # "estado":"ok"
 ```
 
-Luego:
-1. Entre a `https://agroprecios.duckdns.org/admin` con `ADMIN_EMAIL` y
-   `ADMIN_PASSWORD`, ejecute cada ingesta y haga la carga histórica (TRM desde
-   1990 y SIPSA desde 2020; ver `docs/DESPLIEGUE.md` §3). La carga histórica de
-   SIPSA es la operación más pesada: ejecútela **sola** y verifique la memoria
-   (§10).
-2. En un celular Android con Chrome: abra la dirección, **instale la app**,
-   active el modo avión y confirme que muestra los últimos datos.
+Luego entre a `http://<IP-estatica>/admin` con `ADMIN_EMAIL` y
+`ADMIN_PASSWORD`, ejecute cada ingesta y haga la carga histórica (TRM desde
+1990 y SIPSA desde 2020; ver `docs/DESPLIEGUE.md` §3). La carga histórica de
+SIPSA es la operación más pesada: ejecútela **sola** y verifique la memoria
+(§10).
+
+**Con esto la app ya está publicada.** Lo que sigue (§8 a §11) es el trabajo
+diario y la operación; §12 reúne las mejoras que se dejaron para después.
 
 ## 8. Trabajar día a día: cambios desde git
 
@@ -407,11 +383,9 @@ una migración dañó datos, restaure el respaldo `predespliegue` (§9.3).
 
 ## 9. Operación
 
-Para todo lo que sigue, entre por **SSH** (botón de la consola) y cambie al
-usuario de despliegue:
+Para todo lo que sigue, entre por **SSH** (botón de la consola):
 
 ```bash
-sudo -iu despliegue
 cd ~/agroprecios
 alias dc='docker compose -f docker-compose.prod.yml --env-file .env.prod'
 ```
@@ -438,40 +412,19 @@ del commit problemático en `main` y deje que se despliegue.
 - Respaldo diario a las 2:00 a. m. y respaldo antes de cada despliegue, en
   `~/agroprecios/respaldos`, con retención de 14 días.
 - Para restaurar, siga `docs/DESPLIEGUE.md` §5.
-
-### 9.4 Copia de los respaldos a Google Drive
-
-Google AI Pro incluye 2 TB de Drive. Use una carpeta dedicada.
-
-```bash
-# Como su usuario normal (no despliegue):
-sudo apt -y install rclone
-rclone config
-#  n (nuevo) → nombre: gdrive → tipo: drive → scope: drive.file
-#  "Use web browser to automatically authenticate?" → n
-#  En SU PC (con rclone instalado) ejecute: rclone authorize "drive"
-#  y pegue en la VM el token que le devuelve.
-
-(crontab -l 2>/dev/null; echo '0 3 * * * rclone copy /home/despliegue/agroprecios/respaldos gdrive:agroprecios-respaldos --max-age 72h >> ~/rclone.log 2>&1') | crontab -
-```
-
-El respaldo contiene el correo del administrador y el hash de su clave. Guárdelo
-en una carpeta privada de Drive y no la comparta.
-
-**Pruebe una restauración** completa al menos una vez.
-
-### 9.5 Monitoreo
-
-Cree un monitor HTTP gratuito en **UptimeRobot** sobre
-`https://agroprecios.duckdns.org/api/salud`, con aviso por correo.
+- Mientras no configure la copia a Drive (§12.3), los respaldos **solo viven en
+  la VM**: si se pierde el disco, se pierden. Descargue uno de vez en cuando
+  (botón de engranaje de la consola SSH → *Descargar archivo*).
 
 ## 10. Problemas frecuentes
 
 | Síntoma | Causa probable | Qué hacer |
 |---|---|---|
 | Google rechaza la tarjeta débito | El banco no permite compras internacionales o pagos recurrentes | Pedir al banco que active ambas cosas e intentarlo de nuevo |
-| El workflow falla en "Configurar SSH" | Secreto mal copiado, llave pública ausente o `VM_KNOWN_HOSTS` no coincide | Revisar §4.4 y §6. Si recreó la VM, la llave de host cambió |
-| Falla en "Aplicar la versión": falta `.env.prod` | No se creó en `/home/despliegue/agroprecios` | §5.2 |
+| El workflow falla en "Configurar SSH" | Secreto mal copiado, `VM_USER` distinto de `whoami`, llave pública ausente o `VM_KNOWN_HOSTS` no coincide | Revisar §4.4 y §6. Si recreó la VM, la llave de host cambió |
+| La llave de GitHub desaparece de `authorized_keys` | El agente de Google reescribió el archivo o el proyecto usa OS Login | Agregue la llave pública en **Compute Engine → VM → Editar → Claves SSH**, con el comentario igual a su `whoami` |
+| "permission denied … docker.sock" | El usuario no quedó en el grupo `docker` | `sudo usermod -aG docker <usuario>` y volver a conectarse |
+| Falla en "Aplicar la versión": falta `.env.prod` | No se creó en `~/agroprecios` del usuario de `VM_USER` | §5 |
 | Caddy no obtiene el certificado | DuckDNS apunta a otra IP o falta la regla HTTP/HTTPS | `nslookup`; en la VM: *Editar → Firewall*; `dc logs web` |
 | La API se reinicia durante una ingesta grande | Falta de memoria | `free -h`, `dmesg \| grep -i oom`. Ejecute las cargas históricas de a una; si persiste, ver §11 |
 | Llega una alerta de presupuesto | Más tráfico de salida que el esperado, o los créditos vencieron o no se aplicaron | Facturación → Informes |
@@ -485,3 +438,117 @@ podría pasar de los USD 10: confírmelo antes en la
 [calculadora de Google Cloud](https://cloud.google.com/products/calculator).
 Para cambiarla: detener la VM → *Editar* → tipo de máquina → arrancar. Se
 conservan la IP estática y los datos.
+
+## 12. Mejoras para después
+
+> Estos pasos **no son necesarios para publicar la app**. Se dejaron para
+> después del primer despliegue y se pueden hacer en cualquier orden.
+
+### 12.1 Dominio con HTTPS (habilita instalar la app y el modo offline)
+
+Para los campesinos de Charguayaco esta es la mejora más importante: sin HTTPS
+el navegador no activa el *service worker*, así que la app no se instala ni
+funciona sin conexión.
+
+**Opción A — DuckDNS:**
+
+1. Entre a https://www.duckdns.org e inicie sesión (por ejemplo, con GitHub).
+2. Cree el subdominio, por ejemplo `agroprecios` → `agroprecios.duckdns.org`.
+3. En **current ip** escriba la IP estática de la VM → **update ip**.
+4. Compruebe desde su PC: `nslookup agroprecios.duckdns.org` debe devolver esa IP.
+
+Con IP estática no hace falta un actualizador automático.
+
+**Opción B — sslip.io (sin registrarse en nada):** el servicio público
+`sslip.io` convierte una IP en un nombre (`34.1.2.3` → `34-1-2-3.sslip.io`).
+Caddy debería obtener el certificado de Let's Encrypt sin más pasos. No se ha
+probado en este proyecto; si falla, use DuckDNS.
+
+**Aplicar el dominio** (no requiere cambiar código ni volver a desplegar desde
+GitHub). En `~/agroprecios/.env.prod` cambie:
+
+```dotenv
+DOMINIO=agroprecios.duckdns.org
+CORS_ORIGIN=https://agroprecios.duckdns.org,http://<IP-estatica>
+ACME_EMAIL=<correo-que-se-revise>
+```
+
+y ejecute:
+
+```bash
+cd ~/agroprecios && docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+curl -I https://agroprecios.duckdns.org/     # 200 y certificado válido
+```
+
+Luego, en un celular Android con Chrome: abra la dirección, **instale la app**,
+active el modo avión y confirme que muestra los últimos datos.
+
+### 12.2 Usuario de despliegue dedicado
+
+> Antes de esto, y en cualquier caso cuando la app tenga usuarios reales,
+> proteja el archivo de claves para que solo su dueño pueda leerlo:
+> `chmod 600 ~/agroprecios/.env.prod`.
+
+Separa la llave de GitHub de su cuenta personal: un usuario sin contraseña, sin
+`sudo`, que solo entra con llave SSH.
+
+En la consola SSH de la VM:
+
+```bash
+sudo adduser --disabled-password --gecos "" despliegue
+sudo usermod -aG docker despliegue
+sudo -iu despliegue mkdir -p /home/despliegue/.ssh
+sudo chmod 700 /home/despliegue/.ssh
+
+# Copiar la llave pública de GitHub Actions (la línea "github-actions-agroprecios")
+grep github-actions-agroprecios ~/.ssh/authorized_keys \
+  | sudo tee /home/despliegue/.ssh/authorized_keys
+sudo chmod 600 /home/despliegue/.ssh/authorized_keys
+sudo chown -R despliegue:despliegue /home/despliegue/.ssh
+
+# Mover la instalación (la base de datos vive en un volumen de Docker y no se toca)
+cd ~/agroprecios && docker compose -f docker-compose.prod.yml --env-file .env.prod down
+cd ~ && sudo mv ~/agroprecios /home/despliegue/agroprecios
+sudo chown -R despliegue:despliegue /home/despliegue/agroprecios
+sudo -iu despliegue sh -c 'cd ~/agroprecios && docker compose -f docker-compose.prod.yml --env-file .env.prod up -d'
+
+# Quitar la llave de GitHub de su usuario
+sed -i '/github-actions-agroprecios/d' ~/.ssh/authorized_keys
+```
+
+En GitHub, cambie el secreto `VM_USER` a `despliegue` (`VM_HOST`, `VM_SSH_KEY`
+y `VM_KNOWN_HOSTS` no cambian). Lance **Actions → Desplegar → Run workflow**
+para comprobar.
+
+Desde entonces, para operar (§9) entre primero con `sudo -iu despliegue`.
+
+> Si el contenedor de respaldos no puede escribir en `respaldos/` después de
+> mover la carpeta, revise el dueño con `ls -ln respaldos`.
+
+### 12.3 Copia de los respaldos a Google Drive
+
+Google AI Pro incluye 2 TB de Drive. Use una carpeta dedicada.
+
+```bash
+# Como su usuario normal:
+sudo apt -y install rclone
+rclone config
+#  n (nuevo) → nombre: gdrive → tipo: drive → scope: drive.file
+#  "Use web browser to automatically authenticate?" → n
+#  En SU PC (con rclone instalado) ejecute: rclone authorize "drive"
+#  y pegue en la VM el token que le devuelve.
+
+# Si ya hizo §12.2, cambie la ruta por /home/despliegue/agroprecios/respaldos
+(crontab -l 2>/dev/null; echo "0 3 * * * rclone copy $HOME/agroprecios/respaldos gdrive:agroprecios-respaldos --max-age 72h >> $HOME/rclone.log 2>&1") | crontab -
+```
+
+El respaldo contiene el correo del administrador y el hash de su clave. Guárdelo
+en una carpeta privada de Drive y no la comparta.
+
+**Pruebe una restauración** completa al menos una vez.
+
+### 12.4 Monitoreo
+
+Cree un monitor HTTP gratuito en **UptimeRobot** sobre `/api/salud` (con el
+dominio de §12.1 o, mientras tanto, `http://<IP-estatica>/api/salud`), con aviso
+por correo.

@@ -7,7 +7,7 @@
 #
 # Secretos del repositorio (Settings → Secrets and variables → Actions):
 #   VM_HOST          IP pública estática de la VM
-#   VM_USER          usuario de despliegue en la VM (despliegue)
+#   VM_USER          usuario SSH de la VM (el de la consola, o "despliegue" si se creó)
 #   VM_SSH_KEY       llave privada ed25519 exclusiva para este workflow
 #   VM_KNOWN_HOSTS   línea "<IP> ssh-ed25519 AAAA..." con la llave de host de la VM
 name: Desplegar
